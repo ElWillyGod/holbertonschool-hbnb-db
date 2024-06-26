@@ -1,19 +1,22 @@
 
-"""users endpoint
-POST /users: Create a new user.
-GET /users: Retrieve a list of all users.
-GET /users/{user_id}: Retrieve details of a specific user.
-PUT /users/{user_id}: Update an existing user.
-DELETE /users/{user_id}: Delete a user.
 """
-from api import app
-from flask import request
+    Users endpoints:
+        -POST /users: Create a new user.
+        -GET /users: Retrieve a list of all users.
+        -GET /users/{user_id}: Retrieve details of a specific user.
+        -PUT /users/{user_id}: Update an existing user.
+        -DELETE /users/{user_id}: Delete a user.
+"""
+
+from flask import request, Blueprint
+import api.validation as val
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import api.validation as val
+
+bp = Blueprint("users", __name__, url_prefix="/users")
 
 
-@app.post("/users")
+@bp.post("/")
 def create_User():
     """
     Create a new user.
@@ -71,7 +74,7 @@ def create_User():
     return user, 201
 
 
-@app.get('/users')
+@bp.get('/')
 def get_Users_All():
     """
     Retrieve details of a specific user.
@@ -96,7 +99,7 @@ def get_Users_All():
     return {'message': "Details of the specified user"}, 200
 
 
-@app.get('/users/<user_id>')
+@bp.get('/<user_id>')
 def get_User(user_id):
     """
     Update an existing user.
@@ -147,7 +150,7 @@ def get_User(user_id):
     return users, 200
 
 
-@app.put('/users/<user_id>')
+@bp.put('/<user_id>')
 def update_User(user_id):
     """
     Update an existing user.
@@ -221,7 +224,7 @@ def update_User(user_id):
 
     return user, 201
 
-@app.delete('/users/<user_id>')
+@bp.delete('/<user_id>')
 def delete_user(user_id):
     """
     Delete a user.

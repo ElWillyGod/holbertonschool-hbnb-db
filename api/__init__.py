@@ -5,15 +5,16 @@
 
 from flask import Flask, blueprints
 
-from api.amenities import 
-from api.cities import 
-from api.countries import 
-from api.places import 
-from api.reviews import 
-from api.users import 
+import api.amenities
+import api.countries
+import api.users
+import api.cities
+import api.places
+import api.reviews
 
 from flasgger import Swagger
 from api.swagger import template
+
 
 def appFactory():
     '''
@@ -21,6 +22,15 @@ def appFactory():
     '''
 
     app = Flask("HBnB-AlMaWi")
+
+    app.register_blueprint(api.amenities.bp)
+    app.register_blueprint(api.countries.bp)
+    app.register_blueprint(api.users.bp)
+    app.register_blueprint(api.cities.bp)
+    app.register_blueprint(api.places.bp)
+    app.register_blueprint(api.reviews.bp)
+
+
 
     Swagger(app, template=template)
 

@@ -1,18 +1,23 @@
 
-"""amenities endpoint
-POST /amenities: Create a new amenity.
-GET /amenities: Retrieve a list of all amenities.
-GET /amenities/{amenity_id}: Retrieve detailed information about a specific amenity.
-PUT /amenities/{amenity_id}: Update an existing amenity's information.
-DELETE /amenities/{amenity_id}: Delete a specific amenity."""
-from api import app
-from flask import request
+"""
+    Amenities endpoints:
+        -POST /amenities: Create a new amenity.
+        -GET /amenities: Retrieve a list of all amenities.
+        -GET /amenities/{amenity_id}: Retrieve detailed information about a
+         specific amenity.
+        -PUT /amenities/{amenity_id}: Update an existing amenity's information.
+        -DELETE /amenities/{amenity_id}: Delete a specific amenity.
+"""
+
+from flask import request, Blueprint
+import api.validation as val
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import api.validation as val
+
+bp = Blueprint("amenities", __name__, url_prefix="/amenities")
 
 
-@app.post('/amenities')
+@bp.post('/')
 def create_Amenities():
     """
     Create a new amenity
@@ -53,7 +58,7 @@ def create_Amenities():
     return amenity, 201
 
 
-@app.get('/amenities')
+@bp.get('/')
 def get_all_amenities():
     """
     Retrieve a list of all amenities
@@ -83,7 +88,7 @@ def get_all_amenities():
 
     return amenities, 200
 
-@app.get('/amenities/<amenity_id>')
+@bp.get('/<amenity_id>')
 def get_amenities(amenity_id):
     """
     Retrieve an amenity by ID
@@ -116,7 +121,7 @@ def get_amenities(amenity_id):
     return amenities, 200
 
 
-@app.put('/amenities/<amenity_id>')
+@bp.put('/<amenity_id>')
 def update_Amenities(amenity_id):
     """
     Update an amenity by ID
@@ -170,7 +175,7 @@ def update_Amenities(amenity_id):
     return amenity, 201
     
 
-@app.delete('/amenities/<amenity_id>')
+@bp.delete('/<amenity_id>')
 def delete_Amenities(amenity_id):
     """
     Delete an amenity by ID

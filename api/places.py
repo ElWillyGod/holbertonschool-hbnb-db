@@ -1,19 +1,22 @@
 
-"""places endpoint
-POST /places: Create a new place.
-GET /places: Retrieve a list of all places.
-GET /places/{place_id}: Retrieve detailed information about a specific place.
-PUT /places/{place_id}: Update an existing place's information.
-DELETE /places/{place_id}: Delete a specific place.
 """
-from api import app
-from flask import request
+    places endpoint
+        -POST /places: Create a new place.
+        -GET /places: Retrieve a list of all places.
+        -GET /places/{place_id}: Retrieve detailed information about a specific
+         place.
+        -PUT /places/{place_id}: Update an existing place's information.
+        -DELETE /places/{place_id}: Delete a specific place.
+"""
+from flask import request, Blueprint
+import api.validation as val
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import api.validation as val
+
+bp = Blueprint("places", __name__, url_prefix="/places")
 
 
-@app.post('/places')
+@bp.post('/')
 def create_Place():
     """
     Create a new place
@@ -95,7 +98,7 @@ def create_Place():
     return place, 201
 
 
-@app.get('/places')
+@bp.get('/')
 def get_All_Places():
     """
     Retrieve all places
@@ -141,7 +144,7 @@ def get_All_Places():
 
     return places, 200
 
-@app.get('/places/<place_id>')
+@bp.get('/<place_id>')
 def get_Place(place_id):
     """
     Retrieve details of a specific place by its ID
@@ -203,7 +206,7 @@ def get_Place(place_id):
     return place, 200
 
 
-@app.put('/places/<place_id>')
+@bp.put('/<place_id>')
 def update_Place(place_id):
     """
     Update an existing place's information
@@ -280,7 +283,7 @@ def update_Place(place_id):
     return place, 201
 
 
-@app.delete('/places/<place_id>')
+@bp.delete('/<place_id>')
 def delete_Place(place_id):
     """
     Delete a specific place by its ID

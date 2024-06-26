@@ -1,15 +1,19 @@
 
-"""Countries end point
-GET /countries: Retrieve all pre-loaded countries.
-GET /countries/{country_code}: Retrieve details of a specific country by its code.
 """
-from api import app
-from logic import logicexceptions
-from logic.logicfacade import LogicFacade
+    Countries endpoints:
+        -GET /countries: Retrieve all pre-loaded countries.
+        -GET /countries/{country_code}: Retrieve details of a specific country
+         by its code.
+"""
+
+from logic import logicexceptions, Blueprint
 import api.validation as val
+from logic.logicfacade import LogicFacade
+
+bp = Blueprint("countries", __name__, url_prefix="/countries")
 
 
-@app.get('/countries')
+@bp.get('/')
 def get_All_Countries():
     """
     Retrieve all countries
@@ -25,7 +29,7 @@ def get_All_Countries():
     return countries, 200
 
 
-@app.get('/countries/<country_code>')
+@bp.get('/<country_code>')
 def get_Countries(country_code):
     """
     Retrieve details of a specific country by its code
@@ -49,10 +53,10 @@ def get_Countries(country_code):
         return {'error': '404 Not Found'}, 404
 
     try:
-        countrys = LogicFacade.getCountry(country_code)
+        countries = LogicFacade.getCountry(country_code)
 
     except (logicexceptions.IDNotFoundError) as message:
         
         return {'error': str(message)}, 404
 
-    return countrys, 200
+    return countries, 200

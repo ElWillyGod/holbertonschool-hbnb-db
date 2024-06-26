@@ -1,20 +1,27 @@
 
-"""reviews endpoint
-POST /places/{place_id}/reviews: Create a new review for a specified place.
-GET /users/{user_id}/reviews: Retrieve all reviews written by a specific user.
-GET /places/{place_id}/reviews: Retrieve all reviews for a specific place.
-GET /reviews/{review_id}: Retrieve detailed information about a specific review.
-PUT /reviews/{review_id}: Update an existing review.
-DELETE /reviews/{review_id}: Delete a specific review.
 """
-from api import app
-from flask import request
+    Reviews endpoints:
+        -POST /places/{place_id}/reviews: Create a new review for a specified
+         place.
+        -GET /users/{user_id}/reviews: Retrieve all reviews written by a
+         specific user.
+        -GET /places/{place_id}/reviews: Retrieve all reviews for a specific
+         place.
+        -GET /reviews/{review_id}: Retrieve detailed information about a
+         specific review.
+        -PUT /reviews/{review_id}: Update an existing review.
+        -DELETE /reviews/{review_id}: Delete a specific review.
+"""
+
+from flask import request, Blueprint
+import api.validation as val
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import api.validation as val
+
+bp = Blueprint("reviews", __name__)
 
 
-@app.post('/places/<place_id>/reviews')
+@bp.post('/places/<place_id>/reviews')
 def create_Review(place_id):
     """
     Create a new review for a specified place.
@@ -73,7 +80,7 @@ def create_Review(place_id):
     return review, 201
 
 
-@app.get('/users/<user_id>/reviews')
+@bp.get('/users/<user_id>/reviews')
 def get_User_Reviews(user_id):
     """
     Retrieve all reviews written by a specific user.
@@ -108,7 +115,7 @@ def get_User_Reviews(user_id):
     return reviews, 200
 
 
-@app.get('/places/<place_id>/reviews')
+@bp.get('/places/<place_id>/reviews')
 def get_Place_Reviews(place_id):
     """
     Retrieve all reviews for a specific place.
@@ -145,7 +152,7 @@ def get_Place_Reviews(place_id):
     return reviews, 200
 
 
-@app.get('/reviews/<review_id>')
+@bp.get('/reviews/<review_id>')
 def get_review(review_id):
     """
     Retrieve detailed information about a specific review.
@@ -182,7 +189,7 @@ def get_review(review_id):
     return review, 200
 
 
-@app.put('/reviews/<review_id>')
+@bp.put('/reviews/<review_id>')
 def update_review(review_id):
     """
     Update an existing review.
@@ -238,7 +245,7 @@ def update_review(review_id):
     return review, 200
 
 
-@app.delete('/reviews/<review_id>')
+@bp.delete('/reviews/<review_id>')
 def delete_review(review_id):
     """
     Delete a specific review.

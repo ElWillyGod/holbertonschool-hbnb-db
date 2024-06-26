@@ -1,20 +1,24 @@
 
-"""cities endpoint
-GET /countries/{country_code}/cities: Retrieve all cities belonging to a specific country.
-POST /cities: Create a new city.
-GET /cities: Retrieve all cities.
-GET /cities/{city_id}: Retrieve details of a specific city.
-PUT /cities/{city_id}: Update an existing city's information.
-DELETE /cities/{city_id}: Delete a specific city.
 """
-from api import app
-from flask import request
+    Cities endpoints:
+        -GET /countries/{country_code}/cities: Retrieve all cities belonging to
+         a specific country.
+        -POST /cities: Create a new city.
+        -GET /cities: Retrieve all cities.
+        -GET /cities/{city_id}: Retrieve details of a specific city.
+        -PUT /cities/{city_id}: Update an existing city's information.
+        -DELETE /cities/{city_id}: Delete a specific city.
+"""
+
+from flask import request, Blueprint
+import api.validation as val
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import api.validation as val
+
+bp = Blueprint("cities", __name__, url_prefix="/cities")
 
 
-@app.get('/countries/<country_code>/cities')
+@bp.get('/<country_code>/cities')
 def get_Cities_For_Contr(country_code):
     """
     Retrieve cities for a specific country
@@ -47,7 +51,7 @@ def get_Cities_For_Contr(country_code):
     return cities, 200
 
 
-@app.post('/cities')
+@bp.post('/')
 def create_Cities():
     """
     Create a new city
@@ -103,7 +107,7 @@ def create_Cities():
 
 
 
-@app.get('/cities')
+@bp.get('/')
 def get_All_Cities():
     """
     Retrieve all cities
@@ -133,7 +137,7 @@ def get_All_Cities():
     return {'message': "A list of all cities"}, 200
 
 
-@app.get('/cities/<city_id>')
+@bp.get('/<city_id>')
 def get_Cities(city_id):
     """
     Retrieve a city by ID
@@ -166,7 +170,7 @@ def get_Cities(city_id):
     return city, 200
 
 
-@app.put('/cities/<city_id>')
+@bp.put('/<city_id>')
 def update_Cities(city_id):
     """
     Update a city by ID
@@ -234,7 +238,7 @@ def update_Cities(city_id):
     return city, 201
 
 
-@app.delete('/cities/<city_id>')
+@bp.delete('/<city_id>')
 def delete_Cities(city_id):
     """
     Delete a city by ID
