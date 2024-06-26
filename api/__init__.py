@@ -3,14 +3,11 @@
     Package where endpoints and type validations are made.
 '''
 
-from flask import Flask, blueprints
+from flask import Flask
 
-import api.amenities
-import api.countries
-import api.users
-import api.cities
-import api.places
-import api.reviews
+from blueprints import *
+
+import api.jwt
 
 from flasgger import Swagger
 from api.swagger import template
@@ -23,15 +20,16 @@ def appFactory():
 
     app = Flask("HBnB-AlMaWi")
 
-    app.register_blueprint(api.amenities.bp)
-    app.register_blueprint(api.countries.bp)
-    app.register_blueprint(api.users.bp)
-    app.register_blueprint(api.cities.bp)
-    app.register_blueprint(api.places.bp)
-    app.register_blueprint(api.reviews.bp)
+    app.register_blueprint(amenities.bp)
+    app.register_blueprint(countries.bp)
+    app.register_blueprint(users.bp)
+    app.register_blueprint(cities.bp)
+    app.register_blueprint(places.bp)
+    app.register_blueprint(reviews.bp)
 
+    app.config['JWT_SECRET_KEY'] = '00Ba3EpLas52se6QhQ8gE'
+    jwt = api.jwt.createJWT(app)
 
-
-    Swagger(app, template=template)
+    swagger = Swagger(app, template=template)
 
     return app

@@ -14,7 +14,7 @@
 """
 
 from flask import request, Blueprint
-import api.validation as val
+import api.validations as val
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 

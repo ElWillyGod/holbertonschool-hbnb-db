@@ -7,7 +7,7 @@
 """
 
 from logic import logicexceptions, Blueprint
-import api.validation as val
+import api.validations as val
 from logic.logicfacade import LogicFacade
 
 bp = Blueprint("countries", __name__, url_prefix="/countries")
