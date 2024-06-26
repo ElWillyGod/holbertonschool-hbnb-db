@@ -10,7 +10,7 @@ template = {
         "description": "API for Holberton AirBNB project",
         "contact": {
             "responsibleDeveloper": "Wilson Antognazza, Matias Davezac, Alison Alvez",
-            "email": "alisonalvez05@gmailcom, w@w.com, m@a.com",
+            "email": "alisonalvez05@gmailcom, w@w.com, matiasdavezac@gmail.com",
         },
         "version": "0.0.1"
     },
