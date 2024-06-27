@@ -1,10 +1,11 @@
 
 '''
     Countries endpoints:
+        '+': Public, '#': Needs auth, '-': Needs is_admin = True.
 
-        -GET /countries: Retrieve all pre-loaded countries.
+        +GET /countries: Retrieve all pre-loaded countries.
 
-        -GET /countries/{country_code}: Retrieve details of a specific country
+        +GET /countries/{country_code}: Retrieve details of a specific country
          by its code.
 '''
 
@@ -17,7 +18,7 @@ bp = Blueprint("countries", __name__, url_prefix="/countries")
 
 
 @bp.get('/')
-def get_All_Countries():
+def getAllCountries():
     """
     Retrieve all countries
     ---
@@ -33,7 +34,7 @@ def get_All_Countries():
 
 
 @bp.get('/<country_code>')
-def get_Countries(country_code):
+def getCounty(country_code):
     """
     Retrieve details of a specific country by its code
     ---
@@ -59,7 +60,6 @@ def get_Countries(country_code):
         countries = LogicFacade.getCountry(country_code)
 
     except (logicexceptions.IDNotFoundError) as message:
-        
         return {'error': str(message)}, 404
 
     return countries, 200

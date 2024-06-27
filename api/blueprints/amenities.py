@@ -1,13 +1,14 @@
 
 '''
     Amenities endpoints:
+        '+': Public, '#': Needs auth, '-': Needs is_admin = True.
+
+        +GET /amenities/{amenity_id}: Retrieve detailed information about a
+         specific amenity.
+
+        +GET /amenities: Retrieve a list of all amenities.
 
         -POST /amenities: Create a new amenity.
-
-        -GET /amenities: Retrieve a list of all amenities.
-
-        -GET /amenities/{amenity_id}: Retrieve detailed information about a
-         specific amenity.
 
         -PUT /amenities/{amenity_id}: Update an existing amenity's information.
 
@@ -16,14 +17,85 @@
 
 from flask import request, Blueprint
 import api.validations as val
+from api.security import notAdmin
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
+from flask_jwt_extended import jwt_required, get_jwt
 
 bp = Blueprint("amenities", __name__, url_prefix="/amenities")
 
 
+# @jwt_required()
+#    if err := notAdmin(jwt := get_jwt()):
+#        return err, 403
+
+
+@bp.get('/')
+def getAllAmenities():
+    """
+    Retrieve a list of all amenities
+    ---
+    tags:
+      - amenities
+    responses:
+      200:
+        description: A list of amenities
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              created_at:
+                type: string
+              updated_at:
+                type: string
+      200:
+        description: No amenities found
+    """
+    amenities = LogicFacade.getByType('amenity')
+
+    return amenities, 200
+
+
+@bp.get('/<amenity_id>')
+def getAmenity(amenity_id):
+    """
+    Retrieve an amenity by ID
+    ---
+    tags:
+      - amenities
+    parameters:
+      - in: path
+        name: amenity_id
+        type: string
+        required: true
+        description: The ID of the amenity to retrieve
+    responses:
+      200:
+        description: Amenity details
+      400:
+        description: Bad request, invalid ID format
+      404:
+        description: Amenity not found
+    """
+    if not val.idChecksum(amenity_id):
+        return {'error': "Invalid ID"}, 400
+
+    try:
+        amenities = LogicFacade.getByID(amenity_id, 'amenity')
+
+    except (logicexceptions.IDNotFoundError) as message:
+        return {'error': str(message)}, 404
+
+    return amenities, 200
+
+
 @bp.post('/')
-def create_Amenities():
+def createAmenity():
     """
     Create a new amenity
     ---
@@ -63,71 +135,8 @@ def create_Amenities():
     return amenity, 201
 
 
-@bp.get('/')
-def get_all_amenities():
-    """
-    Retrieve a list of all amenities
-    ---
-    tags:
-      - amenities
-    responses:
-      200:
-        description: A list of amenities
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              created_at:
-                type: string
-              updated_at:
-                type: string
-      200:
-        description: No amenities found
-    """
-    amenities = LogicFacade.getByType('amenity')
-
-    return amenities, 200
-
-@bp.get('/<amenity_id>')
-def get_amenities(amenity_id):
-    """
-    Retrieve an amenity by ID
-    ---
-    tags:
-      - amenities
-    parameters:
-      - in: path
-        name: amenity_id
-        type: string
-        required: true
-        description: The ID of the amenity to retrieve
-    responses:
-      200:
-        description: Amenity details
-      400:
-        description: Bad request, invalid ID format
-      404:
-        description: Amenity not found
-    """
-    if not val.idChecksum(amenity_id):
-        return {'error': "Invalid ID"}, 400
-
-    try:
-        amenities = LogicFacade.getByID(amenity_id, 'amenity')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-    return amenities, 200
-
-
 @bp.put('/<amenity_id>')
-def update_Amenities(amenity_id):
+def updateAmenity(amenity_id):
     """
     Update an amenity by ID
     ---
@@ -178,10 +187,10 @@ def update_Amenities(amenity_id):
         return {'error': str(message2)}, 404
 
     return amenity, 201
-    
+
 
 @bp.delete('/<amenity_id>')
-def delete_Amenities(amenity_id):
+def deleteAmenity(amenity_id):
     """
     Delete an amenity by ID
     ---

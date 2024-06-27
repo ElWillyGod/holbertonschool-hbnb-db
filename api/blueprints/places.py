@@ -1,17 +1,19 @@
 
 '''
     Places endpoints:
+        '+': Public, '#': Needs auth, '@': Needs auth and be the same user
+             that created it, '-': Needs is_admin = True.
 
-        -POST /places: Create a new place.
+        +GET /places: Retrieve a list of all places.
 
-        -GET /places: Retrieve a list of all places.
-
-        -GET /places/{place_id}: Retrieve detailed information about a specific
+        +GET /places/{place_id}: Retrieve detailed information about a specific
          place.
 
-        -PUT /places/{place_id}: Update an existing place's information.
+        #POST /places: Create a new place.
 
-        -DELETE /places/{place_id}: Delete a specific place.
+        @PUT /places/{place_id}: Update an existing place's information.
+
+        @DELETE /places/{place_id}: Delete a specific place.
 '''
 
 from flask import request, Blueprint
@@ -22,90 +24,8 @@ from logic.logicfacade import LogicFacade
 bp = Blueprint("places", __name__, url_prefix="/places")
 
 
-@bp.post('/')
-def create_Place():
-    """
-    Create a new place
-    ---
-    tags:
-      - places
-    parameters:
-      - in: body
-        name: place
-        required: true
-        schema:
-          type: object
-          properties:
-            name:
-              type: string
-              description: The name of the place
-              example: Casa de playa
-            description:
-              type: string
-              description: Description of the place
-              example: es una casa en la playa
-            city_id:
-              type: string
-              description: ID of the city where the place is located
-            host_id:
-              type: string
-              description: ID of the host of the place
-            amenity_ids:
-              type: array
-              items:
-                type: string
-              description: List of amenity IDs available at the place
-    responses:
-      201:
-        description: Place created successfully
-      400:
-        description: Invalid request data or missing fields
-      404:
-        description: City ID not found
-    """
-    data = request.get_json()
-
-    if val.isNoneFields('place', data):
-        return {'error': "Invalid data"}, 400
-
-    if not val.idChecksum(data['host_id']):
-        return {'error': "Invalid host ID"}, 400
-
-    if not val.idChecksum(data['city_id']):
-        return {'error': "Invalid city ID"}, 400
-
-    if not (val.isLatitudeValid(data['latitude']) and
-            val.isLongitudeValid(data['longitude'])):
-        return {'error': "Invalid location"}, 400
-
-    if not val.isNameValid(data['name']):
-        return {'error': "Invalid name"}, 400
-
-    if not (isinstance(data['number_of_rooms'], int) and
-            isinstance(data['number_of_bathrooms'], int) and
-            isinstance(data['max_guests'], int) and
-            isinstance(data['price_per_night'], (int, float)) and
-            data['number_of_rooms'] > 0 and
-            data['number_of_bathrooms'] >= 0 and
-            data['max_guests'] > 0 and
-            data['price_per_night'] > 0):
-        return {'error': "Invalid data"}, 400
-
-    for amenity_id in data['amenity_ids']:
-        if not val.idChecksum(amenity_id):
-            return {'error': f'Invalid amenity ID: {amenity_id}'}, 400
-
-    try:
-        place = LogicFacade.createObjectByJson('place', data)
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-
-    return place, 201
-
-
 @bp.get('/')
-def get_All_Places():
+def getAllPlaces():
     """
     Retrieve all places
     ---
@@ -150,8 +70,9 @@ def get_All_Places():
 
     return places, 200
 
+
 @bp.get('/<place_id>')
-def get_Place(place_id):
+def getPlace(place_id):
     """
     Retrieve details of a specific place by its ID
     ---
@@ -212,8 +133,91 @@ def get_Place(place_id):
     return place, 200
 
 
+@bp.post('/')
+def createPlace():
+    """
+    Create a new place
+    ---
+    tags:
+      - places
+    parameters:
+      - in: body
+        name: place
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The name of the place
+              example: Casa de playa
+            description:
+              type: string
+              description: Description of the place
+              example: es una casa en la playa
+            city_id:
+              type: string
+              description: ID of the city where the place is located
+            host_id:
+              type: string
+              description: ID of the host of the place
+            amenity_ids:
+              type: array
+              items:
+                type: string
+              description: List of amenity IDs available at the place
+    responses:
+      201:
+        description: Place created successfully
+      400:
+        description: Invalid request data or missing fields
+      404:
+        description: City ID not found
+    """
+    data = request.get_json()
+
+    if val.isNoneFields('place', data):
+        return {'error': "Invalid data"}, 400
+
+    if not val.idChecksum(data['host_id']):
+        return {'error': "Invalid host ID"}, 400
+
+    if not val.idChecksum(data['city_id']):
+        return {'error': "Invalid city ID"}, 400
+
+    if not (val.isLatitudeValid(data['latitude']) and
+            val.isLongitudeValid(data['longitude'])):
+        return {'error': "Invalid location"}, 400
+
+    if not val.isNameValid(data['name']):
+        return {'error': "Invalid name"}, 400
+
+    if not (isinstance(data['number_of_rooms'], int) and
+            isinstance(data['number_of_bathrooms'], int) and
+            isinstance(data['max_guests'], int) and
+            isinstance(data['price_per_night'], (int, float))):
+        return {'error': "Invalid data"}, 400
+
+    if not (data['number_of_rooms'] > 0 and
+            data['number_of_bathrooms'] >= 0 and
+            data['max_guests'] > 0 and
+            data['price_per_night'] > 0):
+        return {'error': "Invalid data"}, 400
+
+    for amenity_id in data['amenity_ids']:
+        if not val.idChecksum(amenity_id):
+            return {'error': f'Invalid amenity ID: {amenity_id}'}, 400
+
+    try:
+        place = LogicFacade.createObjectByJson('place', data)
+    except (logicexceptions.IDNotFoundError) as message:
+        return {'error': str(message)}, 404
+
+    return place, 201
+
+
 @bp.put('/<place_id>')
-def update_Place(place_id):
+def updatePlace(place_id):
     """
     Update an existing place's information
     ---
@@ -264,15 +268,21 @@ def update_Place(place_id):
     if val.isNoneFields('place', data):
         return {'error': "Invalid data"}, 400
 
-    if not (val.isLatitudeValid(data['latitude']) and val.isLongitudeValid(data['longitude'])):
+    if not (val.isLatitudeValid(data['latitude']) and
+            val.isLongitudeValid(data['longitude'])):
         return {'error': "Invalid location"}, 400
 
-    if not (isinstance(data['number_of_rooms'], int) and (data['number_of_rooms'] > 0) and
+    if not (isinstance(data['number_of_rooms'], int) and
             isinstance(data['number_of_bathrooms'], int) and
-            (data['number_of_bathrooms'] >= 0) and isinstance(data['max_guests'], int) and
+            isinstance(data['max_guests'], int) and
+            isinstance(data['price_per_night'], (int, float))):
+        return {'error': "Invalid data"}, 400
+
+    if not (data['number_of_rooms'] > 0 and
+            data['number_of_bathrooms'] >= 0 and
             data['max_guests'] > 0 and
-            isinstance(data['price_per_night'], (int, float)) and data['price_per_night'] > 0):
-        return {'error': "Invalid data of rooms"}, 400
+            data['price_per_night'] > 0):
+        return {'error': "Invalid data"}, 400
 
     if not val.idChecksum(data['city_id']):
         return {'error': "Invalid city ID"}, 400
@@ -290,7 +300,7 @@ def update_Place(place_id):
 
 
 @bp.delete('/<place_id>')
-def delete_Place(place_id):
+def deletePlace(place_id):
     """
     Delete a specific place by its ID
     ---
@@ -321,11 +331,12 @@ def delete_Place(place_id):
     return "", 204
 
 
-'''     
+'''
     for place in places:
 
         city = getCity(place['city_id'])
-        amenities = [getAmenity(amenity_id) for amenity_id in place['amenity_ids']]
+        amenities = [getAmenity(amenity_id) for amenity_id in \
+            place['amenity_ids']]
         response.append({
             'id': place['id'],
             'name': place['name'],

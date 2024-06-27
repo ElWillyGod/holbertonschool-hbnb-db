@@ -1,15 +1,16 @@
 
 '''
     Cities endpoints:
+        '+': Public, '#': Needs auth, '-': Needs is_admin = True.
 
-        -GET /countries/{country_code}/cities: Retrieve all cities belonging to
+        +GET /cities: Retrieve all cities.
+
+        +GET /countries/{country_code}/cities: Retrieve all cities belonging to
          a specific country.
 
+        +GET /cities/{city_id}: Retrieve details of a specific city.
+
         -POST /cities: Create a new city.
-
-        -GET /cities: Retrieve all cities.
-
-        -GET /cities/{city_id}: Retrieve details of a specific city.
 
         -PUT /cities/{city_id}: Update an existing city's information.
 
@@ -24,8 +25,38 @@ from logic.logicfacade import LogicFacade
 bp = Blueprint("cities", __name__, url_prefix="/cities")
 
 
+@bp.get('/')
+def getAllCities():
+    """
+    Retrieve all cities
+    ---
+    tags:
+      - cities
+    responses:
+      200:
+        description: A list of all cities
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              country_code:
+                type: string
+    """
+    cities = LogicFacade.getByType("city")
+
+    if cities is not None and len(cities) > 0:
+        return cities, 200
+
+    return {'message': "A list of all cities"}, 200
+
+
 @bp.get('/<country_code>/cities')
-def get_Cities_For_Contr(country_code):
+def getCitiesForCountry(country_code):
     """
     Retrieve cities for a specific country
     ---
@@ -57,8 +88,41 @@ def get_Cities_For_Contr(country_code):
     return cities, 200
 
 
+@bp.get('/<city_id>')
+def getCity(city_id):
+    """
+    Retrieve a city by ID
+    ---
+    tags:
+      - cities
+    parameters:
+      - in: path
+        name: city_id
+        type: string
+        required: true
+        description: The ID of the city to retrieve
+    responses:
+      200:
+        description: City details
+      400:
+        description: Bad request, invalid ID format
+      404:
+        description: City not found
+    """
+
+    if not val.idChecksum(city_id):
+        return {'error': "Invalid ID format"}, 400
+
+    try:
+        city = LogicFacade.getByID(city_id, "city")
+    except (logicexceptions.IDNotFoundError) as message:
+        return {'error': str(message)}, 404
+
+    return city, 200
+
+
 @bp.post('/')
-def create_Cities():
+def createCity():
     """
     Create a new city
     ---
@@ -79,7 +143,8 @@ def create_Cities():
               example: New York
             country_code:
               type: string
-              description: The ISO code of the country to which the city belongs
+              description: The ISO code of the country to which the city \
+                belongs
               example: US
     responses:
       201:
@@ -112,72 +177,8 @@ def create_Cities():
     return city, 201
 
 
-
-@bp.get('/')
-def get_All_Cities():
-    """
-    Retrieve all cities
-    ---
-    tags:
-      - cities
-    responses:
-      200:
-        description: A list of all cities
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              country_code:
-                type: string
-    """
-    cities = LogicFacade.getByType("city")
-
-    if cities is not None and len(cities) > 0:
-        return cities, 200
-
-    return {'message': "A list of all cities"}, 200
-
-
-@bp.get('/<city_id>')
-def get_Cities(city_id):
-    """
-    Retrieve a city by ID
-    ---
-    tags:
-      - cities
-    parameters:
-      - in: path
-        name: city_id
-        type: string
-        required: true
-        description: The ID of the city to retrieve
-    responses:
-      200:
-        description: City details
-      400:
-        description: Bad request, invalid ID format
-      404:
-        description: City not found
-    """
-
-    if not val.idChecksum(city_id):
-        return {'error': "Invalid ID format"}, 400
-
-    try:
-        city = LogicFacade.getByID(city_id, "city")
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-    return city, 200
-
-
 @bp.put('/<city_id>')
-def update_Cities(city_id):
+def updateCity(city_id):
     """
     Update a city by ID
     ---
@@ -203,7 +204,8 @@ def update_Cities(city_id):
               example: Los Angeles
             country_code:
               type: string
-              description: The ISO code of the country to which the city belongs
+              description: The ISO code of the country to which the city \
+                belongs
               example: US
     responses:
       200:
@@ -245,7 +247,7 @@ def update_Cities(city_id):
 
 
 @bp.delete('/<city_id>')
-def delete_Cities(city_id):
+def deleteCity(city_id):
     """
     Delete a city by ID
     ---

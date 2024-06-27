@@ -5,7 +5,7 @@
 '''
 
 from flask_jwt_extended import JWTManager, create_access_token
-from flask import request, Blueprint
+from flask import request, Blueprint, jsonify, Response
 import flask_bcrypt
 from logic.logicfacade import LogicFacade
 
@@ -18,6 +18,16 @@ login_bp = Blueprint("login", __name__)
 def associateSecurity(app):
     jwt.init_app(app)
     bcrypt.init_app(app)
+
+
+def notAdmin(claims: dict) -> None | Response:
+    '''
+        Returns None if admin, and response when not admin.
+    '''
+
+    if "is_admin" not in claims:
+        return jsonify({"msg": "Administration rights required"})
+    return None
 
 
 @jwt.unauthorized_loader
@@ -72,7 +82,7 @@ def login():
         # Create token.
         access_token = create_access_token(
             identity=email,
-            additional_claims=[is_admin]
+            additional_claims={"is_admin": True}
             )
         return {"access_token": access_token}, 200
     return WRONG_DATA, 401

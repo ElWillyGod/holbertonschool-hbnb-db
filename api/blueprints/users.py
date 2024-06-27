@@ -1,11 +1,12 @@
 '''
     Users endpoints:
-
-        -POST /users: Create a new user.
+        '+': Public, '#': Needs auth, '-': Needs is_admin = True.
 
         -GET /users: Retrieve a list of all users.
 
         -GET /users/{user_id}: Retrieve details of a specific user.
+
+        -POST /users: Create a new user.
 
         -PUT /users/{user_id}: Update an existing user.
 
@@ -20,66 +21,8 @@ from logic.logicfacade import LogicFacade
 bp = Blueprint("users", __name__, url_prefix="/users")
 
 
-@bp.post("/")
-def create_User():
-    """
-    Create a new user.
-    ---
-    tags:
-      - users
-    parameters:
-      - in: body
-        name: user
-        required: true
-        schema:
-          type: object
-          properties:
-            email:
-              type: string
-              description: Email address of the user
-            first_name:
-              type: string
-              description: First name of the user
-            last_name:
-              type: string
-              description: Last name of the user
-    responses:
-      201:
-        description: User created successfully
-      400:
-        description: Invalid request data or missing fields
-      409:
-        description: Email address already exists
-    """
-    data = request.get_json()
-
-    if val.isNoneFields('user', data):
-        return {'error': "Invalid data or missing fields"}, 400
-
-    email = data.get('email')
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
-
-    if (not val.isStrValid(email) or not val.isNameValid(first_name) or
-        not val.isNameValid(last_name)):
-
-        return {'error': "Invalid data or missing fields"}, 400
-
-    if not val.isEmailValid(email):
-        return {'error': "Invalid data"}, 400
-
-    try:
-        user = LogicFacade.createObjectByJson("user", data)
-
-    except (logicexceptions.EmailDuplicated) as message:
-
-        return {'error': str(message)}, 409
-
-    return user, 201
-
-
 @bp.get('/')
-def get_Users_All():
+def getAllUsers():
     """
     Retrieve details of a specific user.
     ---
@@ -104,7 +47,7 @@ def get_Users_All():
 
 
 @bp.get('/<user_id>')
-def get_User(user_id):
+def getUser(user_id):
     """
     Update an existing user.
     ---
@@ -144,18 +87,73 @@ def get_User(user_id):
         return {'error': "Invalid data"}, 400
 
     try:
-
         users = LogicFacade.getByID(user_id, 'user')
 
     except (logicexceptions.IDNotFoundError) as message:
-        
         return {'error': str(message)}, 404
 
     return users, 200
 
 
+@bp.post("/")
+def createUser():
+    """
+    Create a new user.
+    ---
+    tags:
+      - users
+    parameters:
+      - in: body
+        name: user
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              description: Email address of the user
+            first_name:
+              type: string
+              description: First name of the user
+            last_name:
+              type: string
+              description: Last name of the user
+    responses:
+      201:
+        description: User created successfully
+      400:
+        description: Invalid request data or missing fields
+      409:
+        description: Email address already exists
+    """
+    data = request.get_json()
+
+    if val.isNoneFields('user', data):
+        return {'error': "Invalid data or missing fields"}, 400
+
+    email = data.get('email')
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+
+    if (not val.isStrValid(email) or
+            not val.isNameValid(first_name) or
+            not val.isNameValid(last_name)):
+        return {'error': "Invalid data or missing fields"}, 400
+
+    if not val.isEmailValid(email):
+        return {'error': "Invalid data"}, 400
+
+    try:
+        user = LogicFacade.createObjectByJson("user", data)
+
+    except (logicexceptions.EmailDuplicated) as message:
+        return {'error': str(message)}, 409
+
+    return user, 201
+
+
 @bp.put('/<user_id>')
-def update_User(user_id):
+def updateUser(user_id):
     """
     Update an existing user.
     ---
@@ -183,7 +181,7 @@ def update_User(user_id):
               example: juan
             last_name:
               type: string
-              description: Updated last name of the 
+              description: Updated last name of the user
               example: pepe
     responses:
       201:
@@ -208,9 +206,9 @@ def update_User(user_id):
     first_name = data.get('first_name')
     last_name = data.get('last_name')
 
-    if (not val.isStrValid(email) or not val.isNameValid(first_name) or
-        not val.isNameValid(last_name)):
-
+    if (not val.isStrValid(email) or
+            not val.isNameValid(first_name) or
+            not val.isNameValid(last_name)):
         return {'error': "Invalid data or missing fields"}, 400
 
     if not val.isEmailValid(email):
@@ -220,7 +218,6 @@ def update_User(user_id):
         user = LogicFacade.updateByID(user_id, "user", data)
 
     except (logicexceptions.EmailDuplicated) as message:
-
         return {'error': str(message)}, 409
 
     except (logicexceptions.IDNotFoundError) as message:
@@ -228,8 +225,9 @@ def update_User(user_id):
 
     return user, 201
 
+
 @bp.delete('/<user_id>')
-def delete_user(user_id):
+def deleteUser(user_id):
     """
     Delete a user.
     ---
