@@ -62,7 +62,7 @@ class LogicFacade(ABC):
         Persistence.delete(id, typePlural)
 
     @staticmethod
-    def updateByID(id: str, type: str, data: dict) -> dict:
+    def updateByID(id: str, type: str, data: dict, *, is_admin=False) -> dict:
         typePlural: str = getPlural(type)
         old_data = Persistence.get(id, typePlural)
         if old_data is None or len(old_data) == 0:
@@ -74,7 +74,8 @@ class LogicFacade(ABC):
         data["id"] = id
         data["created_at"] = old_data["created_at"]
         data["updated_at"] = None
-        data_updated = getClassByName(type)(**data, update=updated)
+        data_updated = getClassByName(type)(
+            **data, update=updated, is_admin=is_admin)
         Persistence.update(id, typePlural, data_updated.toJson())
         return Persistence.get(id, typePlural)
 

@@ -63,3 +63,12 @@ class AmenityNameDuplicated(Exception):  # 409
     '''
 
     pass
+
+
+class ForbiddenAccess(Exception):  # 403
+    '''
+        Called when trying to do an unauthorized action.
+        (needs is_admin = True)
+    '''
+
+    pass

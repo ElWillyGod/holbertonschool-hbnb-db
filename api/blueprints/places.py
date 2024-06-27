@@ -307,8 +307,11 @@ def updatePlace(place_id):
             return {'error': 'Invalid amenity ID'}, 400
 
     # Calls BL to update place.
+    # If admin it can update places of other people.
+    is_admin: bool = get_jwt().get("is_admin", False)
     try:
-        place = LogicFacade.updateByID(place_id, 'place', data)
+        place = LogicFacade.updateByID(
+            place_id, 'place', data, is_admin=is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
 
@@ -343,8 +346,10 @@ def deletePlace(place_id):
         return {'error': "Invalid place ID"}, 400
 
     # Calls BL to delete place.
+    # If admin it can deletes places of other people.
+    is_admin: bool = get_jwt().get("is_admin", False)
     try:
-        LogicFacade.deleteByID(place_id, 'place')
+        LogicFacade.deleteByID(place_id, 'place', is_admin=is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
 

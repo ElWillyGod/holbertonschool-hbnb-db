@@ -24,6 +24,7 @@ bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @bp.get('/')
+@jwt_required()
 def getAllUsers():
     """
     Retrieve details of a specific user.
@@ -41,13 +42,18 @@ def getAllUsers():
         description: Details of the specified user
     """
 
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
     # Calls BL to get all users.
     users = LogicFacade.getByType("user")
- 
+
     return users, 200
 
 
 @bp.get('/<user_id>')
+@jwt_required()
 def getUser(user_id):
     """
     Update an existing user.
@@ -84,6 +90,10 @@ def getUser(user_id):
         description: User ID not found
     """
 
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
     # Checks if id is valid.
     if not val.idChecksum(user_id):
         return {'error': "Invalid data"}, 400
@@ -98,6 +108,7 @@ def getUser(user_id):
 
 
 @bp.post("/")
+@jwt_required()
 def createUser():
     """
     Create a new user.
@@ -129,6 +140,10 @@ def createUser():
         description: Email address already exists
     """
 
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
     # Get data from request.
     data = request.get_json()
 
@@ -158,6 +173,7 @@ def createUser():
 
 
 @bp.put('/<user_id>')
+@jwt_required()
 def updateUser(user_id):
     """
     Update an existing user.
@@ -199,6 +215,10 @@ def updateUser(user_id):
         description: Email address already exists
     """
 
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
     # Checks if id is valid.
     if not val.idChecksum(user_id):
         return {'error': 'Invalid id'}, 400
@@ -234,6 +254,7 @@ def updateUser(user_id):
 
 
 @bp.delete('/<user_id>')
+@jwt_required()
 def deleteUser(user_id):
     """
     Delete a user.
@@ -254,6 +275,10 @@ def deleteUser(user_id):
       404:
         description: User ID not found
     """
+
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
 
     # Checks if id is valid.
     if not val.idChecksum(user_id):

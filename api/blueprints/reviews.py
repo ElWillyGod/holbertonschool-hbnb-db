@@ -246,8 +246,11 @@ def updateReview(review_id):
         return {'error': 'Invalid rating'}, 400
 
     # Calls BL to update review.
+    # If admin it can update reviews of other people.
+    is_admin: bool = get_jwt().get("is_admin", False)
     try:
-        review = LogicFacade.updateByID(review_id, 'review', data)
+        review = LogicFacade.updateByID(
+            review_id, 'review', data, is_admin=is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
     except (logicexceptions.TryingToReviewOwnPlace) as err:
@@ -284,8 +287,10 @@ def deleteReview(review_id):
         return {'error': "Invalid review ID format"}, 400
 
     # Calls BL to delete review.
+    # If admin it can update reviews of other people.
+    is_admin: bool = get_jwt().get("is_admin", False)
     try:
-        LogicFacade.deleteByID(review_id, 'review')
+        LogicFacade.deleteByID(review_id, 'review', is_admin=is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
 
