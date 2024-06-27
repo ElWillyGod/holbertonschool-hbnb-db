@@ -8,6 +8,7 @@ import json
 import os
 import glob
 from persistence.data_manager_interface import IPersistenceManager
+from persistence.model.model_amenity import createAmenity
 
 
 class DataManager(IPersistenceManager):
@@ -46,14 +47,15 @@ class DataManager(IPersistenceManager):
             Returns:
                 The entity
         """
-
+        createAmenity() 
         entity_type = type
+        """
         entity_id = id
         file_path = self._file_path(entity_type, entity_id)
 
         with open(file_path, 'w') as file:
             json.dump(entity, file)
-        
+        """
         result = {
             'entity': entity,
             'entity_type': entity_type
