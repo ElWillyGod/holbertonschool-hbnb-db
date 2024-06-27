@@ -4,13 +4,13 @@
         '+': Public, '#': Needs auth, '@': Needs auth and be the same user
              that created it, '-': Needs is_admin = True.
 
-        @GET /users/{user_id}/reviews: Retrieve all reviews written by a
+        +GET /users/{user_id}/reviews: Retrieve all reviews written by a
          specific user.
 
-        @GET /places/{place_id}/reviews: Retrieve all reviews for a specific
+        +GET /places/{place_id}/reviews: Retrieve all reviews for a specific
          place.
 
-        @GET /reviews/{review_id}: Retrieve detailed information about a
+        +GET /reviews/{review_id}: Retrieve detailed information about a
          specific review.
 
         #POST /places/{place_id}/reviews: Create a new review for a specified
@@ -18,7 +18,7 @@
 
         @PUT /reviews/{review_id}: Update an existing review.
 
-        -DELETE /reviews/{review_id}: Delete a specific review.
+        @DELETE /reviews/{review_id}: Delete a specific review.
 '''
 
 from flask import request, Blueprint
