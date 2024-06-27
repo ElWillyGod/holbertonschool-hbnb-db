@@ -1,17 +1,23 @@
 
-"""
+'''
     Reviews endpoints:
+
         -POST /places/{place_id}/reviews: Create a new review for a specified
          place.
+
         -GET /users/{user_id}/reviews: Retrieve all reviews written by a
          specific user.
+
         -GET /places/{place_id}/reviews: Retrieve all reviews for a specific
          place.
+
         -GET /reviews/{review_id}: Retrieve detailed information about a
          specific review.
+
         -PUT /reviews/{review_id}: Update an existing review.
+
         -DELETE /reviews/{review_id}: Delete a specific review.
-"""
+'''
 
 from flask import request, Blueprint
 import api.validations as val

@@ -1,14 +1,20 @@
 
-"""
+'''
     Cities endpoints:
+
         -GET /countries/{country_code}/cities: Retrieve all cities belonging to
          a specific country.
+
         -POST /cities: Create a new city.
+
         -GET /cities: Retrieve all cities.
+
         -GET /cities/{city_id}: Retrieve details of a specific city.
+
         -PUT /cities/{city_id}: Update an existing city's information.
+
         -DELETE /cities/{city_id}: Delete a specific city.
-"""
+'''
 
 from flask import request, Blueprint
 import api.validations as val

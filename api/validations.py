@@ -1,8 +1,7 @@
 
-"""
+'''
     Endpoint validation library.
-"""
-
+'''
 
 
 def idChecksum(id: str) -> bool:
@@ -11,7 +10,6 @@ def idChecksum(id: str) -> bool:
     '''
 
     return len(id) == 36
-
 
 
 def isCountryValid(country_code: str) -> bool:
@@ -27,7 +25,6 @@ def isCountryValid(country_code: str) -> bool:
             return False
 
     return True
-
 
 
 def isStrValid(string: str, ignoreStr: str="", ignoreDigits=True) -> bool:
@@ -151,6 +148,9 @@ def isEmailValid(email: str) -> bool:
 
 
 def isNoneFields(enty: str, data: dict) -> bool:
+    '''
+        Checks all fields of an object.
+    '''
 
     required_fields = []
 

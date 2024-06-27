@@ -1,6 +1,6 @@
 
 '''
-    Template for Swagger.
+    Template for Swagger documentation.
 '''
 
 template = {

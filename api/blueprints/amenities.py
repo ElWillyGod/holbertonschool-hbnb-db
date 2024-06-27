@@ -1,13 +1,18 @@
 
-"""
+'''
     Amenities endpoints:
+
         -POST /amenities: Create a new amenity.
+
         -GET /amenities: Retrieve a list of all amenities.
+
         -GET /amenities/{amenity_id}: Retrieve detailed information about a
          specific amenity.
+
         -PUT /amenities/{amenity_id}: Update an existing amenity's information.
+
         -DELETE /amenities/{amenity_id}: Delete a specific amenity.
-"""
+'''
 
 from flask import request, Blueprint
 import api.validations as val

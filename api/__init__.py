@@ -1,6 +1,6 @@
 
 '''
-    Package where endpoints and type validations are made.
+    Package where endpoints, authorizations and type validations are made.
 '''
 
 from flask import Flask
@@ -13,9 +13,15 @@ from flasgger import Swagger
 from api.swagger import template
 
 
-def appFactory():
+def appFactory() -> Flask:
     '''
-        Creates an app.
+        Creates an app using:
+
+            All blueprints from blueprints.
+
+            JWT, for authorization.
+
+            Swagger, for documentationn.
     '''
 
     app = Flask("HBnB-AlMaWi")

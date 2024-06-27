@@ -1,13 +1,19 @@
 
-"""
-    places endpoint
+'''
+    Places endpoints:
+
         -POST /places: Create a new place.
+
         -GET /places: Retrieve a list of all places.
+
         -GET /places/{place_id}: Retrieve detailed information about a specific
          place.
+
         -PUT /places/{place_id}: Update an existing place's information.
+
         -DELETE /places/{place_id}: Delete a specific place.
-"""
+'''
+
 from flask import request, Blueprint
 import api.validations as val
 from logic import logicexceptions

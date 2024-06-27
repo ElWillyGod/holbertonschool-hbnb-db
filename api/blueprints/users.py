@@ -1,12 +1,16 @@
-
-"""
+'''
     Users endpoints:
+
         -POST /users: Create a new user.
+
         -GET /users: Retrieve a list of all users.
+
         -GET /users/{user_id}: Retrieve details of a specific user.
+
         -PUT /users/{user_id}: Update an existing user.
+
         -DELETE /users/{user_id}: Delete a user.
-"""
+'''
 
 from flask import request, Blueprint
 import api.validations as val

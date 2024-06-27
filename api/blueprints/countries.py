@@ -1,10 +1,12 @@
 
-"""
+'''
     Countries endpoints:
+
         -GET /countries: Retrieve all pre-loaded countries.
+
         -GET /countries/{country_code}: Retrieve details of a specific country
          by its code.
-"""
+'''
 
 from logic import logicexceptions, Blueprint
 import api.validations as val
