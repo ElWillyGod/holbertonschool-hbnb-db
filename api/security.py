@@ -38,13 +38,16 @@ def login():
         return WRONG_FIELDS, 400
 
     # Fetch user data by email. 401 if email not found.
-    hashed_password = LogicFacade.getPasswordByEmail(email)
+    hashed_password, is_admin = LogicFacade.getPswdAndAdminByEmail(email)
     if hashed_password == None:
         return WRONG_DATA, 401
 
     # Compare passwords. 401 if different.
     if bcrypt.check_password_hash(hashed_password, password):
         # Create token.
-        access_token = create_access_token(identity=email)
+        access_token = create_access_token(
+            identity=email,
+            additional_claims=[is_admin]
+            )
         return {"access_token": access_token}, 200
     return WRONG_DATA, 401

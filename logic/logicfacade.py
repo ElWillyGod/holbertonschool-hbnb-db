@@ -109,5 +109,6 @@ class LogicFacade(ABC):
         )
 
     @staticmethod
-    def getPasswordByEmail(email: str) -> str:
-        return Persistence.get_by_property("users", "email", email)["password"]
+    def getPswdAndAdminByEmail(email: str) -> tuple[str, bool]:
+        user = Persistence.get_by_property("users", "email", email)
+        return user["password"], user["is_admin"]

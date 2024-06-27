@@ -21,7 +21,7 @@ def appFactory() -> Flask:
 
             JWT, for authorization, bcrypt for hashing.
 
-            Swagger, for documentationn.
+            Swagger, for documentation.
     '''
 
     app = Flask("HBnB-AlMaWi")
@@ -37,6 +37,6 @@ def appFactory() -> Flask:
     app.register_blueprint(places.bp)
     app.register_blueprint(reviews.bp)
 
-    swagger = Swagger(app, template=template)
+    Swagger(app, template=template)
 
     return app
