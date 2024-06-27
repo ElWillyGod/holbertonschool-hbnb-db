@@ -18,8 +18,10 @@
 
 from flask import request, Blueprint
 import api.validations as val
+from api.security import notAdmin
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
+from flask_jwt_extended import jwt_required, get_jwt
 
 bp = Blueprint("places", __name__, url_prefix="/places")
 
@@ -66,6 +68,8 @@ def getAllPlaces():
                 type: string
                 description: Date and time when the place was last updated
     """
+
+    # Calls BL to get all places.
     places = LogicFacade.getByType('place')
 
     return places, 200
@@ -121,19 +125,22 @@ def getPlace(place_id):
       404:
         description: Place not found
     """
-    if not val.idChecksum(place_id):
-        return {'message': "Invalid ID"}, 400
 
+    # Check if id is valid.
+    if not val.idChecksum(place_id):
+        return {'err': "Invalid ID"}, 400
+
+    # Calls BL to get place.
     try:
         place = LogicFacade.getByID(place_id, 'place')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return place, 200
 
 
 @bp.post('/')
+@jwt_required()
 def createPlace():
     """
     Create a new place
@@ -174,8 +181,11 @@ def createPlace():
       404:
         description: City ID not found
     """
+
+    # Get data from request.
     data = request.get_json()
 
+    # Check if data is valid.
     if val.isNoneFields('place', data):
         return {'error': "Invalid data"}, 400
 
@@ -208,15 +218,17 @@ def createPlace():
         if not val.idChecksum(amenity_id):
             return {'error': f'Invalid amenity ID: {amenity_id}'}, 400
 
+    # Calls BL to create place.
     try:
         place = LogicFacade.createObjectByJson('place', data)
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return place, 201
 
 
 @bp.put('/<place_id>')
+@jwt_required()
 def updatePlace(place_id):
     """
     Update an existing place's information
@@ -260,10 +272,13 @@ def updatePlace(place_id):
       404:
         description: Place ID not found
     """
+
+    # Get data from request.
+    data = request.get_json()
+
+    # Check if data is valid.
     if not val.idChecksum(place_id):
         return {'error': "Invalid ID"}, 400
-
-    data = request.get_json()
 
     if val.isNoneFields('place', data):
         return {'error': "Invalid data"}, 400
@@ -291,15 +306,17 @@ def updatePlace(place_id):
         if not val.idChecksum(amenity_id):
             return {'error': 'Invalid amenity ID'}, 400
 
+    # Calls BL to update place.
     try:
         place = LogicFacade.updateByID(place_id, 'place', data)
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return place, 201
 
 
 @bp.delete('/<place_id>')
+@jwt_required()
 def deletePlace(place_id):
     """
     Delete a specific place by its ID
@@ -320,13 +337,16 @@ def deletePlace(place_id):
       404:
         description: Place not found
     """
+
+    # Check if id is valid.
     if not val.idChecksum(place_id):
         return {'error': "Invalid place ID"}, 400
+
+    # Calls BL to delete place.
     try:
         LogicFacade.deleteByID(place_id, 'place')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return "", 204
 

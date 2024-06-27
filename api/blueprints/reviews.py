@@ -23,8 +23,10 @@
 
 from flask import request, Blueprint
 import api.validations as val
+from api.security import notAdmin
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
+from flask_jwt_extended import jwt_required, get_jwt
 
 bp = Blueprint("reviews", __name__)
 
@@ -50,16 +52,16 @@ def getUserReviews(user_id):
       404:
         description: User ID not found or no reviews found for the user
     """
+
+    # Check if id is valid.
     if not val.idChecksum(user_id):
         return {'error': "Invalid user ID"}, 400
 
+    # Calls BL to get all reviews of user.
     try:
         reviews = LogicFacade.getByID(user_id, "reviewUser")
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-    if reviews is not None:
-        return reviews, 200
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return reviews, 200
 
@@ -85,18 +87,16 @@ def getPlaceReviews(place_id):
       404:
         description: Place ID not found or no reviews found for the place
     """
+
+    # Check if id is valid.
     if not val.idChecksum(place_id):
         return {'error': "Invalid place ID format"}, 400
 
+    # Calls BL to get all reviews of place
     try:
-
         reviews = LogicFacade.getByID(place_id, 'reviewPlace')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-    if reviews is not None:
-        return reviews, 200
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return reviews, 200
 
@@ -122,23 +122,22 @@ def getReview(review_id):
       404:
         description: Review ID not found
     """
+
+    # Checks if id is valid.
     if not val.idChecksum(review_id):
         return {'error': "Invalid review ID"}, 400
 
+    # Calls BL to get review.
     try:
-
         review = LogicFacade.getByID(review_id, 'review')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-    if review is not None:
-        return review, 200
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return review, 200
 
 
 @bp.post('/places/<place_id>/reviews')
+@jwt_required()
 def createReview(place_id):
     """
     Create a new review for a specified place.
@@ -173,8 +172,11 @@ def createReview(place_id):
       404:
         description: Place ID not found or trying to review own place
     """
+
+    # Get data from request.
     data = request.get_json()
 
+    # Check if data is valid.
     if (val.isNoneFields('review', data) or
             not val.idChecksum(place_id) or
             not val.isStrValid('comment')):
@@ -185,19 +187,19 @@ def createReview(place_id):
 
     data['place_id'] = place_id
 
+    # Calls BL to create review.
     try:
         review = LogicFacade.createObjectByJson('review', data)
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-    except (logicexceptions.TryingToReviewOwnPlace) as message:
-        return {'error': str(message)}, 400
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
+    except (logicexceptions.TryingToReviewOwnPlace) as err:
+        return {'error': str(err)}, 400
 
     return review, 201
 
 
 @bp.put('/reviews/<review_id>')
+@jwt_required()
 def updateReview(review_id):
     """
     Update an existing review.
@@ -230,8 +232,11 @@ def updateReview(review_id):
       404:
         description: Review ID not found or trying to update own review
     """
+
+    # Get data from request.
     data = request.get_json()
 
+    # Check if data is valid.
     if (val.isNoneFields('review', data) or
             not val.idChecksum(review_id) or
             not val.isStrValid('comment')):
@@ -240,19 +245,19 @@ def updateReview(review_id):
     if not (1 <= data['rating'] <= 5):
         return {'error': 'Invalid rating'}, 400
 
+    # Calls BL to update review.
     try:
         review = LogicFacade.updateByID(review_id, 'review', data)
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-    except (logicexceptions.TryingToReviewOwnPlace) as message:
-        return {'error': str(message)}, 400
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
+    except (logicexceptions.TryingToReviewOwnPlace) as err:
+        return {'error': str(err)}, 400
 
     return review, 200
 
 
 @bp.delete('/reviews/<review_id>')
+@jwt_required()
 def deleteReview(review_id):
     """
     Delete a specific review.
@@ -273,12 +278,15 @@ def deleteReview(review_id):
       404:
         description: Review ID not found
     """
+
+    # Checks if id is valid.
     if not val.idChecksum(review_id):
         return {'error': "Invalid review ID format"}, 400
+
+    # Calls BL to delete review.
     try:
         LogicFacade.deleteByID(review_id, 'review')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return "", 204

@@ -28,6 +28,8 @@ def getAllCountries():
       200:
         description: A list of all countries
     """
+
+    # Calls BL to get all countries.
     countries = LogicFacade.getAllCountries()
 
     return countries, 200
@@ -53,12 +55,13 @@ def getCounty(country_code):
         description: Country not found
     """
 
+    # Check if country code is valid.
     if not val.isCountryValid(country_code):
         return {'error': '404 Not Found'}, 404
 
+    # Calls BL to get country.
     try:
         countries = LogicFacade.getCountry(country_code)
-
     except (logicexceptions.IDNotFoundError) as message:
         return {'error': str(message)}, 404
 

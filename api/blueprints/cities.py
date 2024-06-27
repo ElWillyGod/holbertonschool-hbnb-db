@@ -19,8 +19,10 @@
 
 from flask import request, Blueprint
 import api.validations as val
+from api.security import notAdmin
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
+from flask_jwt_extended import jwt_required, get_jwt
 
 bp = Blueprint("cities", __name__, url_prefix="/cities")
 
@@ -47,12 +49,11 @@ def getAllCities():
               country_code:
                 type: string
     """
+
+    # Calls BL to get all cities.
     cities = LogicFacade.getByType("city")
 
-    if cities is not None and len(cities) > 0:
-        return cities, 200
-
-    return {'message': "A list of all cities"}, 200
+    return cities, 200
 
 
 @bp.get('/<country_code>/cities')
@@ -76,14 +77,16 @@ def getCitiesForCountry(country_code):
       404:
         description: Country not found
     """
+
+    # Check if country code is valid.
     if not val.isCountryValid(country_code):
         return {'error': "Invalid country code"}, 400
 
+    # Call BL to get cities of country.
     try:
         cities = LogicFacade.getContryCities(country_code)
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return cities, 200
 
@@ -110,18 +113,21 @@ def getCity(city_id):
         description: City not found
     """
 
+    # Check if id is valid.
     if not val.idChecksum(city_id):
         return {'error': "Invalid ID format"}, 400
 
+    # Calls BL to get city.
     try:
         city = LogicFacade.getByID(city_id, "city")
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return city, 200
 
 
 @bp.post('/')
+@jwt_required()
 def createCity():
     """
     Create a new city
@@ -154,30 +160,38 @@ def createCity():
       409:
         description: City name already exists
     """
+
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
+    # Get data from request.
     data = request.get_json()
 
+    # Check if data is valid.
     if val.isNoneFields('city', data):
         return {'error': "Invalid data"}, 400
 
     name = data['name']
     code = data['country_code']
 
-    if not val.isNameValid(name) or not val.isCountryValid(code):
+    if not (val.isNameValid(name) and
+            val.isCountryValid(code)):
         return {'error': "Invalid data"}, 400
 
+    # Calls BL to create city.
     try:
         city = LogicFacade.createObjectByJson("city", data)
-
-    except (logicexceptions.CountryNotFoundError) as message:
-        return {'error': str(message)}, 400
-
-    except (logicexceptions.CityNameDuplicated) as message:
-        return {'error': str(message)}, 409
+    except (logicexceptions.CountryNotFoundError) as err:
+        return {'error': str(err)}, 400
+    except (logicexceptions.CityNameDuplicated) as err:
+        return {'error': str(err)}, 409
 
     return city, 201
 
 
 @bp.put('/<city_id>')
+@jwt_required()
 def updateCity(city_id):
     """
     Update a city by ID
@@ -217,8 +231,15 @@ def updateCity(city_id):
       409:
         description: City name already exists
     """
+
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
+    # Get data from request.
     data = request.get_json()
 
+    # Check if data is valid.
     if not val.idChecksum(city_id):
         return {'error': "Invalid ID format"}, 400
 
@@ -231,22 +252,21 @@ def updateCity(city_id):
     if not val.isNameValid(name) or not val.isCountryValid(code):
         return {'error': "Invalid data"}, 400
 
+    # Calls BL to update city.
     try:
         city = LogicFacade.updateByID(city_id, "city", data)
-
-    except (logicexceptions.CountryNotFoundError) as message:
-        return {'error': str(message)}, 400
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
-
-    except (logicexceptions.CityNameDuplicated) as message2:
-        return {'error': str(message2)}, 409
+    except (logicexceptions.CountryNotFoundError) as err:
+        return {'error': str(err)}, 400
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
+    except (logicexceptions.CityNameDuplicated) as err:
+        return {'error': str(err)}, 409
 
     return city, 201
 
 
 @bp.delete('/<city_id>')
+@jwt_required()
 def deleteCity(city_id):
     """
     Delete a city by ID
@@ -267,12 +287,18 @@ def deleteCity(city_id):
       404:
         description: City not found
     """
+
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
+    # Check if id is valid.
     if not val.idChecksum(city_id):
         return {'error': 'Invalid ID'}, 400
 
+    # Calls BL to delete city.
     try:
         LogicFacade.deleteByID(city_id, "city")
-
     except (logicexceptions.IDNotFoundError) as message:
         return {'error': str(message)}, 404
 

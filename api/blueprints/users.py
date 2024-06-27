@@ -15,8 +15,10 @@
 
 from flask import request, Blueprint
 import api.validations as val
+from api.security import notAdmin
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
+from flask_jwt_extended import jwt_required, get_jwt
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 
@@ -38,12 +40,11 @@ def getAllUsers():
       200:
         description: Details of the specified user
     """
+
+    # Calls BL to get all users.
     users = LogicFacade.getByType("user")
-
-    if users is not None and len(users) > 0:
-        return users, 200
-
-    return {'message': "Details of the specified user"}, 200
+ 
+    return users, 200
 
 
 @bp.get('/<user_id>')
@@ -83,14 +84,15 @@ def getUser(user_id):
         description: User ID not found
     """
 
+    # Checks if id is valid.
     if not val.idChecksum(user_id):
         return {'error': "Invalid data"}, 400
 
+    # Calls BL to get user.
     try:
         users = LogicFacade.getByID(user_id, 'user')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return users, 200
 
@@ -126,8 +128,11 @@ def createUser():
       409:
         description: Email address already exists
     """
+
+    # Get data from request.
     data = request.get_json()
 
+    # Check if data is valid.
     if val.isNoneFields('user', data):
         return {'error': "Invalid data or missing fields"}, 400
 
@@ -143,11 +148,11 @@ def createUser():
     if not val.isEmailValid(email):
         return {'error': "Invalid data"}, 400
 
+    # Calls BL to create user.
     try:
         user = LogicFacade.createObjectByJson("user", data)
-
-    except (logicexceptions.EmailDuplicated) as message:
-        return {'error': str(message)}, 409
+    except (logicexceptions.EmailDuplicated) as err:
+        return {'error': str(err)}, 409
 
     return user, 201
 
@@ -194,11 +199,14 @@ def updateUser(user_id):
         description: Email address already exists
     """
 
+    # Checks if id is valid.
     if not val.idChecksum(user_id):
         return {'error': 'Invalid id'}, 400
 
+    # Get data from request.
     data = request.get_json()
 
+    # Checks if data is valid.
     if val.isNoneFields('user', data):
         return {'error': "Invalid data"}, 400
 
@@ -214,14 +222,13 @@ def updateUser(user_id):
     if not val.isEmailValid(email):
         return {'error': "Invalid email"}, 400
 
+    # Calls BL to update user.
     try:
         user = LogicFacade.updateByID(user_id, "user", data)
-
-    except (logicexceptions.EmailDuplicated) as message:
-        return {'error': str(message)}, 409
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.EmailDuplicated) as err:
+        return {'error': str(err)}, 409
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return user, 201
 
@@ -247,13 +254,15 @@ def deleteUser(user_id):
       404:
         description: User ID not found
     """
+
+    # Checks if id is valid.
     if not val.idChecksum(user_id):
         return {'error': 'Invalid user ID'}, 400
 
+    # Calls BL to delete user.
     try:
         LogicFacade.deleteByID(user_id, "user")
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return "", 204

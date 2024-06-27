@@ -25,11 +25,6 @@ from flask_jwt_extended import jwt_required, get_jwt
 bp = Blueprint("amenities", __name__, url_prefix="/amenities")
 
 
-# @jwt_required()
-#    if err := notAdmin(jwt := get_jwt()):
-#        return err, 403
-
-
 @bp.get('/')
 def getAllAmenities():
     """
@@ -56,6 +51,8 @@ def getAllAmenities():
       200:
         description: No amenities found
     """
+
+    # Calls BL to get all amenities
     amenities = LogicFacade.getByType('amenity')
 
     return amenities, 200
@@ -82,19 +79,22 @@ def getAmenity(amenity_id):
       404:
         description: Amenity not found
     """
+
+    # Checks if id is valid.
     if not val.idChecksum(amenity_id):
         return {'error': "Invalid ID"}, 400
 
+    # Calls BL to get amenity
     try:
         amenities = LogicFacade.getByID(amenity_id, 'amenity')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as error:
+        return {'error': str(error)}, 404
 
     return amenities, 200
 
 
 @bp.post('/')
+@jwt_required()
 def createAmenity():
     """
     Create a new amenity
@@ -121,21 +121,30 @@ def createAmenity():
       409:
         description: Amenity name already exists
     """
+
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
+    # Get data from request.
     data = request.get_json()
 
-    if val.isNoneFields('amenity', data) or not val.isNameValid(data['name']):
+    # Check if data is valid.
+    if (val.isNoneFields('amenity', data) or
+            not val.isNameValid(data['name'])):
         return {'error': "Invalid data"}, 400
 
+    # Try creating amenity in BL layer.
     try:
         amenity = LogicFacade.createObjectByJson('amenity', data)
-
-    except (logicexceptions.AmenityNameDuplicated) as message:
-        return {'error': str(message)}, 409
+    except (logicexceptions.AmenityNameDuplicated) as error:
+        return {'error': str(error)}, 409
 
     return amenity, 201
 
 
 @bp.put('/<amenity_id>')
+@jwt_required()
 def updateAmenity(amenity_id):
     """
     Update an amenity by ID
@@ -169,27 +178,34 @@ def updateAmenity(amenity_id):
       409:
         description: Amenity name already exists
     """
+
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
+    # Get data from request.
     data = request.get_json()
 
+    # Check if data is valid.
     if val.isNoneFields('amenity', data) or not val.isNameValid(data['name']):
         return {'error': "Invalid data"}, 400
 
     if not val.idChecksum(amenity_id):
         return {'error': 'Invalid ID format'}, 400
 
+    # Try updating amenity in BL layer.
     try:
         amenity = LogicFacade.updateByID(amenity_id, 'amenity', data)
-
-    except (logicexceptions.AmenityNameDuplicated) as message:
-        return {'error': str(message)}, 409
-
-    except (logicexceptions.IDNotFoundError) as message2:
-        return {'error': str(message2)}, 404
+    except (logicexceptions.AmenityNameDuplicated) as err:
+        return {'error': str(err)}, 409
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return amenity, 201
 
 
 @bp.delete('/<amenity_id>')
+@jwt_required()
 def deleteAmenity(amenity_id):
     """
     Delete an amenity by ID
@@ -210,13 +226,19 @@ def deleteAmenity(amenity_id):
       404:
         description: Amenity not found
     """
-    if not val.idChecksum(amenity_id):
-        return {'message': "Invalid ID format"}, 400
 
+    # Check if user is admin.
+    if err := notAdmin(jwt := get_jwt()):
+        return err, 403
+
+    # Try creating amenity in BL layer.
+    if not val.idChecksum(amenity_id):
+        return {'error': "Invalid ID format"}, 400
+
+    # Try creating amenity in BL layer.
     try:
         LogicFacade.deleteByID(amenity_id, 'amenity')
-
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        return {'error': str(err)}, 404
 
     return "", 204
