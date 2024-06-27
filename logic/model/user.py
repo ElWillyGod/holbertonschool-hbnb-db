@@ -35,3 +35,5 @@ class User(TrackedObject):
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
+        self.password = password
+        self.is_admin = is_admin
