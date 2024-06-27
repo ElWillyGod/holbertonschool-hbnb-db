@@ -27,7 +27,11 @@ def isCountryValid(country_code: str) -> bool:
     return True
 
 
-def isStrValid(string: str, ignoreStr: str="", ignoreDigits=True) -> bool:
+def isStrValid(
+        string: str,
+        ignoreStr: str = "",
+        ignoreDigits=True
+) -> bool:
     '''
         Checks if the string does not have any special character aside
         from chars from ignoreStr.
@@ -37,7 +41,7 @@ def isStrValid(string: str, ignoreStr: str="", ignoreDigits=True) -> bool:
 
     if not string.isascii():
         return False
-    
+
     if not string.isprintable():
         return False
 
@@ -100,7 +104,7 @@ def isEmailValid(email: str) -> bool:
         valid example: "user@gmail.com"
         valid example: "user@ceibal.edu.uy"
     '''
-    
+
     if " " in email:
         return False
 
@@ -164,10 +168,12 @@ def isNoneFields(entity: str, data: dict) -> bool:
         required_fields = ['name']
 
     if entity == 'place':
-        required_fields = ['name', 'description', 'city_id',  # 'address',
-                           'latitude', 'longitude', 'host_id', 'number_of_rooms',
-                           'number_of_bathrooms', 'price_per_night', 'max_guests',
-                           'amenity_ids']
+        required_fields = [
+            'name', 'description', 'city_id',  # 'address',
+            'latitude', 'longitude', 'host_id', 'number_of_rooms',
+            'number_of_bathrooms', 'price_per_night', 'max_guests',
+            'amenity_ids'
+            ]
     if entity == 'review':
         required_fields = ['user_id', 'rating', 'comment']
 

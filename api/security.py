@@ -26,7 +26,7 @@ def notAdmin(claims: dict) -> None | Response:
     '''
 
     if "is_admin" not in claims:
-        return jsonify({"msg": "Administration rights required"})
+        return jsonify({"error": "Administration rights required"})
     return None
 
 
@@ -74,7 +74,7 @@ def login():
 
     # Fetch user data by email. 401 if email not found.
     hashed_password, is_admin = LogicFacade.getPswdAndAdminByEmail(email)
-    if hashed_password == None:
+    if hashed_password is None:
         return WRONG_DATA, 401
 
     # Compare passwords. 401 if different.
@@ -85,4 +85,5 @@ def login():
             additional_claims={"is_admin": True}
             )
         return {"access_token": access_token}, 200
-    return WRONG_DATA, 401
+    else:
+        return WRONG_DATA, 401
