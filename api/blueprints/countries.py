@@ -7,8 +7,8 @@
         -GET /countries/{country_code}: Retrieve details of a specific country
          by its code.
 '''
-
-from logic import logicexceptions, Blueprint
+from flask import Blueprint
+from logic import logicexceptions
 import api.validations as val
 from logic.logicfacade import LogicFacade
 

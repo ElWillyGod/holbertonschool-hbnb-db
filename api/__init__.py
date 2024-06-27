@@ -5,9 +5,9 @@
 
 from flask import Flask
 
-from blueprints import *
+import api.security as security
 
-import api.jwt
+from blueprints import *
 
 from flasgger import Swagger
 from api.swagger import template
@@ -17,14 +17,18 @@ def appFactory() -> Flask:
     '''
         Creates an app using:
 
-            All blueprints from blueprints.
+            All blueprints from blueprints (endpoints).
 
-            JWT, for authorization.
+            JWT, for authorization, bcrypt for hashing.
 
             Swagger, for documentationn.
     '''
 
     app = Flask("HBnB-AlMaWi")
+
+    app.config['JWT_SECRET_KEY'] = '00Ba3EpLas52se6QhQ8gE'
+    security.associateSecurity(app)
+    app.register_blueprint(security.login_bp)
 
     app.register_blueprint(amenities.bp)
     app.register_blueprint(countries.bp)
@@ -32,9 +36,6 @@ def appFactory() -> Flask:
     app.register_blueprint(cities.bp)
     app.register_blueprint(places.bp)
     app.register_blueprint(reviews.bp)
-
-    app.config['JWT_SECRET_KEY'] = '00Ba3EpLas52se6QhQ8gE'
-    jwt = api.jwt.createJWT(app)
 
     swagger = Swagger(app, template=template)
 
