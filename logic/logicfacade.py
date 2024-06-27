@@ -107,3 +107,7 @@ class LogicFacade(ABC):
         return Persistence.get_by_property(
             "places", "id", id
         )
+
+    @staticmethod
+    def getPasswordByEmail(email: str) -> str:
+        return Persistence.get_by_property("users", "email", email)["password"]

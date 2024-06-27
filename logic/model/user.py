@@ -19,6 +19,8 @@ class User(TrackedObject):
                  email: str,
                  first_name: str,
                  last_name: str,
+                 password: str,
+                 is_admin: bool = False,
                  *,
                  id: str = None,
                  created_at: str = None,

@@ -147,28 +147,28 @@ def isEmailValid(email: str) -> bool:
     return True
 
 
-def isNoneFields(enty: str, data: dict) -> bool:
+def isNoneFields(entity: str, data: dict) -> bool:
     '''
         Checks all fields of an object.
     '''
 
     required_fields = []
 
-    if enty == 'user':
-        required_fields = ['email', 'first_name', 'last_name']
+    if entity == 'user':
+        required_fields = ['email', 'first_name', 'last_name', 'password']
 
-    if enty == 'city':
+    if entity == 'city':
         required_fields = ['name', 'country_code']
 
-    if enty == 'amenity':
+    if entity == 'amenity':
         required_fields = ['name']
 
-    if enty == 'place':
+    if entity == 'place':
         required_fields = ['name', 'description', 'city_id',  # 'address',
                            'latitude', 'longitude', 'host_id', 'number_of_rooms',
                            'number_of_bathrooms', 'price_per_night', 'max_guests',
                            'amenity_ids']
-    if enty == 'review':
+    if entity == 'review':
         required_fields = ['user_id', 'rating', 'comment']
 
     if len(data) != len(required_fields):
