@@ -20,6 +20,31 @@ def associateSecurity(app):
     bcrypt.init_app(app)
 
 
+@jwt.unauthorized_loader
+def handle_unauthorized_error(err):
+    return {"error": "401 Unauthorized"}, 401
+
+
+@jwt.invalid_token_loader
+def handle_invalid_token_error(err):
+    return {"error": "401 Unauthorized"}, 401
+
+
+@jwt.expired_token_loader
+def handle_expired_token_error(err):
+    return {"error": "401 Unauthorized"}, 401
+
+
+@jwt.revoked_token_loader
+def handle_revoked_token_error(err):
+    return {"error": "401 Unauthorized"}, 401
+
+
+@jwt.needs_fresh_token_loader
+def handle_needs_fresh_token_error(err):
+    return {"error": "401 Unauthorized"}, 401
+
+
 @login_bp.post('/login')
 def login():
     """
