@@ -18,16 +18,17 @@
 '''
 
 from flask import request, Blueprint
-import api.validations as val
-from api.security import notAdmin
+from flask_jwt_extended import jwt_required, get_jwt
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-from flask_jwt_extended import jwt_required, get_jwt
+import api.validations as val
+import api.authlib as authlib
 
 bp = Blueprint("cities", __name__, url_prefix="/cities")
 
 
 @bp.get('/')
+@jwt_required(optional=True)
 def getAllCities():
     """
     Retrieve all cities
@@ -50,6 +51,10 @@ def getAllCities():
                 type: string
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAllAuthorized("city", get_jwt()):
+        return err, 403
+
     # Calls BL to get all cities.
     cities = LogicFacade.getByType("city")
 
@@ -57,6 +62,7 @@ def getAllCities():
 
 
 @bp.get('/<country_code>/cities')
+@jwt_required(optional=True)
 def getCitiesForCountry(country_code):
     """
     Retrieve cities for a specific country
@@ -78,6 +84,10 @@ def getCitiesForCountry(country_code):
         description: Country not found
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAllAuthorized("country/city", get_jwt()):
+        return err, 403
+
     # Check if country code is valid.
     if not val.isCountryValid(country_code):
         return {'error': "Invalid country code"}, 400
@@ -92,6 +102,7 @@ def getCitiesForCountry(country_code):
 
 
 @bp.get('/<city_id>')
+@jwt_required(optional=True)
 def getCity(city_id):
     """
     Retrieve a city by ID
@@ -113,6 +124,10 @@ def getCity(city_id):
         description: City not found
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAuthorized("city", get_jwt()):
+        return err, 403
+
     # Check if id is valid.
     if not val.idChecksum(city_id):
         return {'error': "Invalid ID format"}, 400
@@ -127,7 +142,7 @@ def getCity(city_id):
 
 
 @bp.post('/')
-@jwt_required()
+@jwt_required(optional=False)
 def createCity():
     """
     Create a new city
@@ -161,8 +176,8 @@ def createCity():
         description: City name already exists
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPostAuthorized("city", get_jwt()):
         return err, 403
 
     # Get data from request.
@@ -191,7 +206,7 @@ def createCity():
 
 
 @bp.put('/<city_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def updateCity(city_id):
     """
     Update a city by ID
@@ -232,8 +247,8 @@ def updateCity(city_id):
         description: City name already exists
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPutAuthorized("city", get_jwt()):
         return err, 403
 
     # Get data from request.
@@ -266,7 +281,7 @@ def updateCity(city_id):
 
 
 @bp.delete('/<city_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def deleteCity(city_id):
     """
     Delete a city by ID
@@ -288,8 +303,8 @@ def deleteCity(city_id):
         description: City not found
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notDeleteAuthorized("city", get_jwt()):
         return err, 403
 
     # Check if id is valid.

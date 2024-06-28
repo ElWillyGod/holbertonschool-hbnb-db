@@ -45,7 +45,10 @@ class LogicFacade(ABC):
         return Persistence.get_all(typePlural)
 
     @staticmethod
-    def getByID(id: str, type: str) -> dict:
+    def getByID(
+        id: str,
+        type: str
+) -> dict:
         typePlural = getPlural(type)
         call = Persistence.get(id, typePlural)
         if call is None or len(call) == 0:
@@ -53,7 +56,10 @@ class LogicFacade(ABC):
         return call
 
     @staticmethod
-    def deleteByID(id: str, type: str) -> None:
+    def deleteByID(
+        id: str,
+        type: str
+) -> None:
         typePlural = getPlural(type)
         call = Persistence.get(id, typePlural)
         if call is None or len(call) == 0:
@@ -62,7 +68,11 @@ class LogicFacade(ABC):
         Persistence.delete(id, typePlural)
 
     @staticmethod
-    def updateByID(id: str, type: str, data: dict, *, is_admin=False) -> dict:
+    def updateByID(
+        id: str,
+        type: str,
+        data: dict
+) -> dict:
         typePlural: str = getPlural(type)
         old_data = Persistence.get(id, typePlural)
         if old_data is None or len(old_data) == 0:
@@ -74,13 +84,15 @@ class LogicFacade(ABC):
         data["id"] = id
         data["created_at"] = old_data["created_at"]
         data["updated_at"] = None
-        data_updated = getClassByName(type)(
-            **data, update=updated, is_admin=is_admin)
+        data_updated = getClassByName(type)(**data, update=updated)
         Persistence.update(id, typePlural, data_updated.toJson())
         return Persistence.get(id, typePlural)
 
     @staticmethod
-    def createObjectByJson(type: str, data: dict) -> dict:
+    def createObjectByJson(
+        type: str,
+        data: dict
+) -> dict:
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id
@@ -110,6 +122,8 @@ class LogicFacade(ABC):
         )
 
     @staticmethod
-    def getPswdAndAdminByEmail(email: str) -> tuple[str, bool]:
+    def getPswdAndAdminByEmail(
+        email: str
+) -> tuple[str, bool]:
         user = Persistence.get_by_property("users", "email", email)
-        return user["password"], user["is_admin"]
+        return user["password"], user["id"], user["is_admin"]

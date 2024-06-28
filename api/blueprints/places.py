@@ -17,16 +17,17 @@
 '''
 
 from flask import request, Blueprint
-import api.validations as val
-from api.security import notAdmin
+from flask_jwt_extended import jwt_required, get_jwt
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-from flask_jwt_extended import jwt_required, get_jwt
+import api.validations as val
+import api.authlib as authlib
 
 bp = Blueprint("places", __name__, url_prefix="/places")
 
 
 @bp.get('/')
+@jwt_required(optional=True)
 def getAllPlaces():
     """
     Retrieve all places
@@ -69,6 +70,10 @@ def getAllPlaces():
                 description: Date and time when the place was last updated
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAllAuthorized("place", get_jwt()):
+        return err, 403
+
     # Calls BL to get all places.
     places = LogicFacade.getByType('place')
 
@@ -76,6 +81,7 @@ def getAllPlaces():
 
 
 @bp.get('/<place_id>')
+@jwt_required(optional=True)
 def getPlace(place_id):
     """
     Retrieve details of a specific place by its ID
@@ -126,6 +132,10 @@ def getPlace(place_id):
         description: Place not found
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAuthorized("place", get_jwt()):
+        return err, 403
+
     # Check if id is valid.
     if not val.idChecksum(place_id):
         return {'err': "Invalid ID"}, 400
@@ -140,7 +150,7 @@ def getPlace(place_id):
 
 
 @bp.post('/')
-@jwt_required()
+@jwt_required(optional=False)
 def createPlace():
     """
     Create a new place
@@ -181,6 +191,10 @@ def createPlace():
       404:
         description: City ID not found
     """
+
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPostAuthorized("place", get_jwt()):
+        return err, 403
 
     # Get data from request.
     data = request.get_json()
@@ -228,7 +242,7 @@ def createPlace():
 
 
 @bp.put('/<place_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def updatePlace(place_id):
     """
     Update an existing place's information
@@ -273,6 +287,10 @@ def updatePlace(place_id):
         description: Place ID not found
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPutAuthorized("place", get_jwt()):
+        return err, 403
+
     # Get data from request.
     data = request.get_json()
 
@@ -307,11 +325,8 @@ def updatePlace(place_id):
             return {'error': 'Invalid amenity ID'}, 400
 
     # Calls BL to update place.
-    # If admin it can update places of other people.
-    is_admin: bool = get_jwt().get("is_admin", False)
     try:
-        place = LogicFacade.updateByID(
-            place_id, 'place', data, is_admin=is_admin)
+        place = LogicFacade.updateByID(place_id, 'place', data)
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
 
@@ -319,7 +334,7 @@ def updatePlace(place_id):
 
 
 @bp.delete('/<place_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def deletePlace(place_id):
     """
     Delete a specific place by its ID
@@ -341,43 +356,18 @@ def deletePlace(place_id):
         description: Place not found
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notDeleteAuthorized("place", get_jwt()):
+        return err, 403
+
     # Check if id is valid.
     if not val.idChecksum(place_id):
         return {'error': "Invalid place ID"}, 400
 
     # Calls BL to delete place.
-    # If admin it can deletes places of other people.
-    is_admin: bool = get_jwt().get("is_admin", False)
     try:
-        LogicFacade.deleteByID(place_id, 'place', is_admin=is_admin)
+        LogicFacade.deleteByID(place_id, 'place')
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
 
     return "", 204
-
-
-'''
-    for place in places:
-
-        city = getCity(place['city_id'])
-        amenities = [getAmenity(amenity_id) for amenity_id in \
-            place['amenity_ids']]
-        response.append({
-            'id': place['id'],
-            'name': place['name'],
-            'description': place['description'],
-            'address': place['address'],
-            'city_id': place['city_id'],
-            'latitude': place['latitude'],
-            'longitude': place['longitude'],
-            'host_id': place['host_id'],
-            'number_of_rooms': place['number_of_rooms'],
-            'number_of_bathrooms': place['number_of_bathrooms'],
-            'price_per_night': place['price_per_night'],
-            'max_guests': place['max_guests'],
-            'city': city,
-            'amenities': amenities,
-            'created_at': place['created_at'],
-            'updated_at': place['updated_at']
-            })
-            '''

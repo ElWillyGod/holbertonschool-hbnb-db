@@ -14,17 +14,17 @@
 '''
 
 from flask import request, Blueprint
-import api.validations as val
-from api.security import notAdmin
+from flask_jwt_extended import jwt_required, get_jwt
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-from flask_jwt_extended import jwt_required, get_jwt
+import api.validations as val
+import api.authlib as authlib
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @bp.get('/')
-@jwt_required()
+@jwt_required(optional=False)
 def getAllUsers():
     """
     Retrieve details of a specific user.
@@ -42,8 +42,8 @@ def getAllUsers():
         description: Details of the specified user
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAllAuthorized("user", get_jwt()):
         return err, 403
 
     # Calls BL to get all users.
@@ -53,7 +53,7 @@ def getAllUsers():
 
 
 @bp.get('/<user_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def getUser(user_id):
     """
     Update an existing user.
@@ -90,8 +90,8 @@ def getUser(user_id):
         description: User ID not found
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAuthorized("user", get_jwt()):
         return err, 403
 
     # Checks if id is valid.
@@ -108,7 +108,7 @@ def getUser(user_id):
 
 
 @bp.post("/")
-@jwt_required()
+@jwt_required(optional=False)
 def createUser():
     """
     Create a new user.
@@ -140,8 +140,8 @@ def createUser():
         description: Email address already exists
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPostAuthorized("user", get_jwt()):
         return err, 403
 
     # Get data from request.
@@ -173,7 +173,7 @@ def createUser():
 
 
 @bp.put('/<user_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def updateUser(user_id):
     """
     Update an existing user.
@@ -215,8 +215,8 @@ def updateUser(user_id):
         description: Email address already exists
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPutAuthorized("user", get_jwt()):
         return err, 403
 
     # Checks if id is valid.
@@ -244,7 +244,7 @@ def updateUser(user_id):
 
     # Calls BL to update user.
     try:
-        user = LogicFacade.updateByID(user_id, "user", data)
+        user = LogicFacade.updateByID(user_id, "user", data, user=get_jwt())
     except (logicexceptions.EmailDuplicated) as err:
         return {'error': str(err)}, 409
     except (logicexceptions.IDNotFoundError) as err:
@@ -254,7 +254,7 @@ def updateUser(user_id):
 
 
 @bp.delete('/<user_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def deleteUser(user_id):
     """
     Delete a user.
@@ -276,8 +276,8 @@ def deleteUser(user_id):
         description: User ID not found
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notDeleteAuthorized("user", get_jwt()):
         return err, 403
 
     # Checks if id is valid.
@@ -286,7 +286,7 @@ def deleteUser(user_id):
 
     # Calls BL to delete user.
     try:
-        LogicFacade.deleteByID(user_id, "user")
+        LogicFacade.deleteByID(user_id, "user", user=get_jwt())
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
 

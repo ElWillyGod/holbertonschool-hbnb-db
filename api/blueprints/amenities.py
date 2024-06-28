@@ -16,22 +16,27 @@
 '''
 
 from flask import request, Blueprint
-import api.validations as val
-from api.security import notAdmin
-from logic import logicexceptions
-from logic.logicfacade import LogicFacade
 from flask_jwt_extended import jwt_required, get_jwt
 from flasgger import swag_from
+from logic import logicexceptions
+from logic.logicfacade import LogicFacade
+import api.validations as val
+import api.authlib as authlib
 
 bp = Blueprint("amenities", __name__, url_prefix="/amenities")
 
 
 @bp.get('/')
+@jwt_required(optional=True)
 @swag_from("swagger/amenities/get_all.yaml")
 def getAllAmenities():
     """
         Gets all amenities.
     """
+
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAllAuthorized("amenity", get_jwt()):
+        return err, 403
 
     # Calls BL to get all amenities
     amenities = LogicFacade.getByType('amenity')
@@ -40,11 +45,16 @@ def getAllAmenities():
 
 
 @bp.get('/<amenity_id>')
+@jwt_required(optional=True)
 @swag_from("swagger/amenities/get.yaml")
 def getAmenity(amenity_id):
     """
         Get an amenity.
     """
+
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAuthorized("amenity", get_jwt()):
+        return err, 403
 
     # Checks if id is valid.
     if not val.idChecksum(amenity_id):
@@ -60,15 +70,15 @@ def getAmenity(amenity_id):
 
 
 @bp.post('/')
-@jwt_required()
+@jwt_required(optional=False)
 @swag_from("swagger/amenities/post.yaml")
 def createAmenity():
     """
         Creates an amenity.
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPostAuthorized("amenity", get_jwt()):
         return err, 403
 
     # Get data from request.
@@ -89,15 +99,15 @@ def createAmenity():
 
 
 @bp.put('/<amenity_id>')
-@jwt_required()
+@jwt_required(optional=False)
 @swag_from("swagger/amenities/put.yaml")
 def updateAmenity(amenity_id):
     """
         Updates an amenity.
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPutAuthorized("amenity", get_jwt()):
         return err, 403
 
     # Get data from request.
@@ -122,15 +132,15 @@ def updateAmenity(amenity_id):
 
 
 @bp.delete('/<amenity_id>')
-@jwt_required()
+@jwt_required(optional=False)
 @swag_from("swagger/amenities/delete.yaml")
 def deleteAmenity(amenity_id):
     """
         Deletes an amenity.
     """
 
-    # Check if user is admin.
-    if err := notAdmin(jwt := get_jwt()):
+    # Checks if it's authorized to make the request.
+    if err := authlib.notDeleteAuthorized("amenity", get_jwt()):
         return err, 403
 
     # Try creating amenity in BL layer.

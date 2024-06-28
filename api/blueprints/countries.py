@@ -10,14 +10,17 @@
 '''
 
 from flask import Blueprint
+from flask_jwt_extended import jwt_required, get_jwt
 from logic import logicexceptions
-import api.validations as val
 from logic.logicfacade import LogicFacade
+import api.validations as val
+import api.authlib as authlib
 
 bp = Blueprint("countries", __name__, url_prefix="/countries")
 
 
 @bp.get('/')
+@jwt_required(optional=True)
 def getAllCountries():
     """
     Retrieve all countries
@@ -29,6 +32,10 @@ def getAllCountries():
         description: A list of all countries
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAllAuthorized("country", get_jwt()):
+        return err, 403
+
     # Calls BL to get all countries.
     countries = LogicFacade.getAllCountries()
 
@@ -36,6 +43,7 @@ def getAllCountries():
 
 
 @bp.get('/<country_code>')
+@jwt_required(optional=True)
 def getCounty(country_code):
     """
     Retrieve details of a specific country by its code
@@ -54,6 +62,10 @@ def getCounty(country_code):
       404:
         description: Country not found
     """
+
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAuthorized("country", get_jwt()):
+        return err, 403
 
     # Check if country code is valid.
     if not val.isCountryValid(country_code):

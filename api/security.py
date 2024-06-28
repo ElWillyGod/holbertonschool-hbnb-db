@@ -20,16 +20,6 @@ def associateSecurity(app):
     bcrypt.init_app(app)
 
 
-def notAdmin(claims: dict) -> None | Response:
-    '''
-        Returns None if admin, and response when not admin.
-    '''
-
-    if "is_admin" not in claims:
-        return jsonify({"error": "Administration rights required"})
-    return None
-
-
 @jwt.unauthorized_loader
 def handle_unauthorized_error(err):
     return {"error": "401 Unauthorized"}, 401

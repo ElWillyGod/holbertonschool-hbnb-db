@@ -22,16 +22,17 @@
 '''
 
 from flask import request, Blueprint
-import api.validations as val
-from api.security import notAdmin
+from flask_jwt_extended import jwt_required, get_jwt
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-from flask_jwt_extended import jwt_required, get_jwt
+import api.validations as val
+import api.authlib as authlib
 
 bp = Blueprint("reviews", __name__)
 
 
 @bp.get('/users/<user_id>/reviews')
+@jwt_required(optional=True)
 def getUserReviews(user_id):
     """
     Retrieve all reviews written by a specific user.
@@ -53,6 +54,10 @@ def getUserReviews(user_id):
         description: User ID not found or no reviews found for the user
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAllAuthorized("user/review", get_jwt()):
+        return err, 403
+
     # Check if id is valid.
     if not val.idChecksum(user_id):
         return {'error': "Invalid user ID"}, 400
@@ -67,6 +72,7 @@ def getUserReviews(user_id):
 
 
 @bp.get('/places/<place_id>/reviews')
+@jwt_required(optional=True)
 def getPlaceReviews(place_id):
     """
     Retrieve all reviews for a specific place.
@@ -88,6 +94,10 @@ def getPlaceReviews(place_id):
         description: Place ID not found or no reviews found for the place
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAllAuthorized("place/review", get_jwt()):
+        return err, 403
+
     # Check if id is valid.
     if not val.idChecksum(place_id):
         return {'error': "Invalid place ID format"}, 400
@@ -102,6 +112,7 @@ def getPlaceReviews(place_id):
 
 
 @bp.get('/reviews/<review_id>')
+@jwt_required(optional=True)
 def getReview(review_id):
     """
     Retrieve detailed information about a specific review.
@@ -123,6 +134,10 @@ def getReview(review_id):
         description: Review ID not found
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notGetAuthorized("review", get_jwt()):
+        return err, 403
+
     # Checks if id is valid.
     if not val.idChecksum(review_id):
         return {'error': "Invalid review ID"}, 400
@@ -137,7 +152,7 @@ def getReview(review_id):
 
 
 @bp.post('/places/<place_id>/reviews')
-@jwt_required()
+@jwt_required(optional=False)
 def createReview(place_id):
     """
     Create a new review for a specified place.
@@ -173,6 +188,10 @@ def createReview(place_id):
         description: Place ID not found or trying to review own place
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPostAuthorized("review", get_jwt()):
+        return err, 403
+
     # Get data from request.
     data = request.get_json()
 
@@ -199,7 +218,7 @@ def createReview(place_id):
 
 
 @bp.put('/reviews/<review_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def updateReview(review_id):
     """
     Update an existing review.
@@ -233,6 +252,10 @@ def updateReview(review_id):
         description: Review ID not found or trying to update own review
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notPutAuthorized("amenity", get_jwt()):
+        return err, 403
+
     # Get data from request.
     data = request.get_json()
 
@@ -246,11 +269,9 @@ def updateReview(review_id):
         return {'error': 'Invalid rating'}, 400
 
     # Calls BL to update review.
-    # If admin it can update reviews of other people.
-    is_admin: bool = get_jwt().get("is_admin", False)
     try:
         review = LogicFacade.updateByID(
-            review_id, 'review', data, is_admin=is_admin)
+            review_id, 'review', data, user=get_jwt())
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
     except (logicexceptions.TryingToReviewOwnPlace) as err:
@@ -260,7 +281,7 @@ def updateReview(review_id):
 
 
 @bp.delete('/reviews/<review_id>')
-@jwt_required()
+@jwt_required(optional=False)
 def deleteReview(review_id):
     """
     Delete a specific review.
@@ -282,15 +303,17 @@ def deleteReview(review_id):
         description: Review ID not found
     """
 
+    # Checks if it's authorized to make the request.
+    if err := authlib.notDeleteAuthorized("amenity", get_jwt()):
+        return err, 403
+
     # Checks if id is valid.
     if not val.idChecksum(review_id):
         return {'error': "Invalid review ID format"}, 400
 
     # Calls BL to delete review.
-    # If admin it can update reviews of other people.
-    is_admin: bool = get_jwt().get("is_admin", False)
     try:
-        LogicFacade.deleteByID(review_id, 'review', is_admin=is_admin)
+        LogicFacade.deleteByID(review_id, 'review', user=get_jwt())
     except (logicexceptions.IDNotFoundError) as err:
         return {'error': str(err)}, 404
 
