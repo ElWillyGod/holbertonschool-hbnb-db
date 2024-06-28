@@ -21,6 +21,7 @@ class TrackedObject(ABC):
         toJson() -> str: Returns a JSON representation of this object.
     '''
 
+
     def __init__(self,
                  id: str = None,
                  created_at: str = None,

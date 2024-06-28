@@ -4,16 +4,35 @@
     An amenity is something that places have.
 '''
 
+from sqlalchemy.ext.declarative import declarative_base
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import isAmenityDuplicated
 from logic.model.logicexceptions import AmenityNameDuplicated
+from api import app, db, Base
+from sqlalchemy import column, String, TIMESTAMP
 
 
-class Amenity(TrackedObject):
+class Amenity(Base):
     '''
         Amenity Class.
     '''
+    if app.config['USE_DATABASE']:
 
+        __tablename__ = 'amenity'
+
+        id = db.Column(db.String,
+                       nullable=False,
+                       primary_key=True)
+
+        name = db.Column(db.String(255),
+                         primary_key=True)
+
+        created_at = db.Column(db.TIMESTAMP,
+                               nullable=False)
+
+        update_at = db.Column(db.TIMESTAMP,
+                              nullable=False)
+    """   
     def __init__(self,
                  name: str,
                  *,
@@ -27,3 +46,4 @@ class Amenity(TrackedObject):
             if isAmenityDuplicated(name):
                 raise AmenityNameDuplicated("amenity already exists")
         self.name = name
+        """

@@ -7,8 +7,13 @@
 import json
 import os
 import glob
+
+from sqlalchemy.orm import session
 from persistence.data_manager_interface import IPersistenceManager
 from persistence.model.model_amenity import createAmenity
+################################################# tener cuidado con esto
+from app import app
+from api import db
 
 
 class DataManager(IPersistenceManager):
@@ -47,20 +52,27 @@ class DataManager(IPersistenceManager):
             Returns:
                 The entity
         """
-        return createAmenity(id, entity)
-        """
-        entity_id = id
-        entity_type = type
-        file_path = self._file_path(entity_type, entity_id)
+        if app.config['USE_DATABASE']:# config de la bd
 
-        with open(file_path, 'w') as file:
-            json.dump(entity, file)
+            db.session.add(entity)
+            db.session.commit()
+
+            db.session.close()
+
+        else:
+
+            entity_id = id
+            entity_type = type
+            file_path = self._file_path(entity_type, entity_id)
+
+            with open(file_path, 'w') as file:
+                json.dump(entity, file)
+
         result = {
             'entity': entity,
             'entity_type': type
         }
         return result
-        """
         
 
     def get(self, entity_id: str, entity_type: str) -> dict:
