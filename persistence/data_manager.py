@@ -47,20 +47,21 @@ class DataManager(IPersistenceManager):
             Returns:
                 The entity
         """
-        createAmenity() 
-        entity_type = type
+        return createAmenity(id, entity)
         """
         entity_id = id
+        entity_type = type
         file_path = self._file_path(entity_type, entity_id)
 
         with open(file_path, 'w') as file:
             json.dump(entity, file)
-        """
         result = {
             'entity': entity,
-            'entity_type': entity_type
+            'entity_type': type
         }
         return result
+        """
+        
 
     def get(self, entity_id: str, entity_type: str) -> dict:
         """

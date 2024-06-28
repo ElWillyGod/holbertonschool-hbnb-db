@@ -10,7 +10,7 @@ class Amenity(Base):
 
     __tablename__ = 'amenity'
 
-    id = Column(Integer,
+    id = Column(String,
                 nullable=False,
                 primary_key=True)
 
@@ -24,9 +24,7 @@ class Amenity(Base):
                        nullable=False)
 
 
-def createAmenity():
-
-    print("anda")
+def createAmenity(id, data):
 
     engine = create_engine('mysql+mysqldb://root:@localhost/hbnb'
                            , pool_pre_ping=True)
@@ -34,7 +32,7 @@ def createAmenity():
 
     session = Session(engine)
 
-    ameni = Amenity(id=1, name='tele', created_at='1999-12-31 23:59:59', update_at='1999-12-31 23:59:59')
+    ameni = Amenity(id='{}'.format(id), name=data.get('name'), created_at='1999-12-31 23:59:59', update_at='1999-12-31 23:59:59')
 
     session.add(ameni)
     session.commit()
@@ -42,3 +40,10 @@ def createAmenity():
     print(ameni.name)
 
     session.close()
+
+    result = {
+            'entity': data,
+            'entity_type': 'users'
+        }
+
+    return result

@@ -83,8 +83,8 @@ class LogicFacade(ABC):
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id
-        Persistence.save(id, typePlural, new.toJson())
-        return Persistence.get(id, typePlural)
+        return Persistence.save(id, typePlural, new.toJson())
+        # return Persistence.get(id, typePlural)
 
     @staticmethod
     def getAllCountries() -> dict:
