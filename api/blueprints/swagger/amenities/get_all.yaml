@@ -1,0 +1,20 @@
+Retrieve a list of all amenities
+---
+tags:
+  - amenities
+responses:
+  200:
+    description: A list of amenities
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          created_at:
+            type: string
+          updated_at:
+            type: string

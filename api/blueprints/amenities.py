@@ -21,35 +21,16 @@ from api.security import notAdmin
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 from flask_jwt_extended import jwt_required, get_jwt
+from flasgger import swag_from
 
 bp = Blueprint("amenities", __name__, url_prefix="/amenities")
 
 
 @bp.get('/')
+@swag_from("swagger/amenities/get_all.yaml")
 def getAllAmenities():
     """
-    Retrieve a list of all amenities
-    ---
-    tags:
-      - amenities
-    responses:
-      200:
-        description: A list of amenities
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              created_at:
-                type: string
-              updated_at:
-                type: string
-      200:
-        description: No amenities found
+        Gets all amenities.
     """
 
     # Calls BL to get all amenities
@@ -59,25 +40,10 @@ def getAllAmenities():
 
 
 @bp.get('/<amenity_id>')
+@swag_from("swagger/amenities/get.yaml")
 def getAmenity(amenity_id):
     """
-    Retrieve an amenity by ID
-    ---
-    tags:
-      - amenities
-    parameters:
-      - in: path
-        name: amenity_id
-        type: string
-        required: true
-        description: The ID of the amenity to retrieve
-    responses:
-      200:
-        description: Amenity details
-      400:
-        description: Bad request, invalid ID format
-      404:
-        description: Amenity not found
+        Get an amenity.
     """
 
     # Checks if id is valid.
@@ -95,31 +61,10 @@ def getAmenity(amenity_id):
 
 @bp.post('/')
 @jwt_required()
+@swag_from("swagger/amenities/post.yaml")
 def createAmenity():
     """
-    Create a new amenity
-    ---
-    tags:
-      - amenities
-    parameters:
-      - in: body
-        name: body
-        schema:
-          type: object
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: The name of the amenity
-              example: Pool
-    responses:
-      201:
-        description: Amenity created successfully
-      400:
-        description: Bad request, invalid data
-      409:
-        description: Amenity name already exists
+        Creates an amenity.
     """
 
     # Check if user is admin.
@@ -145,38 +90,10 @@ def createAmenity():
 
 @bp.put('/<amenity_id>')
 @jwt_required()
+@swag_from("swagger/amenities/put.yaml")
 def updateAmenity(amenity_id):
     """
-    Update an amenity by ID
-    ---
-    tags:
-      - amenities
-    parameters:
-      - in: path
-        name: amenity_id
-        type: string
-        required: true
-        description: The ID of the amenity to update
-      - in: body
-        name: body
-        schema:
-          type: object
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: The name of the amenity
-              example: Gym
-    responses:
-      200:
-        description: Amenity updated successfully
-      400:
-        description: Bad request, invalid data or ID format
-      404:
-        description: Amenity not found
-      409:
-        description: Amenity name already exists
+        Updates an amenity.
     """
 
     # Check if user is admin.
@@ -206,25 +123,10 @@ def updateAmenity(amenity_id):
 
 @bp.delete('/<amenity_id>')
 @jwt_required()
+@swag_from("swagger/amenities/delete.yaml")
 def deleteAmenity(amenity_id):
     """
-    Delete an amenity by ID
-    ---
-    tags:
-      - amenities
-    parameters:
-      - in: path
-        name: amenity_id
-        type: string
-        required: true
-        description: The ID of the amenity to delete
-    responses:
-      204:
-        description: Amenity deleted successfully
-      400:
-        description: Bad request, invalid ID format
-      404:
-        description: Amenity not found
+        Deletes an amenity.
     """
 
     # Check if user is admin.

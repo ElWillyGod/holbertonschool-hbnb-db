@@ -1,0 +1,17 @@
+Delete an amenity by ID
+---
+tags:
+  - amenities
+parameters:
+  - in: path
+    name: amenity_id
+    type: string
+    required: true
+    description: The ID of the amenity to delete
+responses:
+  204:
+    description: Amenity deleted successfully
+  400:
+    description: Bad request, invalid ID format
+  404:
+    description: Amenity not found
