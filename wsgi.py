@@ -6,8 +6,15 @@
     To run from flask do:
     flask run
 
+    This will start flask.
+    Config for flask is defined in '.flaskenv'
+
+
     To run from gunicorn do:
-    gunicorn -w 4 -b 0.0.0.0:8000 wsgi:app
+    gunicorn
+
+    This will start multiple workers threads of Flask.
+    Config for gunicorn is defined in 'gunicorn.conf.py'
 '''
 
 from api import appFactory
