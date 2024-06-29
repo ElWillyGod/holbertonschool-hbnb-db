@@ -83,14 +83,23 @@ class DataManager(IPersistenceManager):
                 entity_type: the type of the entity
             Return: the retrieved entity or None if not found
         """
+        if app.config['USE_DATABASE']:
 
-        file_path = self._file_path(entity_type, entity_id)
-        if not os.path.exists(file_path):
-            return None
+            data = db.session.query(entity_type).filter(entity_type.id == entity_id)
+
+            db.session.close()
+
+            return data
+
         else:
-            with open(file_path, 'r') as file:
-                entity = json.load(file)
-            return entity
+
+            file_path = self._file_path(entity_type, entity_id)
+            if not os.path.exists(file_path):
+                return None
+            else:
+                with open(file_path, 'r') as file:
+                    entity = json.load(file)
+                return entity
 
     def update(self, entity_id: str, entity_type: str, data: dict) -> dict:
         """
@@ -125,13 +134,25 @@ class DataManager(IPersistenceManager):
             Returns:
                 Nothing
         """
-        file_path = self._file_path(entity_type, entity_id)
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        if app.config['USE_DATABASE']:
+
+            data = db.session.query(entity_type).filter(entity_type.id == entity_id)
+
+            db.session.delete(data)
+            db.session.commit()
+            db.session.close()
+
             return
+
         else:
-            raise FileNotFoundError(
-                f"No such entity: {entity_type} with {entity_id}")
+
+            file_path = self._file_path(entity_type, entity_id)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                return
+            else:
+                raise FileNotFoundError(
+                    f"No such entity: {entity_type} with {entity_id}")
 
     def get_all(self, entity_type: str) -> list[dict]:
         """
@@ -140,14 +161,25 @@ class DataManager(IPersistenceManager):
             entity_type: the type of entities to retrieve
             Return: a list of all entities of the given type in JSON
         """
-        path = os.path.join(self.storage_path, f"{entity_type}_*.json")
-        files = glob.glob(path)
-        entities = []
-        for file_path in files:
-                with open(file_path, 'r') as file:
-                    data = json.load(file)
-                    entities.append(data)
-        return entities
+
+        if app.config['USE_DATABASE']:# config de la bd
+
+            entity = db.session.query(entity_type)
+
+            db.session.close()
+
+            return entity
+
+        else:
+
+            path = os.path.join(self.storage_path, f"{entity_type}_*.json")
+            files = glob.glob(path)
+            entities = []
+            for file_path in files:
+                    with open(file_path, 'r') as file:
+                        data = json.load(file)
+                        entities.append(data)
+            return entities
 
     def get_by_property(self, entity_type: str,
                         property_name: str, property_value) -> list[dict]:

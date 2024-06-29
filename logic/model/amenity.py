@@ -32,6 +32,8 @@ class Amenity(Base):
 
         update_at = db.Column(db.TIMESTAMP,
                               nullable=False)
+
+
     """   
     def __init__(self,
                  name: str,

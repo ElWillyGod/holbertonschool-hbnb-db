@@ -8,11 +8,41 @@ from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import idExists, isOwnerIDTheSame
 from logic.model.logicexceptions import IDNotFoundError, TryingToReviewOwnPlace
 
+from sqlalchemy.orm import Session
+from api import Base, db
+from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP, create_engine, engine
 
+
+class Review(Base):
+
+    __tablename__ = 'review'
+
+    id = db.Column(db.Integer,
+                nullable=False,
+                primary_key=True)
+
+    placeId = db.Column(db.Integer,
+                     ForeignKey('place.id'),
+                     nullable=False,
+                     primary_key=True)
+
+    userId = db.Column(db.Integer,
+                    ForeignKey('user.id'),
+                    nullable=False,
+                    primary_key=True)
+
+    reating = db.Column(db.Integer,
+                     nullable=False)
+
+    create_at = db.Column(db.TIMESTAMP,
+                       nullable=False)
+
+    update_at = db.Column(db.TIMESTAMP,
+                       nullable=False)
+
+    """
 class Review(TrackedObject):
-    """
-        Review Class.
-    """
+
 
     def __init__(self,
                  place_id: str,
@@ -36,3 +66,4 @@ class Review(TrackedObject):
         self.place_id = place_id
         self.user_id = user_id
         self.comment = comment
+        """

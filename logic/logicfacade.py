@@ -13,6 +13,8 @@ from logic.model.logicexceptions import IDNotFoundError
 from logic.model.validationlib import idExists
 from logic import DM as Persistence
 from logic.model.linkeddeleter import raiseDeleteEvent
+from api import app
+from logic.model import amenity
 
 
 class LogicFacade(ABC):
@@ -76,9 +78,9 @@ class LogicFacade(ABC):
 
     @staticmethod
     def createObjectByJson(type: str, data: dict) -> dict:
-        new = getClassByName(type)
-        entydad = new(id='cuaasdasd', name=data.get('name'), created_at='1999-12-31 23:59:59', update_at='1999-12-31 23:59:59')
-        id = new.id
+        # new = getClassByName(type)
+        entydad = amenity.Amenity(id='cuaasdasd', name=data.get('name'), created_at='1999-12-31 23:59:59', update_at='1999-12-31 23:59:59')
+        id = entydad.id
         return Persistence.save(id, type, entydad)
         # return Persistence.get(id, typePlural)
 

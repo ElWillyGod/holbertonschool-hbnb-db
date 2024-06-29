@@ -7,11 +7,60 @@ from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import idExists
 from logic.model.logicexceptions import IDNotFoundError
 
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP
+from api import Base, db
 
+
+class Place(Base):
+
+    __tablename__ = 'place'
+
+    id = db.Column(db.Integer,
+                nullable=False,
+                primary_key=True)
+
+    userId = db.Column(db.Integer,
+                    ForeignKey('user.id'),
+                    nullable=False,
+                    primary_key=True)
+
+    name = db.Column(db.String(255),
+                  nullable=False)
+
+    description = db.Column(db.String(255),
+                         nullable=False)
+
+    numberOfRooms = db.Column(db.Integer,
+                           nullable=False)
+
+    numberOfBathrooms = db.Column(db.Integer,
+                               nullable=False)
+
+    maxGues = db.Column(db.Integer,
+                     nullable=False)
+
+    pricePreNigth = db.Column(db.Float,
+                           nullable=False)
+
+    latitude = db.Column(db.Float,
+                      nullable=False)
+
+    longitude = db.Column(db.Float,
+                       nullable=False)
+
+    citiId = db.Column(db.Integer,
+                    ForeignKey('city.id'),
+                    nullable=False)
+
+    create_at = db.Column(db.TIMESTAMP,
+                       nullable=False)
+
+    update_at = db.Column(db.TIMESTAMP,
+                       nullable=False)
+
+"""
 class Place(TrackedObject):
-    """
         Place Class.
-    """
 
     def __init__(self,
                  host_id: str,
@@ -50,3 +99,5 @@ class Place(TrackedObject):
         self.longitude = longitude
         self.city_id = city_id
         self.amenity_ids = amenity_ids
+
+"""
