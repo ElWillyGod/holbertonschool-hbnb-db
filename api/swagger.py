@@ -11,10 +11,12 @@ template = {
         "contact": {
             "responsibleDeveloper":
                 "Wilson Antognazza, Matias Davezac, Alison Alvez",
-            "email":
-                "alisonalvez05@gmailcom, w@w.com, matiasdavezac@gmail.com",
+            "email": (
+                "alisonalvez05@gmailcom, " +
+                "manuelantognazza@gmail.com, " +
+                "matiasdavezac@gmail.com"),
         },
-        "version": "0.0.1"
+        "version": "0.0.2"
     },
     "basePath": "/",
     "schemes": [
