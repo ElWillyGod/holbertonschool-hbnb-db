@@ -38,6 +38,8 @@ def appFactory() -> Flask:
 
             Registers all blueprints from blueprints package (fancy endpoints).
 
+            Also registers home page ("/") to a redirect to apidocs.
+
             Swagger, for documentation.
     '''
 

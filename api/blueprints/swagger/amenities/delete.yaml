@@ -16,6 +16,7 @@ responses:
     schema:
       type: string
       example: ""
+      description: Empty string
   400:
     description: Bad request, invalid ID format
     schema:
@@ -23,7 +24,7 @@ responses:
       properties:
         error:
           type: string
-          example: Invalid ID format
+          example: invalid id
   401:
     description: Not authenticated.
     schema:
@@ -31,7 +32,7 @@ responses:
       properties:
         error:
           type: string
-          example: Unauthenticated
+          example: unauthenticated
   403:
     description: Not authorized.
     schema:
@@ -39,7 +40,7 @@ responses:
       properties:
         error:
           type: string
-          example: Requires admin privileges
+          example: requires admin privileges
   404:
     description: Amenity not found
     schema:
@@ -47,4 +48,4 @@ responses:
       properties:
         error:
           type: string
-          example: Id not found
+          example: id not found
