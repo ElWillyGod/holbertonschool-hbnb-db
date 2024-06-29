@@ -8,11 +8,11 @@
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import isUserEmailDuplicated
 from logic.model.logicexceptions import EmailDuplicated
-from api import Base, db
+from api import db
 from sqlalchemy import Column, Integer, String, TIMESTAMP
 
 
-class User(Base):
+class User(db.Model):
     """tabla del user"""
 
     __tablename__ = 'user'

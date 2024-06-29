@@ -8,10 +8,10 @@ from logic.model.validationlib import idExists
 from logic.model.logicexceptions import IDNotFoundError
 
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP
-from api import Base, db
+from api import db
 
 
-class Place(Base):
+class Place(TrackedObject, db.Model):
 
     __tablename__ = 'place'
 
@@ -58,10 +58,6 @@ class Place(Base):
     update_at = db.Column(db.TIMESTAMP,
                        nullable=False)
 
-"""
-class Place(TrackedObject):
-        Place Class.
-
     def __init__(self,
                  host_id: str,
                  name: str,
@@ -81,6 +77,7 @@ class Place(TrackedObject):
                  update: dict | None = None
                  ) -> None:
         super().__init__(id, created_at, updated_at)
+        """
         if not idExists(host_id, "users"):
             raise IDNotFoundError("host_id does not exist")
         if not idExists(city_id, "cities"):
@@ -88,6 +85,7 @@ class Place(TrackedObject):
         for id in amenity_ids:
             if not idExists(id, "amenities"):
                 raise IDNotFoundError(f"'{id}' in amenity_ids does not exist")
+                """
         self.host_id = host_id
         self.name = name
         self.description = description
@@ -99,5 +97,3 @@ class Place(TrackedObject):
         self.longitude = longitude
         self.city_id = city_id
         self.amenity_ids = amenity_ids
-
-"""

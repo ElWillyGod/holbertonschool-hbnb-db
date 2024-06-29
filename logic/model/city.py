@@ -11,10 +11,10 @@ from logic.model.validationlib import doesCountryExist, isCityNameDuplicated
 from logic.model.logicexceptions import CountryNotFoundError, CityNameDuplicated
 
 from sqlalchemy import Column, Integer, String, TIMESTAMP
-from api import Base, db
+from api import db
 
 
-class City(Base):
+class City(TrackedObject, db.Model):
 
     __tablename__ = 'city'
 
@@ -35,11 +35,6 @@ class City(Base):
 
     update_at = db.Column(db.TIMESTAMP,
                             nullable=False)
-"""
-class City(TrackedObject):
-
-        City Class.
-
 
     def __init__(self,
                  name: str,
@@ -51,6 +46,7 @@ class City(TrackedObject):
                  update: dict | None = None
                  ) -> None:
         super().__init__(id, created_at, updated_at)
+        """
         if not doesCountryExist(country_code):
             raise CountryNotFoundError(
                 f"country '{country_code}' not found")
@@ -58,6 +54,7 @@ class City(TrackedObject):
             if isCityNameDuplicated(name, country_code):
                 raise CityNameDuplicated(
                     f"{name} already exists in {country_code}")
+        """
         self.name = name
         self.country_code = country_code
-        """
+

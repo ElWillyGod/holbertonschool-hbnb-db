@@ -5,14 +5,13 @@
     other classes.
 '''
 
-from abc import ABC
 from datetime import datetime
 import uuid
 import json
 import inspect
 
 
-class TrackedObject(ABC):
+class TrackedObject:
     '''
         id (str): UUID4 as hex.
         created_at: datetime as string at time of creation.

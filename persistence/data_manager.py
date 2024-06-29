@@ -44,7 +44,7 @@ class DataManager(IPersistenceManager):
         else:
             return os.path.join(self.storage_path, f"{entity_type}.json")
         
-    def save(self, id: str, type: str, entity: dict) -> dict:
+    def save(self, id: str, type: str, entity) -> dict:
         """
             Save an entity to a JSON file
             Attributes:

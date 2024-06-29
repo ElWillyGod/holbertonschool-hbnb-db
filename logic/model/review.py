@@ -9,11 +9,11 @@ from logic.model.validationlib import idExists, isOwnerIDTheSame
 from logic.model.logicexceptions import IDNotFoundError, TryingToReviewOwnPlace
 
 from sqlalchemy.orm import Session
-from api import Base, db
+from api import db
 from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP, create_engine, engine
 
 
-class Review(Base):
+class Review(TrackedObject, db.Model):
 
     __tablename__ = 'review'
 
@@ -39,11 +39,6 @@ class Review(Base):
 
     update_at = db.Column(db.TIMESTAMP,
                        nullable=False)
-
-    """
-class Review(TrackedObject):
-
-
     def __init__(self,
                  place_id: str,
                  user_id: str,
@@ -56,14 +51,15 @@ class Review(TrackedObject):
                  update: dict | None = None
                  ) -> None:
         super().__init__(id, created_at, updated_at)
+        """
         if not idExists(place_id, "places"):
             raise IDNotFoundError("place_id doesn't pair with a place")
         if not idExists(user_id, "users"):
             raise IDNotFoundError("user_id doesn't pair with a user")
         if isOwnerIDTheSame(place_id, user_id):
             raise TryingToReviewOwnPlace("you cannot review your own place")
+            """
         self.rating = rating
         self.place_id = place_id
         self.user_id = user_id
         self.comment = comment
-        """

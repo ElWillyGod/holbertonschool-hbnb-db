@@ -78,10 +78,9 @@ class LogicFacade(ABC):
 
     @staticmethod
     def createObjectByJson(type: str, data: dict) -> dict:
-        # new = getClassByName(type)
-        entydad = amenity.Amenity(id='cuaasdasd', name=data.get('name'), created_at='1999-12-31 23:59:59', update_at='1999-12-31 23:59:59')
-        id = entydad.id
-        return Persistence.save(id, type, entydad)
+        new = getClassByName(type)(**data)
+        print("esto es el new {}".format(new))
+        return Persistence.save(new.id, type, new)
         # return Persistence.get(id, typePlural)
 
     @staticmethod
