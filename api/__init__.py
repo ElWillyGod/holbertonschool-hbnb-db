@@ -24,9 +24,9 @@ def appFactory() -> Flask:
             Swagger, for documentation.
     '''
 
-    app = Flask("HBnB-AlMaWi")
+    app = Flask(__name__)
+    app.config.from_pyfile("settings.py")
 
-    app.config['JWT_SECRET_KEY'] = '00Ba3EpLas52se6QhQ8gE'
     security.associateSecurity(app)
     app.register_blueprint(security.login_bp)
 

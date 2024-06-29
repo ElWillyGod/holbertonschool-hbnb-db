@@ -8,7 +8,6 @@ from typing import Any
 import requests
 import json
 from pathlib import Path
-from glob import glob
 import time
 
 
@@ -29,10 +28,8 @@ class HTTPTestClass:
         If debug == True it shows the result of all passed assertions.
     '''
 
-    URL: str = "http://127.0.0.1:5000/"
-    savefolderpath: str = "persistence/storage"
+    local_URL: str = "http://127.0.0.1:8000/"
     _root_path = Path(__file__).parent.parent.resolve()
-    savefolderpath = f"{_root_path}/{savefolderpath}/*.json"
 
     assertionsPassed: int = 0
     assertionsFailed: int = 0
@@ -187,7 +184,7 @@ class HTTPTestClass:
 
     @classmethod
     def GET(cls, endpoint: str) -> dict:
-        response = requests.get(f"{HTTPTestClass.URL}{endpoint}")
+        response = requests.get(f"{HTTPTestClass.local_URL}{endpoint}")
         cls.lastResponse = response
         cls.num_http += 1
         return response
@@ -208,7 +205,7 @@ class HTTPTestClass:
 
     @classmethod
     def POST(cls, endpoint: str) -> dict:
-        response = requests.post(f"{HTTPTestClass.URL}{endpoint}",
+        response = requests.post(f"{HTTPTestClass.local_URL}{endpoint}",
                                  json=cls.json,
                                  headers=cls.headers)
         cls.lastResponse = response
@@ -217,7 +214,7 @@ class HTTPTestClass:
 
     @classmethod
     def PUT(cls, endpoint: str) -> dict:
-        response = requests.put(f"{HTTPTestClass.URL}{endpoint}",
+        response = requests.put(f"{HTTPTestClass.local_URL}{endpoint}",
                                  json=cls.json,
                                  headers=cls.headers)
         cls.lastResponse = response
@@ -226,16 +223,20 @@ class HTTPTestClass:
 
     @classmethod
     def DELETE(cls, endpoint: str) -> dict:
-        response = requests.delete(f"{HTTPTestClass.URL}{endpoint}")
+        response = requests.delete(f"{HTTPTestClass.local_URL}{endpoint}")
         cls.lastResponse = response
         cls.num_http += 1
         return response
 
     @classmethod
     def Teardown(cls) -> None:
-        files = glob(cls.savefolderpath)
-        for file in files:
-            Path.unlink(Path(file))
+        pass
+
+    @classmethod
+    def Authenticate(cls, email: str, password: str) -> None:
+        cls.json = {"email": email, "password": password}
+        cls.POST("/")
+        cls.token = token
 
     @classmethod
     def run(cls) -> None:

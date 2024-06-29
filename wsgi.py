@@ -2,10 +2,17 @@
 
 '''
     Aplication runner.
+
+    To run from flask do:
+    flask run
+
+    To run from gunicorn do:
+    gunicorn -w 4 wsgi:app
 '''
 
 from api import appFactory
+from dotenv import load_dotenv
 
-if __name__ == '__main__':
-    app = appFactory()
-    app.run(host='0.0.0.0')
+load_dotenv('.env')
+
+app = appFactory()
