@@ -12,6 +12,18 @@ responses:
   200:
     description: Detailed information about the review
   400:
-    description: Invalid review ID format
+    description: Invalid review ID
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
   404:
     description: Review ID not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found

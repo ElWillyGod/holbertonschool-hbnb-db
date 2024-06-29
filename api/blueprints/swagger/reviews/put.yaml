@@ -2,6 +2,7 @@ Update an existing review.
 ---
 tags:
   - reviews
+
 parameters:
   - in: path
     name: review_id
@@ -13,6 +14,12 @@ parameters:
     required: true
     schema:
       type: object
+      required:
+        - name
+        - description
+        - city_id
+        - host_id
+        - amenity_ids
       properties:
         rating:
           type: integer
@@ -20,14 +27,63 @@ parameters:
         comment:
           type: string
           description: Updated comment for the review
+
+
 responses:
   201:
     description: Review updated successfully
+    schema:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the review
+          example: 1f2390e77d1341a3b59d0cb56fba5f45
+        rating:
+          type: integer
+          description: Rating for the place (1 to 5)
+          example: 1
+        comment:
+          type: string
+          description: Optional comment about the place
+          example: Sucks.
+        created_at:
+          type: string
+          description: Date and time when the review was created
+          example: 2077-03-30 03:30:30.303030
+        updated_at:
+          type: string
+          description: Date and time when the review was last updated
+          example: 2077-06-06 06:06:06.060606
   400:
     description: Invalid request data or missing fields
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
   401:
     description: Not authenticated.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
   403:
-    description: Not authorized.
+    description: Not authorized. Not your review
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges
   404:
     description: Review ID not found or trying to update own review
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found
