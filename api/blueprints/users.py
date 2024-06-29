@@ -18,6 +18,7 @@ from flask_jwt_extended import jwt_required, get_jwt
 from flasgger import swag_from
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
+from api.security import hashPassword
 import api.validations as val
 import api.authlib as authlib
 
@@ -97,6 +98,9 @@ def createUser():
 
     if not val.isEmailValid(email):
         return {'error': "Invalid data"}, 400
+
+    # Hashes password.
+    data["password"] = hashPassword(data["password"])
 
     # Calls BL to create user.
     try:

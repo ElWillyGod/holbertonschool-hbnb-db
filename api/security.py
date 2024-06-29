@@ -14,10 +14,15 @@ bcrypt = flask_bcrypt.Bcrypt()
 login_bp = Blueprint("login", __name__)
 
 
-# Called from init
+# Called from init.
 def associateSecurity(app):
     jwt.init_app(app)
     bcrypt.init_app(app)
+
+
+# Called in users.
+def hashPassword(password):
+    return bcrypt.generate_password_hash(password, 16)
 
 
 @jwt.unauthorized_loader

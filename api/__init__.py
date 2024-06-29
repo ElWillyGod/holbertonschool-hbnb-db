@@ -7,7 +7,7 @@ from flask import Flask
 
 import api.security as security
 
-from blueprints import *
+from api.blueprints import *
 
 from flasgger import Swagger
 from api.swagger import template

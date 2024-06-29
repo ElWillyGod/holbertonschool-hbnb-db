@@ -8,7 +8,6 @@
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import isUserEmailDuplicated
 from logic.model.logicexceptions import EmailDuplicated
-from logic import bcrypt
 
 
 class User(TrackedObject):
@@ -37,4 +36,4 @@ class User(TrackedObject):
         self.first_name = first_name
         self.last_name = last_name
         self.is_admin = is_admin
-        self.password = bcrypt.generate_password_hash(password, 16)
+        self.password = password
