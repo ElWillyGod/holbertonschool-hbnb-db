@@ -27,5 +27,7 @@ responses:
     description: Review created successfully
   400:
     description: Invalid request data or missing fields
+  401:
+    description: Not authenticated.
   404:
     description: Place ID not found or trying to review own place

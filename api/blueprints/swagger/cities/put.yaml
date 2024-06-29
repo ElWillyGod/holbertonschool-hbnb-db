@@ -32,5 +32,9 @@ responses:
     description: Bad request, invalid data or ID format
   404:
     description: City not found
+  401:
+    description: Not authenticated.
+  403:
+    description: Not authorized.
   409:
     description: City name already exists

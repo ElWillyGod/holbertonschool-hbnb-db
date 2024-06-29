@@ -32,9 +32,13 @@ parameters:
             type: string
           description: List of amenity IDs available at the place
 responses:
-  200:
+  201:
     description: Place updated successfully
   400:
     description: Invalid request data or missing fields
+  401:
+    description: Not authenticated.
+  403:
+    description: Not authorized.
   404:
     description: Place ID not found

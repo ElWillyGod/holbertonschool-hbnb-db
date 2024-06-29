@@ -24,6 +24,10 @@ responses:
     description: Amenity updated successfully
   400:
     description: Bad request, invalid data or ID format
+  401:
+    description: Not authenticated.
+  403:
+    description: Not authorized.
   404:
     description: Amenity not found
   409:

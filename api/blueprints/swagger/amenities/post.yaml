@@ -19,5 +19,9 @@ responses:
     description: Amenity created successfully
   400:
     description: Bad request, invalid data
+  401:
+    description: Not authenticated.
+  403:
+    description: Not authorized.
   409:
     description: Amenity name already exists

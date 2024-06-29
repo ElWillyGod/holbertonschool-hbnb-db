@@ -31,6 +31,10 @@ responses:
     description: User updated successfully
   400:
     description: Invalid request data or missing fields
+  401:
+    description: Not authenticated.
+  403:
+    description: Not authorized.
   404:
     description: User ID not found
   409:

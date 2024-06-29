@@ -13,5 +13,9 @@ responses:
     description: Place deleted successfully
   400:
     description: Invalid place ID format
+  401:
+    description: Not authenticated.
+  403:
+    description: Not authorized.
   404:
     description: Place not found

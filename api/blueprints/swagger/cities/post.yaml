@@ -25,5 +25,9 @@ responses:
     description: City created successfully
   400:
     description: Bad request, invalid data or missing fields
+  401:
+    description: Not authenticated.
+  403:
+    description: Not authorized.
   409:
     description: City name already exists

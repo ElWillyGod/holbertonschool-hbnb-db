@@ -11,3 +11,7 @@ parameters:
 responses:
   200:
     description: Details of the specified user
+  401:
+    description: Not authenticated.
+  403:
+    description: Not authorized.
