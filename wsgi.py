@@ -1,4 +1,11 @@
-from api import app
+#!/usr/bin/python3
 
-if __name__ == "__main__":
-    app.run()
+'''
+    Aplication runner.
+'''
+
+from api import appFactory
+
+if __name__ == '__main__':
+    app = appFactory()
+    app.run(host='0.0.0.0')
