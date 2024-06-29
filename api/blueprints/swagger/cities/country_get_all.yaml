@@ -2,16 +2,51 @@ Retrieve cities for a specific country
 ---
 tags:
   - cities
+
 parameters:
   - in: path
     name: country_code
     type: string
     required: true
-    description: ISO country code (e.g., 'US' for United States)
+    description: ISO country code (e.g., 'UY' for Uruguay)
+
+
 responses:
   200:
     description: A list of cities for the country
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: 1f2390e77d1341a3b59d0cb56fba5f45
+          name:
+            type: string
+            example: Montevideo
+          country_code:
+            type: string
+            example: UY
+          created_at:
+            type: string
+            example: 2077-03-30 03:30:30.303030
+          updated_at:
+            type: string
+            example: 2077-03-30 03:30:30.303030
   400:
     description: Bad request, invalid country code
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid country_code
   404:
     description: Country not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: country 'UY' not found

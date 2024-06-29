@@ -2,16 +2,49 @@ Retrieve a city by ID
 ---
 tags:
   - cities
+
 parameters:
   - in: path
     name: city_id
     type: string
     required: true
     description: The ID of the city to retrieve
+
+
 responses:
   200:
     description: City details
+    schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1f2390e77d1341a3b59d0cb56fba5f45
+        name:
+          type: string
+          example: Montevideo
+        country_code:
+          type: string
+          example: UY
+        created_at:
+          type: string
+          example: 2077-03-30 03:30:30.303030
+        updated_at:
+          type: string
+          example: 2077-03-30 03:30:30.303030
   400:
     description: Bad request, invalid ID format
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
   404:
     description: City not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found

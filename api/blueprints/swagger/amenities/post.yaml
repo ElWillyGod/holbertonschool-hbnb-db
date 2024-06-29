@@ -2,6 +2,7 @@ Create a new amenity
 ---
 tags:
   - amenities
+
 parameters:
   - in: body
     name: body
@@ -14,6 +15,8 @@ parameters:
           type: string
           description: The name of the amenity
           example: Pool
+
+
 responses:
   201:
     description: Amenity created successfully, returning details.

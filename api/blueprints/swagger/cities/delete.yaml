@@ -2,20 +2,51 @@ Delete a city by ID
 ---
 tags:
   - cities
+
 parameters:
   - in: path
     name: city_id
     type: string
     required: true
     description: The ID of the city to delete
+
+
 responses:
   204:
     description: City deleted successfully
+    schema:
+      type: string
+      example: ""
+      description: Empty string
   400:
     description: Bad request, invalid ID format
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
   401:
     description: Not authenticated.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
   403:
     description: Not authorized.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges
   404:
     description: City not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found

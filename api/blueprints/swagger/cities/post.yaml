@@ -2,9 +2,11 @@ Create a new city
 ---
 tags:
   - cities
+
 parameters:
   - in: body
     name: body
+    required: true
     schema:
       type: object
       required:
@@ -14,20 +16,64 @@ parameters:
         name:
           type: string
           description: The name of the city
-          example: New York
+          example: Uruguay
         country_code:
           type: string
           description: The ISO code of the country to which the city \
             belongs
-          example: US
+          example: UY
+
+
 responses:
   201:
     description: City created successfully
+    schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1f2390e77d1341a3b59d0cb56fba5f45
+        name:
+          type: string
+          example: Montevideo
+        country_code:
+          type: string
+          example: UY
+        created_at:
+          type: string
+          example: 2077-03-30 03:30:30.303030
+        updated_at:
+          type: string
+          example: 2077-03-30 03:30:30.303030
   400:
     description: Bad request, invalid data or missing fields
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid data
   401:
-    description: Not authenticated.
+    description: Not authenticated
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
   403:
-    description: Not authorized.
+    description: Not authorized
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges
   409:
     description: City name already exists
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Montevideo already exists in UY
