@@ -30,7 +30,7 @@ parameters:
 
 
 responses:
-  201:
+  204:
     description: City updated successfully
     schema:
       type: object
@@ -49,7 +49,7 @@ responses:
           example: 2077-03-30 03:30:30.303030
         updated_at:
           type: string
-          example: 2077-03-30 03:30:30.303030
+          example: 2077-06-06 06:06:06.060606
   400:
     description: Bad request, invalid data or ID format
     schema:

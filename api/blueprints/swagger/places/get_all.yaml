@@ -2,6 +2,7 @@ Retrieve all places
 ---
 tags:
   - places
+
 responses:
   200:
     description: A list of all places
@@ -13,26 +14,34 @@ responses:
           id:
             type: string
             description: The ID of the place
+            example: 1f2390e77d1341a3b59d0cb56fba5f45
           name:
             type: string
             description: The name of the place
+            example: My House
           description:
             type: string
             description: Description of the place
+            example: Has walls and a roof. No doors though.
           city_id:
             type: string
             description: ID of the city where the place is located
+            example: 1f2390e77d1341a3b59d0cb56fba5f45
           host_id:
             type: string
             description: ID of the host of the place
+            example: em2p90e77d1341a3b59d0cb56fba52le
           amenities:
             type: array
+            description: List of amenity IDs available at the place
             items:
               type: string
-            description: List of amenity IDs available at the place
+              example: m12090e77d1341a3b59d0cb56fba5da3
           created_at:
             type: string
             description: Date and time when the place was created
+            example: 2077-03-30 03:30:30.303030
           updated_at:
             type: string
             description: Date and time when the place was last updated
+            example: 2077-03-30 03:30:30.303030
