@@ -1,0 +1,32 @@
+{
+  "swagger": "2.0",
+  "uiversion": 3,
+  "info": {
+    "title": "HBNB AlMaWi",
+    "description": "API description in Markdown.",
+    "version": "0.6.6",
+    "responsibleDeveloper": [
+      "Wilson Antognazza",
+      "Matias Davezac",
+      "Alison Alvez"
+    ],
+    "email": [
+      "manuelantognazza@gmail.com",
+      "matiasdavezac@gmail.com",
+      "alisonalvez05@gmail.com"
+    ]
+  },
+  "specs": [
+    {
+        "endpoint": "apispec_1",
+        "route": "/apispec_1.json",
+        "rule_filter": true,
+        "model_filter": true
+    }
+],
+  "host": "127.0.0.1:5000",
+  "basePath": "",
+  "schemes": [
+    "http"
+  ]
+}
