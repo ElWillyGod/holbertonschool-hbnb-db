@@ -1,6 +1,8 @@
 
 '''
-    Defines how to authorize endpoints using JWT and bcrypt.
+    Implements authentication and authorization by tokens for using
+    JWT and bcrypt modules. More authorization is done in BL.
+
     Also defines login endpoint.
 '''
 
@@ -8,23 +10,26 @@ from flask_jwt_extended import JWTManager, create_access_token
 from flask import request, Blueprint
 import flask_bcrypt
 from logic.logicfacade import LogicFacade
+from flasgger import swag_from
 
+# Instanciates all required objects.
 jwt = JWTManager()
 bcrypt = flask_bcrypt.Bcrypt()
 login_bp = Blueprint("login", __name__)
 
 
-# Called from init.
+# Called from init to attach to app.
 def associateSecurity(app):
     jwt.init_app(app)
     bcrypt.init_app(app)
 
 
-# Called in users.
+# Called in users endpoint on post and update to hash user password.
 def hashPassword(password):
     return bcrypt.generate_password_hash(password, 16)
 
 
+# Authentication error handlers.
 @jwt.unauthorized_loader
 def handle_unauthorized_error(err):
     return {"error": "Unauthenticated"}, 401
@@ -51,15 +56,19 @@ def handle_needs_fresh_token_error(err):
 
 
 @login_bp.post('/login')
+@swag_from("blueprints/swagger/login.yaml")
 def login():
-    """
-        Here be swag.
-    """
+    '''
+        Login endpoint for users to authenticate.
+
+        Returns as response a token that must be used to authenticate the
+        user identity.
+    '''
 
     WRONG_FIELDS = "Wrong email or password"
     WRONG_DATA = "Wrong email or password"
 
-    # Get user request info
+    # Get user request info.
     email = request.json.get("email", None)
     password = request.json.get("password", None)
 
@@ -70,15 +79,16 @@ def login():
     # Fetch user data by email. 401 if email not found.
     hashed_password, is_admin = LogicFacade.getPswdAndAdminByEmail(email)
     if hashed_password is None:
-        return WRONG_DATA, 401
+        return WRONG_DATA, 400
 
     # Compare passwords. 401 if different.
     if bcrypt.check_password_hash(hashed_password, password):
         # Create token.
         access_token = create_access_token(
             identity=email,
-            additional_claims={"is_admin": True}
-            )
+            additional_claims={"is_admin": is_admin}
+        )
+
         return {"access_token": access_token}, 200
     else:
-        return WRONG_DATA, 401
+        return WRONG_DATA, 400

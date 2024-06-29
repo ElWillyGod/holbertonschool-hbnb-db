@@ -1,0 +1,36 @@
+Authentication endpoint.
+---
+tags:
+  - login
+parameters:
+  - in: body
+    name: user
+    type: object
+    required: true
+    properties:
+      email:
+        type: string
+        description: Email address of the user
+        example: my_user
+      password:
+        type: string
+        description: Password of user
+        example: password@1234
+responses:
+  200:
+    description: Successful authentication. Returns token.
+    schema:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Do not share!
+          example: fj238jkd9wjsdmaiwefj99qw0dkadk023fj398gj
+  400:
+    description: Wrong email or password.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Wrong email or password"

@@ -1,6 +1,11 @@
 
 '''
     Package where endpoints, authorizations and type validations are made.
+
+    TODO:
+    - I have no idea how to implement token auth into swagger, I only placed
+    the correct codes to expect.
+    - Test auth.
 '''
 
 import json
@@ -14,6 +19,8 @@ import api.security as security
 
 from api.blueprints import *
 
+import api.home_redirection as home_redirection
+
 from flasgger import Swagger
 
 
@@ -21,23 +28,30 @@ def appFactory() -> Flask:
     '''
         Creates an app using:
 
-            All blueprints from blueprints (endpoints).
+            Configurations from config.py. Also .env and .flaskenv from root
+            affect some configs.
 
-            JWT, for authorization, bcrypt for hashing.
+            CORS (Cross-Origin Resource Sharing) to fix swagger on gunicorn.
+
+            JWT, for authorization, bcrypt for hashing. Also registers login
+            endpoint.
+
+            Registers all blueprints from blueprints package (fancy endpoints).
 
             Swagger, for documentation.
     '''
 
-    # Creates app.
+    # Creates app and adds configs.
     app = Flask(__name__)
     app.config.from_pyfile("settings.py")
     app.url_map.strict_slashes = False
 
     # Enables Cross-Origin Resource Sharing on all paths.
     # Placed to fix swagger issues when running gunicorn.
+    # I sincerely have no idea what it does but it works.
     CORS(app)
 
-    # Initialized jwc and bcrypt.
+    # Initializes jwc and bcrypt. Also registers login endpoint.
     security.associateSecurity(app)
     app.register_blueprint(security.login_bp)
 
@@ -48,6 +62,9 @@ def appFactory() -> Flask:
     app.register_blueprint(cities.bp)
     app.register_blueprint(places.bp)
     app.register_blueprint(reviews.bp)
+
+    # Redirects homepage ("/") to apidocs
+    app.register_blueprint(home_redirection.bp)
 
     # Assigns template to Swagger.
     # If runned with gunicorn, it overwrites the host attr to gunicorn's
@@ -60,5 +77,5 @@ def appFactory() -> Flask:
         template["host"] = host
     Swagger(app, template=template)
 
-    # Returns app to be runned as flask or gunicorn in root.
+    # Returns app to be runned as flask or gunicorn, in root.
     return app

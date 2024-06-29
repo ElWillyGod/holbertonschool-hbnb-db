@@ -8,14 +8,43 @@ parameters:
     type: string
     required: true
     description: The ID of the amenity to delete
+
+
 responses:
   204:
     description: Amenity deleted successfully
+    schema:
+      type: string
+      example: ""
   400:
     description: Bad request, invalid ID format
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Invalid ID format
   401:
     description: Not authenticated.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Unauthenticated
   403:
     description: Not authorized.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Requires admin privileges
   404:
     description: Amenity not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Id not found
