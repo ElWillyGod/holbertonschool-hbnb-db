@@ -15,6 +15,7 @@
 
 from flask import request, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt
+from flasgger import swag_from
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
@@ -25,22 +26,11 @@ bp = Blueprint("users", __name__, url_prefix="/users")
 
 @bp.get('/')
 @jwt_required(optional=False)
+@swag_from("swagger/users/get_all.yaml")
 def getAllUsers():
-    """
-    Retrieve details of a specific user.
-    ---
-    tags:
-      - users
-    parameters:
-      - in: path
-        name: user_id
-        type: string
-        required: true
-        description: ID of the user to retrieve
-    responses:
-      200:
-        description: Details of the specified user
-    """
+    '''
+        Gets all users.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("user", get_jwt()):
@@ -54,41 +44,11 @@ def getAllUsers():
 
 @bp.get('/<user_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/users/get.yaml")
 def getUser(user_id):
-    """
-    Update an existing user.
-    ---
-    tags:
-      - users
-    parameters:
-      - in: path
-        name: user_id
-        type: string
-        required: true
-        description: ID of the user to update
-      - in: body
-        name: user
-        required: true
-        schema:
-          type: object
-          properties:
-            email:
-              type: string
-              description: Updated email address of the user
-            first_name:
-              type: string
-              description: Updated first name of the user
-            last_name:
-              type: string
-              description: Updated last name of the user
-    responses:
-      201:
-        description: User updated successfully
-      400:
-        description: Invalid request data or missing fields
-      404:
-        description: User ID not found
-    """
+    '''
+        Gets a user.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("user", get_jwt()):
@@ -109,36 +69,11 @@ def getUser(user_id):
 
 @bp.post("/")
 @jwt_required(optional=False)
+@swag_from("swagger/users/post.yaml")
 def createUser():
-    """
-    Create a new user.
-    ---
-    tags:
-      - users
-    parameters:
-      - in: body
-        name: user
-        required: true
-        schema:
-          type: object
-          properties:
-            email:
-              type: string
-              description: Email address of the user
-            first_name:
-              type: string
-              description: First name of the user
-            last_name:
-              type: string
-              description: Last name of the user
-    responses:
-      201:
-        description: User created successfully
-      400:
-        description: Invalid request data or missing fields
-      409:
-        description: Email address already exists
-    """
+    '''
+        Creates a user.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPostAuthorized("user", get_jwt()):
@@ -174,46 +109,11 @@ def createUser():
 
 @bp.put('/<user_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/users/put.yaml")
 def updateUser(user_id):
-    """
-    Update an existing user.
-    ---
-    tags:
-      - users
-    parameters:
-      - in: path
-        name: user_id
-        type: string
-        required: true
-        description: ID of the user to update
-      - in: body
-        name: user
-        required: true
-        schema:
-          type: object
-          properties:
-            email:
-              type: string
-              description: Updated email address of the user
-              example: juanpepe@gmail.com
-            first_name:
-              type: string
-              description: Updated first name of the user
-              example: juan
-            last_name:
-              type: string
-              description: Updated last name of the user
-              example: pepe
-    responses:
-      201:
-        description: User updated successfully
-      400:
-        description: Invalid request data or missing fields
-      404:
-        description: User ID not found
-      409:
-        description: Email address already exists
-    """
+    '''
+        Updates a user.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPutAuthorized("user", get_jwt()):
@@ -255,26 +155,11 @@ def updateUser(user_id):
 
 @bp.delete('/<user_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/users/delete.yaml")
 def deleteUser(user_id):
-    """
-    Delete a user.
-    ---
-    tags:
-      - users
-    parameters:
-      - in: path
-        name: user_id
-        type: string
-        required: true
-        description: ID of the user to delete
-    responses:
-      204:
-        description: User deleted successfully
-      400:
-        description: Invalid user ID format
-      404:
-        description: User ID not found
-    """
+    '''
+        Deletes a user.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notDeleteAuthorized("user", get_jwt()):

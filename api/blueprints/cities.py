@@ -19,6 +19,7 @@
 
 from flask import request, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt
+from flasgger import swag_from
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
@@ -29,27 +30,11 @@ bp = Blueprint("cities", __name__, url_prefix="/cities")
 
 @bp.get('/')
 @jwt_required(optional=True)
+@swag_from("swagger/cities/get_all.yaml")
 def getAllCities():
-    """
-    Retrieve all cities
-    ---
-    tags:
-      - cities
-    responses:
-      200:
-        description: A list of all cities
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              country_code:
-                type: string
-    """
+    '''
+        Gets all cities.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("city", get_jwt()):
@@ -63,26 +48,11 @@ def getAllCities():
 
 @bp.get('/<country_code>/cities')
 @jwt_required(optional=True)
+@swag_from("swagger/cities/country_get_all.yaml")
 def getCitiesForCountry(country_code):
-    """
-    Retrieve cities for a specific country
-    ---
-    tags:
-      - cities
-    parameters:
-      - in: path
-        name: country_code
-        type: string
-        required: true
-        description: ISO country code (e.g., 'US' for United States)
-    responses:
-      200:
-        description: A list of cities for the country
-      400:
-        description: Bad request, invalid country code
-      404:
-        description: Country not found
-    """
+    '''
+        Gets all cities from country.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("country/city", get_jwt()):
@@ -103,26 +73,11 @@ def getCitiesForCountry(country_code):
 
 @bp.get('/<city_id>')
 @jwt_required(optional=True)
+@swag_from("swagger/cities/get.yaml")
 def getCity(city_id):
-    """
-    Retrieve a city by ID
-    ---
-    tags:
-      - cities
-    parameters:
-      - in: path
-        name: city_id
-        type: string
-        required: true
-        description: The ID of the city to retrieve
-    responses:
-      200:
-        description: City details
-      400:
-        description: Bad request, invalid ID format
-      404:
-        description: City not found
-    """
+    '''
+        Gets a city.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("city", get_jwt()):
@@ -143,38 +98,11 @@ def getCity(city_id):
 
 @bp.post('/')
 @jwt_required(optional=False)
+@swag_from("swagger/cities/post.yaml")
 def createCity():
-    """
-    Create a new city
-    ---
-    tags:
-      - cities
-    parameters:
-      - in: body
-        name: body
-        schema:
-          type: object
-          required:
-            - name
-            - country_code
-          properties:
-            name:
-              type: string
-              description: The name of the city
-              example: New York
-            country_code:
-              type: string
-              description: The ISO code of the country to which the city \
-                belongs
-              example: US
-    responses:
-      201:
-        description: City created successfully
-      400:
-        description: Bad request, invalid data or missing fields
-      409:
-        description: City name already exists
-    """
+    '''
+        Creates a city.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPostAuthorized("city", get_jwt()):
@@ -207,45 +135,11 @@ def createCity():
 
 @bp.put('/<city_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/cities/put.yaml")
 def updateCity(city_id):
-    """
-    Update a city by ID
-    ---
-    tags:
-      - cities
-    parameters:
-      - in: path
-        name: city_id
-        type: string
-        required: true
-        description: The ID of the city to update
-      - in: body
-        name: body
-        schema:
-          type: object
-          required:
-            - name
-            - country_code
-          properties:
-            name:
-              type: string
-              description: The name of the city
-              example: Los Angeles
-            country_code:
-              type: string
-              description: The ISO code of the country to which the city \
-                belongs
-              example: US
-    responses:
-      200:
-        description: City updated successfully
-      400:
-        description: Bad request, invalid data or ID format
-      404:
-        description: City not found
-      409:
-        description: City name already exists
-    """
+    '''
+        Updates a city.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPutAuthorized("city", get_jwt()):
@@ -282,26 +176,11 @@ def updateCity(city_id):
 
 @bp.delete('/<city_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/cities/delete.yaml")
 def deleteCity(city_id):
-    """
-    Delete a city by ID
-    ---
-    tags:
-      - cities
-    parameters:
-      - in: path
-        name: city_id
-        type: string
-        required: true
-        description: The ID of the city to delete
-    responses:
-      204:
-        description: City deleted successfully
-      400:
-        description: Bad request, invalid ID format
-      404:
-        description: City not found
-    """
+    '''
+        Deletes a city.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notDeleteAuthorized("city", get_jwt()):

@@ -1,0 +1,29 @@
+Update an existing review.
+---
+tags:
+  - reviews
+parameters:
+  - in: path
+    name: review_id
+    type: string
+    required: true
+    description: ID of the review to update
+  - in: body
+    name: review
+    required: true
+    schema:
+      type: object
+      properties:
+        rating:
+          type: integer
+          description: Updated rating for the review (1 to 5)
+        comment:
+          type: string
+          description: Updated comment for the review
+responses:
+  201:
+    description: Review updated successfully
+  400:
+    description: Invalid request data or missing fields
+  404:
+    description: Review ID not found or trying to update own review

@@ -1,0 +1,31 @@
+Create a new review for a specified place.
+---
+tags:
+  - reviews
+parameters:
+  - in: path
+    name: place_id
+    type: string
+    required: true
+    description: ID of the place to review
+  - in: body
+    name: review
+    required: true
+    schema:
+      type: object
+      properties:
+        rating:
+          type: integer
+          description: Rating for the place (1 to 5)
+          example: 5
+        comment:
+          type: string
+          description: Optional comment about the place
+          example: muy bueno
+responses:
+  201:
+    description: Review created successfully
+  400:
+    description: Invalid request data or missing fields
+  404:
+    description: Place ID not found or trying to review own place

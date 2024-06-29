@@ -11,6 +11,7 @@
 
 from flask import Blueprint
 from flask_jwt_extended import jwt_required, get_jwt
+from flasgger import swag_from
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
@@ -21,16 +22,11 @@ bp = Blueprint("countries", __name__, url_prefix="/countries")
 
 @bp.get('/')
 @jwt_required(optional=True)
+@swag_from("swagger/countries/get_all.yaml")
 def getAllCountries():
-    """
-    Retrieve all countries
-    ---
-    tags:
-      - countries
-    responses:
-      200:
-        description: A list of all countries
-    """
+    '''
+        Gets all countries.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("country", get_jwt()):
@@ -44,24 +40,11 @@ def getAllCountries():
 
 @bp.get('/<country_code>')
 @jwt_required(optional=True)
+@swag_from("swagger/countries/get.yaml")
 def getCounty(country_code):
-    """
-    Retrieve details of a specific country by its code
-    ---
-    tags:
-      - countries
-    parameters:
-      - in: path
-        name: country_code
-        type: string
-        required: true
-        description: ISO code of the country (e.g., 'US' for United States)
-    responses:
-      200:
-        description: All countries retrieved
-      404:
-        description: Country not found
-    """
+    '''
+        Gets a country.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("country", get_jwt()):

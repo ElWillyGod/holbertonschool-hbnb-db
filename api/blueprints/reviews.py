@@ -23,6 +23,7 @@
 
 from flask import request, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt
+from flasgger import swag_from
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
@@ -33,26 +34,11 @@ bp = Blueprint("reviews", __name__)
 
 @bp.get('/users/<user_id>/reviews')
 @jwt_required(optional=True)
+@swag_from("swagger/places/user_get_all.yaml")
 def getUserReviews(user_id):
-    """
-    Retrieve all reviews written by a specific user.
-    ---
-    tags:
-      - reviews
-    parameters:
-      - in: path
-        name: user_id
-        type: string
-        required: true
-        description: ID of the user whose reviews are to be retrieved
-    responses:
-      200:
-        description: List of reviews written by the user
-      400:
-        description: Invalid user ID format
-      404:
-        description: User ID not found or no reviews found for the user
-    """
+    '''
+        Gets all user's reviews.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("user/review", get_jwt()):
@@ -73,26 +59,11 @@ def getUserReviews(user_id):
 
 @bp.get('/places/<place_id>/reviews')
 @jwt_required(optional=True)
+@swag_from("swagger/places/place_get_all.yaml")
 def getPlaceReviews(place_id):
-    """
-    Retrieve all reviews for a specific place.
-    ---
-    tags:
-      - reviews
-    parameters:
-      - in: path
-        name: place_id
-        type: string
-        required: true
-        description: ID of the place whose reviews are to be retrieved
-    responses:
-      200:
-        description: List of reviews for the place
-      400:
-        description: Invalid place ID format
-      404:
-        description: Place ID not found or no reviews found for the place
-    """
+    '''
+        Gets all place's reviews.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("place/review", get_jwt()):
@@ -113,26 +84,11 @@ def getPlaceReviews(place_id):
 
 @bp.get('/reviews/<review_id>')
 @jwt_required(optional=True)
+@swag_from("swagger/places/get.yaml")
 def getReview(review_id):
-    """
-    Retrieve detailed information about a specific review.
-    ---
-    tags:
-      - reviews
-    parameters:
-      - in: path
-        name: review_id
-        type: string
-        required: true
-        description: ID of the review to retrieve
-    responses:
-      200:
-        description: Detailed information about the review
-      400:
-        description: Invalid review ID format
-      404:
-        description: Review ID not found
-    """
+    '''
+        Gets review.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("review", get_jwt()):
@@ -153,40 +109,11 @@ def getReview(review_id):
 
 @bp.post('/places/<place_id>/reviews')
 @jwt_required(optional=False)
+@swag_from("swagger/places/post.yaml")
 def createReview(place_id):
-    """
-    Create a new review for a specified place.
-    ---
-    tags:
-      - reviews
-    parameters:
-      - in: path
-        name: place_id
-        type: string
-        required: true
-        description: ID of the place to review
-      - in: body
-        name: review
-        required: true
-        schema:
-          type: object
-          properties:
-            rating:
-              type: integer
-              description: Rating for the place (1 to 5)
-              example: 5
-            comment:
-              type: string
-              description: Optional comment about the place
-              example: muy bueno
-    responses:
-      201:
-        description: Review created successfully
-      400:
-        description: Invalid request data or missing fields
-      404:
-        description: Place ID not found or trying to review own place
-    """
+    '''
+        Creates a review.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPostAuthorized("review", get_jwt()):
@@ -219,38 +146,11 @@ def createReview(place_id):
 
 @bp.put('/reviews/<review_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/places/put.yaml")
 def updateReview(review_id):
-    """
-    Update an existing review.
-    ---
-    tags:
-      - reviews
-    parameters:
-      - in: path
-        name: review_id
-        type: string
-        required: true
-        description: ID of the review to update
-      - in: body
-        name: review
-        required: true
-        schema:
-          type: object
-          properties:
-            rating:
-              type: integer
-              description: Updated rating for the review (1 to 5)
-            comment:
-              type: string
-              description: Updated comment for the review
-    responses:
-      200:
-        description: Review updated successfully
-      400:
-        description: Invalid request data or missing fields
-      404:
-        description: Review ID not found or trying to update own review
-    """
+    '''
+        Updates a review.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPutAuthorized("amenity", get_jwt()):
@@ -282,26 +182,11 @@ def updateReview(review_id):
 
 @bp.delete('/reviews/<review_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/places/delete.yaml")
 def deleteReview(review_id):
-    """
-    Delete a specific review.
-    ---
-    tags:
-      - reviews
-    parameters:
-      - in: path
-        name: review_id
-        type: string
-        required: true
-        description: ID of the review to delete
-    responses:
-      204:
-        description: Review deleted successfully
-      400:
-        description: Invalid review ID format
-      404:
-        description: Review ID not found
-    """
+    '''
+        Deletes a review.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notDeleteAuthorized("amenity", get_jwt()):

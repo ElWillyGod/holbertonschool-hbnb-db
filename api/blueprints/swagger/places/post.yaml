@@ -1,0 +1,37 @@
+Create a new place
+---
+tags:
+  - places
+parameters:
+  - in: body
+    name: place
+    required: true
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the place
+          example: Casa de playa
+        description:
+          type: string
+          description: Description of the place
+          example: es una casa en la playa
+        city_id:
+          type: string
+          description: ID of the city where the place is located
+        host_id:
+          type: string
+          description: ID of the host of the place
+        amenity_ids:
+          type: array
+          items:
+            type: string
+          description: List of amenity IDs available at the place
+responses:
+  201:
+    description: Place created successfully
+  400:
+    description: Invalid request data or missing fields
+  404:
+    description: City ID not found

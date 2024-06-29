@@ -18,6 +18,7 @@
 
 from flask import request, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt
+from flasgger import swag_from
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
@@ -28,47 +29,11 @@ bp = Blueprint("places", __name__, url_prefix="/places")
 
 @bp.get('/')
 @jwt_required(optional=True)
+@swag_from("swagger/places/get_all.yaml")
 def getAllPlaces():
-    """
-    Retrieve all places
-    ---
-    tags:
-      - places
-    responses:
-      200:
-        description: A list of all places
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: The ID of the place
-              name:
-                type: string
-                description: The name of the place
-              description:
-                type: string
-                description: Description of the place
-              city_id:
-                type: string
-                description: ID of the city where the place is located
-              host_id:
-                type: string
-                description: ID of the host of the place
-              amenities:
-                type: array
-                items:
-                  type: string
-                description: List of amenity IDs available at the place
-              created_at:
-                type: string
-                description: Date and time when the place was created
-              updated_at:
-                type: string
-                description: Date and time when the place was last updated
-    """
+    '''
+        Gets all places.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("place", get_jwt()):
@@ -82,55 +47,11 @@ def getAllPlaces():
 
 @bp.get('/<place_id>')
 @jwt_required(optional=True)
+@swag_from("swagger/places/get.yaml")
 def getPlace(place_id):
-    """
-    Retrieve details of a specific place by its ID
-    ---
-    tags:
-      - places
-    parameters:
-      - in: path
-        name: place_id
-        type: string
-        required: true
-        description: ID of the place
-    responses:
-      200:
-        description: Details of the place
-        schema:
-          type: object
-          properties:
-            id:
-              type: string
-              description: The ID of the place
-            name:
-              type: string
-              description: The name of the place
-            description:
-              type: string
-              description: Description of the place
-            city_id:
-              type: string
-              description: ID of the city where the place is located
-            host_id:
-              type: string
-              description: ID of the host of the place
-            amenities:
-              type: array
-              items:
-                type: string
-              description: List of amenity IDs available at the place
-            created_at:
-              type: string
-              description: Date and time when the place was created
-            updated_at:
-              type: string
-              description: Date and time when the place was last updated
-      400:
-        description: Invalid place ID format
-      404:
-        description: Place not found
-    """
+    '''
+        Gets place.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("place", get_jwt()):
@@ -151,46 +72,11 @@ def getPlace(place_id):
 
 @bp.post('/')
 @jwt_required(optional=False)
+@swag_from("swagger/places/post.yaml")
 def createPlace():
-    """
-    Create a new place
-    ---
-    tags:
-      - places
-    parameters:
-      - in: body
-        name: place
-        required: true
-        schema:
-          type: object
-          properties:
-            name:
-              type: string
-              description: The name of the place
-              example: Casa de playa
-            description:
-              type: string
-              description: Description of the place
-              example: es una casa en la playa
-            city_id:
-              type: string
-              description: ID of the city where the place is located
-            host_id:
-              type: string
-              description: ID of the host of the place
-            amenity_ids:
-              type: array
-              items:
-                type: string
-              description: List of amenity IDs available at the place
-    responses:
-      201:
-        description: Place created successfully
-      400:
-        description: Invalid request data or missing fields
-      404:
-        description: City ID not found
-    """
+    '''
+        Creates a place.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPostAuthorized("place", get_jwt()):
@@ -243,49 +129,11 @@ def createPlace():
 
 @bp.put('/<place_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/places/put.yaml")
 def updatePlace(place_id):
-    """
-    Update an existing place's information
-    ---
-    tags:
-      - places
-    parameters:
-      - in: path
-        name: place_id
-        type: string
-        required: true
-        description: ID of the place to be updated
-      - in: body
-        name: place
-        required: true
-        schema:
-          type: object
-          properties:
-            name:
-              type: string
-              description: The name of the place
-            description:
-              type: string
-              description: Description of the place
-            city_id:
-              type: string
-              description: ID of the city where the place is located
-            host_id:
-              type: string
-              description: ID of the host of the place
-            amenity_ids:
-              type: array
-              items:
-                type: string
-              description: List of amenity IDs available at the place
-    responses:
-      200:
-        description: Place updated successfully
-      400:
-        description: Invalid request data or missing fields
-      404:
-        description: Place ID not found
-    """
+    '''
+        Updates a place.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPutAuthorized("place", get_jwt()):
@@ -335,26 +183,11 @@ def updatePlace(place_id):
 
 @bp.delete('/<place_id>')
 @jwt_required(optional=False)
+@swag_from("swagger/places/delete.yaml")
 def deletePlace(place_id):
-    """
-    Delete a specific place by its ID
-    ---
-    tags:
-      - places
-    parameters:
-      - in: path
-        name: place_id
-        type: string
-        required: true
-        description: ID of the place to be deleted
-    responses:
-      204:
-        description: Place deleted successfully
-      400:
-        description: Invalid place ID format
-      404:
-        description: Place not found
-    """
+    '''
+        Deletes a place.
+    '''
 
     # Checks if it's authorized to make the request.
     if err := authlib.notDeleteAuthorized("place", get_jwt()):

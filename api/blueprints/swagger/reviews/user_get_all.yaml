@@ -1,0 +1,17 @@
+Retrieve all reviews written by a specific user.
+---
+tags:
+  - reviews
+parameters:
+  - in: path
+    name: user_id
+    type: string
+    required: true
+    description: ID of the user whose reviews are to be retrieved
+responses:
+  200:
+    description: List of reviews written by the user
+  400:
+    description: Invalid user ID format
+  404:
+    description: User ID not found or no reviews found for the user

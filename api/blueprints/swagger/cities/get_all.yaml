@@ -1,0 +1,18 @@
+Retrieve all cities
+---
+tags:
+  - cities
+responses:
+  200:
+    description: A list of all cities
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          country_code:
+            type: string

@@ -1,0 +1,7 @@
+Retrieve all countries
+---
+tags:
+  - countries
+responses:
+  200:
+    description: A list of all countries

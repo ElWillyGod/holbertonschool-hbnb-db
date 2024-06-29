@@ -1,0 +1,37 @@
+Update an existing user.
+---
+tags:
+  - users
+parameters:
+  - in: path
+    name: user_id
+    type: string
+    required: true
+    description: ID of the user to update
+  - in: body
+    name: user
+    required: true
+    schema:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Updated email address of the user
+          example: juanpepe@gmail.com
+        first_name:
+          type: string
+          description: Updated first name of the user
+          example: juan
+        last_name:
+          type: string
+          description: Updated last name of the user
+          example: pepe
+responses:
+  201:
+    description: User updated successfully
+  400:
+    description: Invalid request data or missing fields
+  404:
+    description: User ID not found
+  409:
+    description: Email address already exists

@@ -1,0 +1,17 @@
+Retrieve all reviews for a specific place.
+---
+tags:
+  - reviews
+parameters:
+  - in: path
+    name: place_id
+    type: string
+    required: true
+    description: ID of the place whose reviews are to be retrieved
+responses:
+  200:
+    description: List of reviews for the place
+  400:
+    description: Invalid place ID format
+  404:
+    description: Place ID not found or no reviews found for the place

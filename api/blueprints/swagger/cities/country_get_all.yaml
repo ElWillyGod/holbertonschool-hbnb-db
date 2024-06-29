@@ -1,0 +1,17 @@
+Retrieve cities for a specific country
+---
+tags:
+  - cities
+parameters:
+  - in: path
+    name: country_code
+    type: string
+    required: true
+    description: ISO country code (e.g., 'US' for United States)
+responses:
+  200:
+    description: A list of cities for the country
+  400:
+    description: Bad request, invalid country code
+  404:
+    description: Country not found

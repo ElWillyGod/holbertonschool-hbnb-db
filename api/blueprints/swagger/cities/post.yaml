@@ -1,0 +1,29 @@
+Create a new city
+---
+tags:
+  - cities
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      required:
+        - name
+        - country_code
+      properties:
+        name:
+          type: string
+          description: The name of the city
+          example: New York
+        country_code:
+          type: string
+          description: The ISO code of the country to which the city \
+            belongs
+          example: US
+responses:
+  201:
+    description: City created successfully
+  400:
+    description: Bad request, invalid data or missing fields
+  409:
+    description: City name already exists

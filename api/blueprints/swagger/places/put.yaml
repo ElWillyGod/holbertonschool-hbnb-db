@@ -1,0 +1,40 @@
+Update an existing place's information
+---
+tags:
+  - places
+parameters:
+  - in: path
+    name: place_id
+    type: string
+    required: true
+    description: ID of the place to be updated
+  - in: body
+    name: place
+    required: true
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the place
+        description:
+          type: string
+          description: Description of the place
+        city_id:
+          type: string
+          description: ID of the city where the place is located
+        host_id:
+          type: string
+          description: ID of the host of the place
+        amenity_ids:
+          type: array
+          items:
+            type: string
+          description: List of amenity IDs available at the place
+responses:
+  200:
+    description: Place updated successfully
+  400:
+    description: Invalid request data or missing fields
+  404:
+    description: Place ID not found

@@ -1,0 +1,15 @@
+Retrieve details of a specific country by its code
+---
+tags:
+  - countries
+parameters:
+  - in: path
+    name: country_code
+    type: string
+    required: true
+    description: ISO code of the country (e.g., 'US' for United States)
+responses:
+  200:
+    description: Country found
+  404:
+    description: Country not found

@@ -1,0 +1,13 @@
+Retrieve details of a specific user.
+---
+tags:
+  - users
+parameters:
+  - in: path
+    name: user_id
+    type: string
+    required: true
+    description: ID of the user to retrieve
+responses:
+  200:
+    description: Details of the specified user

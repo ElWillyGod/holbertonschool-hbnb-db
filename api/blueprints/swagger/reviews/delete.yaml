@@ -1,0 +1,17 @@
+Delete a specific review.
+---
+tags:
+  - reviews
+parameters:
+  - in: path
+    name: review_id
+    type: string
+    required: true
+    description: ID of the review to delete
+responses:
+  204:
+    description: Review deleted successfully
+  400:
+    description: Invalid review ID format
+  404:
+    description: Review ID not found

@@ -1,0 +1,38 @@
+Retrieve all places
+---
+tags:
+  - places
+responses:
+  200:
+    description: A list of all places
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: The ID of the place
+          name:
+            type: string
+            description: The name of the place
+          description:
+            type: string
+            description: Description of the place
+          city_id:
+            type: string
+            description: ID of the city where the place is located
+          host_id:
+            type: string
+            description: ID of the host of the place
+          amenities:
+            type: array
+            items:
+              type: string
+            description: List of amenity IDs available at the place
+          created_at:
+            type: string
+            description: Date and time when the place was created
+          updated_at:
+            type: string
+            description: Date and time when the place was last updated

@@ -1,0 +1,17 @@
+Retrieve a city by ID
+---
+tags:
+  - cities
+parameters:
+  - in: path
+    name: city_id
+    type: string
+    required: true
+    description: The ID of the city to retrieve
+responses:
+  200:
+    description: City details
+  400:
+    description: Bad request, invalid ID format
+  404:
+    description: City not found

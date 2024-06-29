@@ -1,0 +1,17 @@
+Delete a user.
+---
+tags:
+  - users
+parameters:
+  - in: path
+    name: user_id
+    type: string
+    required: true
+    description: ID of the user to delete
+responses:
+  204:
+    description: User deleted successfully
+  400:
+    description: Invalid user ID format
+  404:
+    description: User ID not found

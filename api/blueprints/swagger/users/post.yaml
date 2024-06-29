@@ -1,0 +1,27 @@
+Create a new user.
+---
+tags:
+  - users
+parameters:
+  - in: body
+    name: user
+    required: true
+    schema:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email address of the user
+        first_name:
+          type: string
+          description: First name of the user
+        last_name:
+          type: string
+          description: Last name of the user
+responses:
+  201:
+    description: User created successfully
+  400:
+    description: Invalid request data or missing fields
+  409:
+    description: Email address already exists
