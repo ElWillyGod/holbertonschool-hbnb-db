@@ -34,7 +34,7 @@ bp = Blueprint("reviews", __name__)
 
 @bp.get('/users/<user_id>/reviews')
 @jwt_required(optional=True)
-@swag_from("swagger/places/user_get_all.yaml")
+@swag_from("swagger/reviews/user_get_all.yaml")
 def getUserReviews(user_id):
     '''
         Gets all user's reviews.
@@ -59,7 +59,7 @@ def getUserReviews(user_id):
 
 @bp.get('/places/<place_id>/reviews')
 @jwt_required(optional=True)
-@swag_from("swagger/places/place_get_all.yaml")
+@swag_from("swagger/reviews/place_get_all.yaml")
 def getPlaceReviews(place_id):
     '''
         Gets all place's reviews.
@@ -84,7 +84,7 @@ def getPlaceReviews(place_id):
 
 @bp.get('/reviews/<review_id>')
 @jwt_required(optional=True)
-@swag_from("swagger/places/get.yaml")
+@swag_from("swagger/reviews/get.yaml")
 def getReview(review_id):
     '''
         Gets review.
@@ -109,7 +109,7 @@ def getReview(review_id):
 
 @bp.post('/places/<place_id>/reviews')
 @jwt_required(optional=False)
-@swag_from("swagger/places/post.yaml")
+@swag_from("swagger/reviews/post.yaml")
 def createReview(place_id):
     '''
         Creates a review.
@@ -146,7 +146,7 @@ def createReview(place_id):
 
 @bp.put('/reviews/<review_id>')
 @jwt_required(optional=False)
-@swag_from("swagger/places/put.yaml")
+@swag_from("swagger/reviews/put.yaml")
 def updateReview(review_id):
     '''
         Updates a review.
@@ -182,7 +182,7 @@ def updateReview(review_id):
 
 @bp.delete('/reviews/<review_id>')
 @jwt_required(optional=False)
-@swag_from("swagger/places/delete.yaml")
+@swag_from("swagger/reviews/delete.yaml")
 def deleteReview(review_id):
     '''
         Deletes a review.

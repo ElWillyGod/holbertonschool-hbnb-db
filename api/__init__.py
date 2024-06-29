@@ -10,7 +10,6 @@ import api.security as security
 from api.blueprints import *
 
 from flasgger import Swagger
-from api.swagger import template
 
 
 def appFactory() -> Flask:
@@ -26,6 +25,7 @@ def appFactory() -> Flask:
 
     app = Flask(__name__)
     app.config.from_pyfile("settings.py")
+    app.url_map.strict_slashes = False
 
     security.associateSecurity(app)
     app.register_blueprint(security.login_bp)
@@ -37,6 +37,6 @@ def appFactory() -> Flask:
     app.register_blueprint(places.bp)
     app.register_blueprint(reviews.bp)
 
-    Swagger(app, template=template)
+    Swagger(app, template_file="blueprints/swagger/swagger.yaml")
 
     return app

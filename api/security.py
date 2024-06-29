@@ -5,7 +5,7 @@
 '''
 
 from flask_jwt_extended import JWTManager, create_access_token
-from flask import request, Blueprint, jsonify, Response
+from flask import request, Blueprint
 import flask_bcrypt
 from logic.logicfacade import LogicFacade
 
@@ -27,27 +27,27 @@ def hashPassword(password):
 
 @jwt.unauthorized_loader
 def handle_unauthorized_error(err):
-    return {"error": "401 Unauthorized"}, 401
+    return {"error": "Unauthenticated"}, 401
 
 
 @jwt.invalid_token_loader
 def handle_invalid_token_error(err):
-    return {"error": "401 Unauthorized"}, 401
+    return {"error": "Invalid token"}, 401
 
 
 @jwt.expired_token_loader
 def handle_expired_token_error(err):
-    return {"error": "401 Unauthorized"}, 401
+    return {"error": "Expired token"}, 401
 
 
 @jwt.revoked_token_loader
 def handle_revoked_token_error(err):
-    return {"error": "401 Unauthorized"}, 401
+    return {"error": "Revoked token"}, 401
 
 
 @jwt.needs_fresh_token_loader
 def handle_needs_fresh_token_error(err):
-    return {"error": "401 Unauthorized"}, 401
+    return {"error": "Needs fresh token"}, 401
 
 
 @login_bp.post('/login')
