@@ -9,7 +9,7 @@ from logic.model.validationlib import idExists, isOwnerIDTheSame
 from logic.model.logicexceptions import IDNotFoundError, TryingToReviewOwnPlace
 
 from sqlalchemy.orm import Session
-from api import db
+from persistence import db
 from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP, create_engine, engine
 
 

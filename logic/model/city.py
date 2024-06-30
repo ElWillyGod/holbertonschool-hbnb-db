@@ -12,7 +12,7 @@ from logic.model.validationlib import doesCountryExist, isCityNameDuplicated
 from logic.model.logicexceptions import CountryNotFoundError, CityNameDuplicated
 
 from sqlalchemy import Column, Integer, String, TIMESTAMP
-from api import db
+from persistence import db
 
 
 class City(TrackedObject, db.Model):

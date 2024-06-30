@@ -8,22 +8,24 @@ import json
 import os
 import glob
 
-
-
-
 from persistence.data_manager_interface import IPersistenceManager
-################################################# tener cuidado con esto
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
 
 class DataManager(IPersistenceManager):
     """
         Handles data persistence using JSON files
     """
+
     def __init__(self, storage_path='data'):
         """
             Initializes the DataManager with a storage path
             Attributes:
                 storage_path: The path to the storage directory
         """
+
         self.storage_path = storage_path
         if not os.path.exists(storage_path):
             os.makedirs(self.storage_path)
@@ -36,6 +38,7 @@ class DataManager(IPersistenceManager):
                 entity_id: The id of the entity
             Return: the file path for the entity
         """
+
         if entity_id:
             return os.path.join(self.storage_path,
                                 f"{entity_type}_{entity_id}.json")
@@ -50,7 +53,8 @@ class DataManager(IPersistenceManager):
             Returns:
                 The entity
         """
-        if app.config['USE_DATABASE']:# config de la bd
+
+        if os.environ.get('USE_DATABASE'):# config de la bd
 
             db.session.add(entity)
             db.session.commit()
@@ -81,7 +85,8 @@ class DataManager(IPersistenceManager):
                 entity_type: the type of the entity
             Return: the retrieved entity or None if not found
         """
-        if app.config['USE_DATABASE']:
+
+        if os.environ.get('USE_DATABASE'):
 
             data = db.session.query(entity_type).filter(entity_type.id == entity_id)
 
@@ -132,7 +137,7 @@ class DataManager(IPersistenceManager):
             Returns:
                 Nothing
         """
-        if app.config['USE_DATABASE']:
+        if os.environ.get('USE_DATABASE'):
 
             data = db.session.query(entity_type).filter(entity_type.id == entity_id)
 
@@ -160,7 +165,7 @@ class DataManager(IPersistenceManager):
             Return: a list of all entities of the given type in JSON
         """
 
-        if app.config['USE_DATABASE']:# config de la bd
+        if os.environ.get('USE_DATABASE'):# config de la bd
 
             entity = db.session.query(entity_type)
 

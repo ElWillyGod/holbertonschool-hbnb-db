@@ -6,6 +6,7 @@
 '''
 
 from abc import ABC
+import os
 
 from logic.model.classes import getClassByName
 from logic.model.countrieslib import getCountry, getCountries
@@ -13,7 +14,6 @@ from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
 from logic.model.validationlib import idExists
 from logic import DM as Persistence
 from logic.model.linkeddeleter import raiseDeleteEvent
-from wsgi import app
 
 
 class LogicFacade(ABC):
@@ -92,7 +92,8 @@ class LogicFacade(ABC):
 ) -> dict:
         new = getClassByName(type)(**data)
         id = new.id
-        return Persistence.save(id, type, new if app.config['USE_DATABASE'] else new.toJson())
+        return Persistence.save(
+            id, type, new if os.environ.get('USE_DATABASE') else new.toJson())
         # return Persistence.get(id, type)
 
     @staticmethod

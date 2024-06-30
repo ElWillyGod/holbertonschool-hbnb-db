@@ -8,7 +8,7 @@ from logic.model.validationlib import idExists
 from logic.model.logicexceptions import IDNotFoundError
 
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP
-from api import db
+from persistence import db
 
 
 class Place(TrackedObject, db.Model):

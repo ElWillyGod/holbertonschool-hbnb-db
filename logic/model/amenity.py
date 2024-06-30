@@ -7,8 +7,8 @@
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import isAmenityDuplicated
 from logic.model.logicexceptions import AmenityNameDuplicated
-from api import db
 from sqlalchemy import column, String, TIMESTAMP
+from persistence import db
 
 
 class Amenity(TrackedObject, db.Model):

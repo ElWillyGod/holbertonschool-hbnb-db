@@ -13,7 +13,6 @@ from os import environ
 from pathlib import Path
 from flask import Flask
 
-
 from flask_cors import CORS
 
 import api.security as security
@@ -24,7 +23,8 @@ import api.home_redirection as home_redirection
 
 from flasgger import Swagger
 
-from flask_sqlalchemy import SQLAlchemy
+from persistence import db
+
 
 def appFactory() -> Flask:
     '''
@@ -49,8 +49,6 @@ def appFactory() -> Flask:
     app = Flask(__name__)
     app.config.from_pyfile("settings.py")
     app.url_map.strict_slashes = False
-    app.config['SQLALCHEMY_DATABASE_URI'] ='mysql+mysqldb://root:@localhost/hbnb'
-    app.config['USE_DATABASE'] = True
 
     # Enables Cross-Origin Resource Sharing on all paths.
     # Placed to fix swagger issues when running gunicorn.
@@ -60,6 +58,9 @@ def appFactory() -> Flask:
     # Initializes jwc and bcrypt. Also registers login endpoint.
     security.associateSecurity(app)
     app.register_blueprint(security.login_bp)
+
+    # Initializes sqlalchemy on flask.
+    db.init_app(app)
 
     # Registers all endpoint blueprints.
     app.register_blueprint(amenities.bp)
@@ -85,6 +86,3 @@ def appFactory() -> Flask:
 
     # Returns app to be runned as flask or gunicorn, in root.
     return app
-
-app = appFactory()
-db = SQLAlchemy(app)

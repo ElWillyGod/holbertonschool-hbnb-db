@@ -9,7 +9,7 @@ from logic.model.validationlib import isUserEmailDuplicated
 from logic.model.logicexceptions import EmailDuplicated
 from sqlalchemy import Column, Integer, String, TIMESTAMP
 
-from api import db
+from persistence import db
 
 
 class User(db.Model):
