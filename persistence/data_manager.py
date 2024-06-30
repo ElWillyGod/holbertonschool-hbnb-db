@@ -138,7 +138,7 @@ class DataManager(IPersistenceManager):
         """
         if os.environ.get('USE_DATABASE'):
             return db.session.query(obj).filter(
-                obj.get(property_name) == property_value).all()
+                getattr(obj, property_name) == property_value).all()
         else:
             all_entities = self.get_all(obj)
             matched_entities = [entity for entity in all_entities

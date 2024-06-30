@@ -125,9 +125,9 @@ class LogicFacade(ABC):
     def getPswdAndAdminByEmail(
         email: str
 ) -> tuple[str, bool]:
-        user = Persistence.get_by_property("users", "email", email)
+        user = Persistence.get_by_property(classes.User, "email", email)
         if not user:
             raise EmailNotFoundError("email not found")
         # user is transformed from list to dict
         user = user[0]
-        return user["password"], user["id"], user["is_admin"]
+        return user.password, user.id, user.is_admin
