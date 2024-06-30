@@ -10,7 +10,7 @@ from uuid import uuid4
 import inspect
 
 
-class TrackedObjectl:
+class TrackedObject:
     '''
         id (str): UUID4 as hex.
         created_at: datetime as string at time of creation.

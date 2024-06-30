@@ -8,13 +8,11 @@ import json
 import os
 import glob
 
-from sqlalchemy.orm import session
+
+
+
 from persistence.data_manager_interface import IPersistenceManager
 ################################################# tener cuidado con esto
-# from app import app
-# from api import db
-from wsgi import app, db
-
 
 class DataManager(IPersistenceManager):
     """

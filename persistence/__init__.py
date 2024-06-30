@@ -6,5 +6,6 @@
 '''
 
 from persistence.data_manager import DataManager
+from api import app, db
 
 DM = DataManager("persistence/storage")

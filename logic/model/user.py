@@ -7,8 +7,9 @@
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import isUserEmailDuplicated
 from logic.model.logicexceptions import EmailDuplicated
-from api import db
 from sqlalchemy import Column, Integer, String, TIMESTAMP
+
+from api import db
 
 
 class User(db.Model):
