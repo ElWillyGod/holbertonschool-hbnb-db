@@ -11,17 +11,17 @@
         Get countries
 """
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod, ABC
 
 
-class IPersistenceManager:
+class IPersistenceManager(ABC):
 
     @abstractmethod
-    def save(self, entity):
+    def create(self, entity):
         pass
     
     @abstractmethod
-    def get(self, entity_id, entity_type):
+    def read(self, entity_id, entity_type):
         pass
 
     @abstractmethod

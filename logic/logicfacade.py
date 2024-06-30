@@ -6,14 +6,13 @@
 '''
 
 from abc import ABC
-import os
 
 from logic.model import classes
 from logic.model.classes import getObjectByName
 from logic.model.countrieslib import getCountry, getCountries
 from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
 from logic.model.validationlib import idExists
-from logic import DM as Persistence
+from persistence import dm as Persistence
 
 
 class LogicFacade(ABC):
@@ -51,10 +50,10 @@ class LogicFacade(ABC):
         type: str
 ) -> dict:
         obj = classes.getObjectByName(type)
-        call = Persistence.get(id, obj)
+        call = Persistence.read(id, obj)
         if call is None or len(call) == 0:
             raise IDNotFoundError("id not found")
-        return call
+        return call.toJson()
 
     @staticmethod
     def deleteByID(
@@ -62,7 +61,7 @@ class LogicFacade(ABC):
         type: str
 ) -> None:
         obj = classes.getObjectByName(type)
-        call = Persistence.get(id, obj)
+        call = Persistence.read(id, obj)
         if call is None or len(call) == 0:
             raise IDNotFoundError("id not found")
         Persistence.delete(id, obj)
@@ -73,6 +72,7 @@ class LogicFacade(ABC):
         type: str,
         data: dict
 ) -> dict:
+        obj = classes.getObjectByName(type)
         old_data = Persistence.get(id, type)
         if old_data is None or len(old_data) == 0:
             raise IDNotFoundError("id not found")
@@ -85,17 +85,17 @@ class LogicFacade(ABC):
         data["updated_at"] = None
         data_updated = getObjectByName(type)(**data, update=updated)
         Persistence.update(id, type, data_updated.toJson())
-        return Persistence.get(id, type)
+        return Persistence.read(id, type).toJson()
 
     @staticmethod
     def createObjectByJson(
         type: str,
         data: dict
 ) -> dict:
-        new = getObjectByName(type)(**data)
+        obj = classes.getObjectByName(type)
+        new = obj(**data)
         id = new.id
-        return Persistence.save(
-            id, type, new if os.environ.get('USE_DATABASE') else new.toJson())
+        return Persistence.create(id, type, new).toJson()
         # return Persistence.get(id, type)
 
     @staticmethod

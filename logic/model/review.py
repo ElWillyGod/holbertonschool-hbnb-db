@@ -19,20 +19,3 @@ class Review(TrackedObject):
     user_id = Column(Integer, ForeignKey(user.id), nullable=False)
     place_id = Column(Integer, ForeignKey(place.id), nullable=False)
     rating = Column(Integer, nullable=False)
-
-    def __init__(
-            self,
-            place_id: str,
-            user_id: str,
-            rating: int,
-            comment: str,
-            *,
-            id: str = None,
-            created_at: str = None,
-            updated_at: str = None
-) -> None:
-        super().__init__(id, created_at, updated_at)
-        self.rating = rating
-        self.place_id = place_id
-        self.user_id = user_id
-        self.comment = comment

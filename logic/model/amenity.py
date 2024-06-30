@@ -15,14 +15,3 @@ class Amenity(TrackedObject):
 
     __tablename__ = 'amenity'
     name = Column(String(255), unique=True)
-
-    def __init__(
-            self,
-            name: str,
-            *,
-            id: str = None,
-            created_at: str = None,
-            updated_at: str = None
-) -> None:
-        super().__init__(id, created_at, updated_at)
-        self.name = name

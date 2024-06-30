@@ -22,12 +22,11 @@ classes = [
 
 def getObjectByName(name):
     '''
-        Gets a class by it's singular name (classes[0]) or
-        plural name (classes[1])
+        Gets a class by it's name.
     '''
 
     for cls in classes:
-        if cls[0] == name or cls[1] == name:
-            return cls[2]
+        if cls[0] == name:
+            return cls[1]
 
     raise ValueError("class not found")

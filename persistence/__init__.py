@@ -8,4 +8,4 @@
 # Exports
 from persistence.data_manager import DataManager
 
-DM = DataManager("persistence/storage")
+dm = DataManager("persistence/storage")

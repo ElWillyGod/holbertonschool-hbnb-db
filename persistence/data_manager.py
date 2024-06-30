@@ -9,8 +9,9 @@ import os
 import glob
 
 from persistence.data_manager_interface import IPersistenceManager
-from flask_sqlalchemy.model import Model
+from logic.model.trackedobject import TrackedObject
 from logic import db
+
 
 class DataManager(IPersistenceManager):
     """
@@ -28,152 +29,95 @@ class DataManager(IPersistenceManager):
         if not os.path.exists(storage_path):
             os.makedirs(self.storage_path)
 
-    def _file_path(self, entity_type: Model, entity_id=""):
+    def _file_path(self, obj: TrackedObject):
         """
-            Generates the file path for an entity
-            Attributes:
-                entity_type: the type of an entity
-                entity_id: The id of the entity
-            Return: the file path for the entity
+            Creates an obj.
         """
 
-        if entity_id:
+        if obj.id:
             return os.path.join(self.storage_path,
-                                f"{entity_type}_{entity_id}.json")
+                                f"{obj.__tablename__}_{obj.id}.json")
         else:
-            return os.path.join(self.storage_path, f"{entity_type}.json")
-        
-    def save(self, id: str, type: str, entity) -> dict:
+            return os.path.join(self.storage_path, f"{obj.__tablename__}.json")
+
+    def create(self, obj: TrackedObject) -> TrackedObject:
         """
-            Save an entity to a JSON file
-            Attributes:
-                entity: the entity to save to a JSON file.
-            Returns:
-                The entity
-        """
-
-        if os.environ.get('USE_DATABASE'):  # config de la bd
-
-            db.session.add(entity)
-            db.session.commit()
-
-            db.session.close()
-
-        else:
-
-            entity_id = id
-            entity_type = type
-            file_path = self._file_path(entity_type, entity_id)
-
-            with open(file_path, 'w') as file:
-                json.dump(entity, file)
-
-        result = {
-            'entity': entity,
-            'entity_type': type
-        }
-        return result
-        
-
-    def get(self, entity_id: str, entity_type: Model) -> dict:
-        """
-            Retrieves an entity from a JSON file
-            Attributes:
-                entity_id: the ID of the entity
-                entity_type: the type of the entity
-            Return: the retrieved entity or None if not found
+            Creates an obj.
         """
 
         if os.environ.get('USE_DATABASE'):
-
-            data = db.session.query(entity_type).filter(entity_type.id == entity_id)
-
-            db.session.close()
-
-            return data
-
+            db.session
+            db.session.add(obj)
+            db.session.commit()
+            return db.session.query(obj).get(obj.id)
         else:
+            file_path = self._file_path(obj, obj.id)
+            with open(file_path, 'w') as file:
+                json.dump(obj.toJson(), file)
 
-            file_path = self._file_path(entity_type, entity_id)
+    def read(self, obj: TrackedObject) -> None | TrackedObject:
+        """
+            Retrieves an obj.
+        """
+
+        if os.environ.get('USE_DATABASE'):
+            return db.session.query(obj).get(obj.id)
+        else:
+            file_path = self._file_path(obj, obj.id)
             if not os.path.exists(file_path):
                 return None
             else:
                 with open(file_path, 'r') as file:
-                    entity = json.load(file)
-                return entity
+                    ret = obj(**json.load(file))
+                return ret
 
-    def update(self, entity_id: str, entity_type, data: dict) -> dict:
+    def update(self, obj: TrackedObject) -> TrackedObject:
         """
-            Update an entity by saving it again to the JSON file
-            Attributes:
-                entity_id: the id entity
-                entity_type: type to entity
-                data: new data fo entity
-            Returns:
-                The entity
+            Update an obj.
         """
-        file_path = self._file_path(entity_type, entity_id)
 
-        with open(file_path, 'r') as file:
-            entiy = json.load(file)
+        if os.environ.get('USE_DATABASE'):
+            old_obj = db.session.query(obj).get(obj.id)
+            # No se
+            db.session.commit()
+            return db.session.query(obj).get(obj.id)
+        else:
+            file_path = self._file_path(obj, obj.id)
+            with open(file_path, 'r') as file:
+                obj = json.load(file)
+                obj.update(obj)
 
-            entiy.update(data)
+            with open(file_path, 'w') as file:
+                json.dump(obj, file)
 
-        with open(file_path, 'w') as file:
-            json.dump(entiy, file)
 
-        return data
-
-    def delete(self, entity_id: str, entity_type: Model) -> None:
+    def delete(self, obj: TrackedObject) -> None:
         """
-            Delete an entity by removing its JSON file
-            Attributes:
-                entity_id: the ID of the entity to delete
-                entity_type: the type of the identity
-            Raises:
-                FileNotFoundError: No such entity {entity_type} with {entity_id}
-            Returns:
-                Nothing
+            Delete an obj.
         """
         if os.environ.get('USE_DATABASE'):
-
-            data = db.session.query(entity_type).filter(entity_type.id == entity_id)
-
-            db.session.delete(data)
+            row = db.session.query(obj).filter(obj.id == obj.id)
+            db.session.delete(row)
             db.session.commit()
-            db.session.close()
-
-            return
-
         else:
-
-            file_path = self._file_path(entity_type, entity_id)
+            file_path = self._file_path(obj, obj.id)
             if os.path.exists(file_path):
                 os.remove(file_path)
                 return
             else:
                 raise FileNotFoundError(
-                    f"No such entity: {entity_type} with {entity_id}")
+                    f"No such obj: {obj} with {obj.id}")
 
-    def get_all(self, entity_type) -> list[dict]:
+    def get_all(self, obj: TrackedObject) -> list[TrackedObject]:
         """
-            Retrieves all entities of a given type
-            Attributes:
-            entity_type: the type of entities to retrieve
-            Return: a list of all entities of the given type in JSON
+            Retrieves all entities of a given type.
         """
 
-        if os.environ.get('USE_DATABASE'):# config de la bd
-
-            entity = db.session.query(entity_type)
-
-            db.session.close()
-
-            return entity
-
+        if os.environ.get('USE_DATABASE'):
+            return db.session.query(obj).all()
         else:
-            entity_type
-            path = os.path.join(self.storage_path, f"{entity_type}_*.json")
+            obj
+            path = os.path.join(self.storage_path, f"{obj}_*.json")
             files = glob.glob(path)
             entities = []
             for file_path in files:
@@ -182,17 +126,21 @@ class DataManager(IPersistenceManager):
                         entities.append(data)
             return entities
 
-    def get_by_property(self, entity_type: Model,
+    def get_by_property(self, obj: TrackedObject,
                         property_name: str, property_value) -> list[dict]:
         """
             Retrieves all entities of a given type that match a specific property
             Attributes:
-                entity_type: the type of entities to retrieve
+                obj: the type of entities to retrieve
                 property_name: the property name to match
                 property_value: the property value to match
             Return: a list of entities that match the given property in JSON
         """
-        all_entities = self.get_all(entity_type)
-        matched_entities = [entity for entity in all_entities
-                            if entity.get(property_name) == property_value]
-        return matched_entities
+        if os.environ.get('USE_DATABASE'):
+            return db.session.query(obj).filter(
+                obj.get(property_name) == property_value).all()
+        else:
+            all_entities = self.get_all(obj)
+            matched_entities = [entity for entity in all_entities
+                                if entity.get(property_name) == property_value]
+            return matched_entities
