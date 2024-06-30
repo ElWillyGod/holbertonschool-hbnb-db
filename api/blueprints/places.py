@@ -20,7 +20,7 @@ from flask import request, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt
 from flasgger import swag_from
 from logic import logicexceptions
-from logic import LogicFacade
+from logic.logicfacade import LogicFacade
 import api.validations as val
 import api.authlib as authlib
 

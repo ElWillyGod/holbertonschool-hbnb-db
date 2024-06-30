@@ -7,7 +7,7 @@
 
 from datetime import datetime
 from uuid import uuid4
-from model import Base
+from logic import Base
 from sqlalchemy import Column, Integer, TIMESTAMP
 
 class TrackedObject(Base):
@@ -15,6 +15,7 @@ class TrackedObject(Base):
         Tracked table.
     '''
 
+    __tablename__ = 'tracked_object'
     id = Column(Integer, nullable=False, primary_key=True)
     created_at = Column(TIMESTAMP, nullable=False)
     updated_at = Column(TIMESTAMP, nullable=False)

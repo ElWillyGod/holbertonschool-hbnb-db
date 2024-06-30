@@ -10,7 +10,7 @@ from flask_jwt_extended import JWTManager, create_access_token
 from flask import request, Blueprint
 import flask_bcrypt
 from logic import logicexceptions
-from logic import LogicFacade
+from logic.logicfacade import LogicFacade
 from flasgger import swag_from
 
 # Instanciates all required objects.

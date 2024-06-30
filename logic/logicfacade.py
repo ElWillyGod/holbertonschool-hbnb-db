@@ -42,7 +42,8 @@ class LogicFacade(ABC):
     @staticmethod
     def getByType(type: str) -> dict:
         obj = classes.getObjectByName(type)
-        return Persistence.get_all(obj)
+        all = Persistence.get_all(obj)
+        return [obj.toJson() for obj in all]
 
     @staticmethod
     def getByID(
@@ -110,7 +111,7 @@ class LogicFacade(ABC):
     def getContryCities(code: str) -> dict:
         return Persistence.get_by_property(
             "cities", "country_code", code
-        )
+        ).toJson()
 
     @staticmethod
     def getReviewsOfPlace(id: str) -> dict:

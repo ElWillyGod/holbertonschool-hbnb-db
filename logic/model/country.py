@@ -6,7 +6,7 @@
     They also lack creation datetime and update datetime.
 '''
 
-from model import Base
+from logic import Base
 
 from sqlalchemy import Column, String
 
@@ -17,5 +17,5 @@ class Country(Base):
     """
 
     __tablename__ = 'country'
-    code = Column(String(3), unique=True)
+    code = Column(String(3), primary_key=True)
     name = Column(String(255), unique=True)

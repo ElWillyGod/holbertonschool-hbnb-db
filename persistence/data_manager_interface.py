@@ -39,7 +39,3 @@ class IPersistenceManager(ABC):
     @abstractmethod
     def get_by_property(self, entity_type, property_name, property_value):
         pass
-
-    @abstractmethod
-    def get_countries(self, code):
-        pass

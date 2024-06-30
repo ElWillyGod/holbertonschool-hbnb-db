@@ -14,4 +14,4 @@ class Amenity(TrackedObject):
     '''
 
     __tablename__ = 'amenity'
-    name = Column(String(255), unique=True)
+    names = Column(String(255), unique=True)

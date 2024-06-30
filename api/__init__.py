@@ -23,7 +23,7 @@ import api.home_redirection as home_redirection
 
 from flasgger import Swagger
 
-from persistence import db
+from logic import db
 
 
 def appFactory() -> Flask:
