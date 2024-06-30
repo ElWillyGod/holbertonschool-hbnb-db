@@ -15,11 +15,8 @@ parameters:
     schema:
       type: object
       required:
-        - name
-        - description
-        - city_id
-        - host_id
-        - amenity_ids
+        - rating
+        - comment
       properties:
         rating:
           type: integer
@@ -75,3 +72,9 @@ responses:
           example: unauthenticated
   404:
     description: Place ID not found or trying to review own place
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: user_id not found

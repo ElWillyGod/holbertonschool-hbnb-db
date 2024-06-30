@@ -2,20 +2,47 @@ Delete a user.
 ---
 tags:
   - users
+
 parameters:
   - in: path
     name: user_id
     type: string
     required: true
     description: ID of the user to delete
+
+
 responses:
   204:
     description: User deleted successfully
   400:
     description: Invalid user ID format
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
   401:
     description: Not authenticated.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
   403:
     description: Not authorized.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges
   404:
     description: User ID not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found
