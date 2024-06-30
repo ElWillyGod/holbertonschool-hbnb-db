@@ -1,0 +1,67 @@
+ ---
+  All commands must be in uppercase and be the first word. Each subsequent word
+is passed to the command in a list, similar to a shell. You can separate
+commands with a ';'.
+
+Builtin:
+  - help/HELP
+    = passes this file to stdout
+  - exit/EXIT:
+    = exits shell's loop
+  - clear
+    = clears screen, don't confuse with CLEAR
+
+Configuration:
+  - CHANGE_URL <url: str>:
+    = changes the url to <url> port must be included. default is localhost:5000
+
+Value Manipulation:
+  - FROM <json: JSON filename>
+    = loads json file into memory to use in post and put
+  - GET_JSON
+    = prints loaded json data
+  - GET_HEADERS
+    = prints headers being used
+  - GET_TOKEN
+    = prints token being used
+  - CLEAR
+    = resets json and last response
+  - CHANGE_VALUE/ADD_VALUE <key: str> <value: Any>
+    = change value from loaded json
+  - REMOVE_VALUE <key: str>
+    = remove value from loaded json
+  - GET_RESPONSE
+    = prints all information about last response
+  - GET_RESPONSE_CODE
+    = prints response code
+  - GET_RESPONSE_JSON
+    = prints response json
+  - GET_RESPONSE_HEADER
+    = prints response header
+  - GET_RESPONSE_TEXT
+    = prints response text
+  - GET_RESPONSE_VALUE <key>
+    = prints response's <key> key.
+  - GET_RESPONSE_WITH <key: str> <value: Any> <target_key: str>
+    = (old) get <target_key> from object with <key>: <value> from response.
+
+Assertions:
+  - ASSERT_CODE <code: int>
+    = assert that the response code is <code>
+  - ASSERT_VALUE <key: str> <value: Any>
+    = assert that the <key> from the response has the value <value>
+
+HTTP Requests:
+  - AUTH <email: str> <password: str>
+    = goes to /login and tries to authenticate from credentials
+  - AUTH_FROM <user: JSON filename>
+    = goes to /login and tries to authenticate from a user.json
+  - GET <endpoint: str>
+    = does a get request on <endpoint>
+  - POST <endpoint: str>
+    = does a post request on <endpoint>
+  - PUT <endpoint: str>
+    = does a put request on <endpoint>
+  - DELETE <endpoint: str>
+    = does a delete request on <endpoint>
+ ---
