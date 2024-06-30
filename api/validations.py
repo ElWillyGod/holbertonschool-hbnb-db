@@ -159,7 +159,8 @@ def isNoneFields(entity: str, data: dict) -> bool:
     required_fields = []
 
     if entity == 'user':
-        required_fields = ['email', 'first_name', 'last_name', 'password']
+        required_fields = ['email', 'first_name', 'last_name',
+                           'password', 'is_admin']
 
     if entity == 'city':
         required_fields = ['name', 'country_code']

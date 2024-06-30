@@ -229,10 +229,6 @@ class HTTPTestClass:
         return response
 
     @classmethod
-    def Teardown(cls) -> None:
-        pass
-
-    @classmethod
     def AUTH(cls, email: str, password: str) -> None:
         cls.json = {"email": email, "password": password}
         cls.POST("/")
@@ -240,6 +236,10 @@ class HTTPTestClass:
         token = cls.lastResponse.json["access_token"]
         cls.token = token
         return token
+
+    @classmethod
+    def Teardown(cls) -> None:
+        pass
 
     @classmethod
     def run(cls) -> None:
