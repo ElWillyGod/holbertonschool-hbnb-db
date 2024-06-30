@@ -14,6 +14,10 @@ parameters:
 responses:
   204:
     description: User deleted successfully
+    schema:
+      type: string
+      example: ""
+      description: Empty string
   400:
     description: Invalid user ID format
     schema:

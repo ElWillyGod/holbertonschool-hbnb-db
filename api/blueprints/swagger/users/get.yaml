@@ -20,7 +20,7 @@ responses:
         id:
           type: string
           description: The ID of the review
-          example: 1f2390e77d1341a3b59d0cb56fba5f45
+          example: "1f2390e77d1341a3b59d0cb56fba5f45"
         email:
           type: string
           description: Email address of the user
@@ -44,11 +44,11 @@ responses:
         created_at:
           type: string
           description: Date and time when the review was created
-          example: 2077-03-30 03:30:30.303030
+          example: "2077-03-30 03:30:30.303030"
         updated_at:
           type: string
           description: Date and time when the review was last updated
-          example: 2077-03-30 03:30:30.303030
+          example: "2077-03-30 03:30:30.303030"
   400:
     description: Invalid request data or missing fields
     schema:

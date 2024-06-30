@@ -8,7 +8,7 @@ parameters:
     name: country_code
     type: string
     required: true
-    description: ISO country code (e.g., 'UY' for Uruguay)
+    description: 2 char ISO code of country
 
 
 responses:
@@ -21,7 +21,7 @@ responses:
         properties:
           id:
             type: string
-            example: 1f2390e77d1341a3b59d0cb56fba5f45
+            example: "1f2390e77d1341a3b59d0cb56fba5f45"
           name:
             type: string
             example: Montevideo
@@ -30,10 +30,10 @@ responses:
             example: UY
           created_at:
             type: string
-            example: 2077-03-30 03:30:30.303030
+            example: "2077-03-30 03:30:30.303030"
           updated_at:
             type: string
-            example: 2077-03-30 03:30:30.303030
+            example: "2077-03-30 03:30:30.303030"
   400:
     description: Bad request, invalid country code
     schema:

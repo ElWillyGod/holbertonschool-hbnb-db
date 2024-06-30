@@ -8,7 +8,7 @@ parameters:
     name: country_code
     type: string
     required: true
-    description: ISO code of the country (e.g., 'UY' for Uruguay)
+    description: 2 char ISO code of country
 
 
 responses:
