@@ -19,7 +19,13 @@
 
 from api import appFactory
 from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv('.env')
 
 app = appFactory()
+
+####################################################################################################
+app.config['SQLALCHEMY_DATABASE_URI'] ='mysql+mysqldb://root:@localhost/hbnb'
+app.config['USE_DATABASE'] = True
+db = SQLAlchemy(app)

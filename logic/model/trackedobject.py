@@ -5,13 +5,12 @@
     other classes.
 '''
 
-from abc import ABC
 from datetime import datetime
 from uuid import uuid4
 import inspect
 
 
-class TrackedObject(ABC):
+class TrackedObjectl:
     '''
         id (str): UUID4 as hex.
         created_at: datetime as string at time of creation.
@@ -30,11 +29,7 @@ class TrackedObject(ABC):
         self.id = uuid4().hex if id is None else id
 
     def getAllInstanceAttributes(self):
-        attributes = inspect.getmembers(self,
-                                        lambda a: not inspect.isroutine(a))
-        return {key: value for key, value in attributes
-                if not (key[0:2] == "__" and key[-2:] == "__")
-                and not key == "_abc_impl"}
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
     def toJson(self) -> str:
         return self.getAllInstanceAttributes()

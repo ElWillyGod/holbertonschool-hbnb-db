@@ -7,12 +7,13 @@
 
 from abc import ABC
 
-from logic.model.classes import getPlural, getClassByName
+from logic.model.classes import getClassByName
 from logic.model.countrieslib import getCountry, getCountries
 from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
 from logic.model.validationlib import idExists
 from logic import DM as Persistence
 from logic.model.linkeddeleter import raiseDeleteEvent
+from wsgi import app
 
 
 class LogicFacade(ABC):
@@ -41,16 +42,14 @@ class LogicFacade(ABC):
 
     @staticmethod
     def getByType(type: str) -> dict:
-        typePlural = getPlural(type)
-        return Persistence.get_all(typePlural)
+        return Persistence.get_all(type)
 
     @staticmethod
     def getByID(
         id: str,
         type: str
 ) -> dict:
-        typePlural = getPlural(type)
-        call = Persistence.get(id, typePlural)
+        call = Persistence.get(id, type)
         if call is None or len(call) == 0:
             raise IDNotFoundError("id not found")
         return call
@@ -60,12 +59,11 @@ class LogicFacade(ABC):
         id: str,
         type: str
 ) -> None:
-        typePlural = getPlural(type)
-        call = Persistence.get(id, typePlural)
+        call = Persistence.get(id, type)
         if call is None or len(call) == 0:
             raise IDNotFoundError("id not found")
         raiseDeleteEvent(type, call)
-        Persistence.delete(id, typePlural)
+        Persistence.delete(id, type)
 
     @staticmethod
     def updateByID(
@@ -73,8 +71,7 @@ class LogicFacade(ABC):
         type: str,
         data: dict
 ) -> dict:
-        typePlural: str = getPlural(type)
-        old_data = Persistence.get(id, typePlural)
+        old_data = Persistence.get(id, type)
         if old_data is None or len(old_data) == 0:
             raise IDNotFoundError("id not found")
         updated = []
@@ -85,19 +82,18 @@ class LogicFacade(ABC):
         data["created_at"] = old_data["created_at"]
         data["updated_at"] = None
         data_updated = getClassByName(type)(**data, update=updated)
-        Persistence.update(id, typePlural, data_updated.toJson())
-        return Persistence.get(id, typePlural)
+        Persistence.update(id, type, data_updated.toJson())
+        return Persistence.get(id, type)
 
     @staticmethod
     def createObjectByJson(
         type: str,
         data: dict
 ) -> dict:
-        typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id
-        Persistence.save(id, typePlural, new.toJson())
-        return Persistence.get(id, typePlural)
+        return Persistence.save(id, type, new if app.config['USE_DATABASE'] else new.toJson())
+        # return Persistence.get(id, type)
 
     @staticmethod
     def getAllCountries() -> dict:
