@@ -186,3 +186,14 @@ def isNoneFields(entity: str, data: dict) -> bool:
             return True
 
     return False
+
+
+def isPasswordValid(password: str) -> bool:
+    '''
+        Checks if the password is valid before encryption.
+    '''
+
+    if not isinstance(password, str):
+        return False
+
+    return True

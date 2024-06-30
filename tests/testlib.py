@@ -233,10 +233,13 @@ class HTTPTestClass:
         pass
 
     @classmethod
-    def Authenticate(cls, email: str, password: str) -> None:
+    def AUTH(cls, email: str, password: str) -> None:
         cls.json = {"email": email, "password": password}
         cls.POST("/")
+        cls.ASSERT_CODE(200)
+        token = cls.lastResponse.json["access_token"]
         cls.token = token
+        return token
 
     @classmethod
     def run(cls) -> None:

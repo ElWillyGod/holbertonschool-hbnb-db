@@ -1,3 +1,4 @@
+
 '''
     Users endpoints:
         '+': Public, '#': Needs auth, '-': Needs is_admin = True.
@@ -17,7 +18,7 @@ from flask import request, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt
 from flasgger import swag_from
 from logic import logicexceptions
-from logic.logicfacade import LogicFacade
+from logic import LogicFacade
 from api.security import hashPassword
 import api.validations as val
 import api.authlib as authlib
@@ -87,9 +88,11 @@ def createUser():
     if val.isNoneFields('user', data):
         return {'error': "Invalid data or missing fields"}, 400
 
-    email = data.get('email')
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
+    email = data.get('email', "email")
+    first_name = data.get('first_name', "firstname")
+    last_name = data.get('last_name', "lastname")
+    password = data.get('password', "password")
+    is_admin = data.get('is_admin', False)
 
     if (not val.isStrValid(email) or
             not val.isNameValid(first_name) or
@@ -98,6 +101,12 @@ def createUser():
 
     if not val.isEmailValid(email):
         return {'error': "Invalid data"}, 400
+
+    if not val.isPasswordValid(password):
+        return {'error': "invalid password"}, 400
+
+    if not isinstance(is_admin, bool):
+        return {'error': "invalid is_admin"}, 400
 
     # Hashes password.
     data["password"] = hashPassword(data["password"])
@@ -137,14 +146,25 @@ def updateUser(user_id):
     email = data.get('email')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
+    password = data.get('password', "password")
+    is_admin = data.get('is_admin', False)
 
     if (not val.isStrValid(email) or
             not val.isNameValid(first_name) or
             not val.isNameValid(last_name)):
-        return {'error': "Invalid data or missing fields"}, 400
+        return {'error': "invalid data"}, 400
 
     if not val.isEmailValid(email):
-        return {'error': "Invalid email"}, 400
+        return {'error': "invalid email"}, 400
+
+    if not val.isPasswordValid(password):
+        return {'error': "invalid password"}, 400
+
+    if not isinstance(is_admin, bool):
+        return {'error': "invalid is_admin"}, 400
+
+    # Hashes password.
+    data["password"] = hashPassword(data["password"])
 
     # Calls BL to update user.
     try:

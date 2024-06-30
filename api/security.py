@@ -9,7 +9,8 @@
 from flask_jwt_extended import JWTManager, create_access_token
 from flask import request, Blueprint
 import flask_bcrypt
-from logic.logicfacade import LogicFacade
+from logic import logicexceptions
+from logic import LogicFacade
 from flasgger import swag_from
 
 # Instanciates all required objects.
@@ -26,7 +27,7 @@ def associateSecurity(app):
 
 # Called in users endpoint on post and update to hash user password.
 def hashPassword(password):
-    return bcrypt.generate_password_hash(password, 16)
+    return bcrypt.generate_password_hash(password, 16).decode('utf-8')
 
 
 # Authentication error handlers.
@@ -65,8 +66,8 @@ def login():
         user identity.
     '''
 
-    WRONG_FIELDS = "Wrong email or password"
-    WRONG_DATA = "Wrong email or password"
+    WRONG_FIELDS = {"error": "needs email and password"}
+    WRONG_DATA = {"error": "wrong email or password"}
 
     # Get user request info.
     email = request.json.get("email", None)
@@ -77,16 +78,22 @@ def login():
         return WRONG_FIELDS, 400
 
     # Fetch user data by email. 401 if email not found.
-    hashed_password, is_admin = LogicFacade.getPswdAndAdminByEmail(email)
-    if hashed_password is None:
-        return WRONG_DATA, 400
+    try:
+        hashed_password, user_id, is_admin = (
+            LogicFacade.getPswdAndAdminByEmail(email)
+            )
+    except logicexceptions.EmailNotFoundError as err:
+        return WRONG_DATA, 401
 
     # Compare passwords. 401 if different.
     if bcrypt.check_password_hash(hashed_password, password):
         # Create token.
         access_token = create_access_token(
             identity=email,
-            additional_claims={"is_admin": is_admin}
+            additional_claims={
+                "is_admin": is_admin,
+                "user_id": user_id
+                }
         )
 
         return {"access_token": access_token}, 200

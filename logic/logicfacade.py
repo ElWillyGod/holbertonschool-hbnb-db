@@ -9,7 +9,7 @@ from abc import ABC
 
 from logic.model.classes import getPlural, getClassByName
 from logic.model.countrieslib import getCountry, getCountries
-from logic.model.logicexceptions import IDNotFoundError
+from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
 from logic.model.validationlib import idExists
 from logic import DM as Persistence
 from logic.model.linkeddeleter import raiseDeleteEvent
@@ -126,4 +126,8 @@ class LogicFacade(ABC):
         email: str
 ) -> tuple[str, bool]:
         user = Persistence.get_by_property("users", "email", email)
+        if not user:
+            raise EmailNotFoundError("email not found")
+        # user is transformed from list to dict
+        user = user[0]
         return user["password"], user["id"], user["is_admin"]

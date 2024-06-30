@@ -13,7 +13,7 @@ from flask import Blueprint
 from flask_jwt_extended import jwt_required, get_jwt
 from flasgger import swag_from
 from logic import logicexceptions
-from logic.logicfacade import LogicFacade
+from logic import LogicFacade
 import api.validations as val
 import api.authlib as authlib
 

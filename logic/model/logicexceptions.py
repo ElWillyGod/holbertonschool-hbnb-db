@@ -72,3 +72,11 @@ class ForbiddenAccess(Exception):  # 403
     '''
 
     pass
+
+
+class EmailNotFoundError(Exception):  # 404
+    '''
+        Called when an email is not found.
+    '''
+
+    pass
