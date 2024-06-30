@@ -21,9 +21,11 @@ class User(db.Model):
                 nullable=False,
                 primary_key=True)
 
-    password = db.Column(db.String(255),
-                      nullable=False,
+    email = db.Column(db.String,
                       primary_key=True)
+
+    password = db.Column(db.String(255),
+                      nullable=False)
 
     firstName = db.Column(db.String(255))
 
@@ -36,8 +38,7 @@ class User(db.Model):
 
     update_at = db.Column(db.TIMESTAMP,
                        nullable=False)
-"""
-class User(TrackedObject):
+
     '''
         User Class.
     '''
@@ -61,4 +62,3 @@ class User(TrackedObject):
         self.first_name = first_name
         self.last_name = last_name
 
-        """

@@ -12,7 +12,7 @@ from api.swagger import template
 
 app = Flask("AirBnB-MWA")
 app.config['SQLALCHEMY_DATABASE_URI'] ='mysql+mysqldb://root:@localhost/hbnb'
-app.config['USE_DATABASE'] = False
+app.config['USE_DATABASE'] = True
 db = SQLAlchemy(app)
 
 swagger = Swagger(app, template=template)
