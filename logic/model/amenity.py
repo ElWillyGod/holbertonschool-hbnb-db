@@ -15,21 +15,19 @@ class Amenity(TrackedObject, db.Model):
     '''
         Amenity Class.
     '''
-    if app.config['USE_DATABASE']:
 
-        __tablename__ = 'amenity'
+    __tablename__ = 'amenity'
+    name = db.Column(db.String(255),
+                         primary_key=True)
 
-        id = db.Column(db.String,
+    id = db.Column(db.String,
                        nullable=False,
                        primary_key=True)
 
-        name = db.Column(db.String(255),
-                         primary_key=True)
-
-        created_at = db.Column(db.TIMESTAMP,
+    created_at = db.Column(db.TIMESTAMP,
                                nullable=False)
 
-        update_at = db.Column(db.TIMESTAMP,
+    update_at = db.Column(db.TIMESTAMP,
                               nullable=False)
 
     def __init__(self,
@@ -47,5 +45,4 @@ class Amenity(TrackedObject, db.Model):
                 raise AmenityNameDuplicated("amenity already exists")
                 """
         self.name = name
-
 

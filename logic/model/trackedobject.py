@@ -9,7 +9,7 @@ from datetime import datetime
 import uuid
 import json
 import inspect
-
+from api import app
 
 class TrackedObject:
     '''
@@ -19,7 +19,6 @@ class TrackedObject:
         update_time() -> None: Updates the updated_at attribute.
         toJson() -> str: Returns a JSON representation of this object.
     '''
-
 
     def __init__(self,
                  id: str = None,
@@ -31,11 +30,7 @@ class TrackedObject:
         self.id = str(uuid.uuid4()) if id is None else id
 
     def getAllInstanceAttributes(self):
-        attributes = inspect.getmembers(self,
-                                        lambda a: not inspect.isroutine(a))
-        return {key: value for key, value in attributes
-                if not (key[0:2] == "__" and key[-2:] == "__")
-                and not key == "_abc_impl"}
+            return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
     def toJson(self) -> str:
         return self.getAllInstanceAttributes()

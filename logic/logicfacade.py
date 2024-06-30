@@ -80,7 +80,7 @@ class LogicFacade(ABC):
     def createObjectByJson(type: str, data: dict) -> dict:
         new = getClassByName(type)(**data)
         print("esto es el new {}".format(new))
-        return Persistence.save(new.id, type, new)
+        return Persistence.save(new.id, type, new if app.config['USE_DATABASE'] else new.toJson())
         # return Persistence.get(id, typePlural)
 
     @staticmethod
