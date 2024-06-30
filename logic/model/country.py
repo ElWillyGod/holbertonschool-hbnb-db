@@ -6,22 +6,27 @@
     They also lack creation datetime and update datetime.
 '''
 
-from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import doesCountryExist
 from logic.model.logicexceptions import CountryNotFoundError
+from model import Base
+
+from sqlalchemy import Column, String
 
 
-class Country(TrackedObject):
+class Country(Base):
     """
-        Country Class
-
-        code (str): 2 char code to identify the country. ISO 3166-1 alpha-2.
-        name (str): Name of country.
+        Country table.
     """
 
-    def __init__(self,
-                 code: str,
-                 name: str):
+    __tablename__ = 'country'
+    code = Column(String(3), unique=True)
+    name = Column(String(255), unique=True)
+
+    def __init__(
+            self,
+            code: str,
+            name: str
+) -> None:
         if not doesCountryExist(code):
             raise CountryNotFoundError("country does not exist")
         self.code = code

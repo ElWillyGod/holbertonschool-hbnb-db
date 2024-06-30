@@ -7,22 +7,24 @@
 
 from datetime import datetime
 from uuid import uuid4
-import inspect
+from model import Base
+from sqlalchemy import Column, Integer, TIMESTAMP
 
-
-class TrackedObject:
+class TrackedObject(Base):
     '''
-        id (str): UUID4 as hex.
-        created_at: datetime as string at time of creation.
-        updated_at: datetime as string at time of last update.
-        update_time() -> None: Updates the updated_at attribute.
-        toJson() -> str: Returns a JSON representation of this object.
+        Tracked table.
     '''
 
-    def __init__(self,
-                 id: str = None,
-                 created_at: str = None,
-                 updated_at: str = None):
+    id = Column(Integer, nullable=False, primary_key=True)
+    created_at = Column(TIMESTAMP, nullable=False)
+    updated_at = Column(TIMESTAMP, nullable=False)
+
+    def __init__(
+            self,
+            id: str = None,
+            created_at: str = None,
+            updated_at: str = None
+) -> None:
         now = str(datetime.now())
         self.created_at = now if created_at is None else created_at
         self.updated_at = now if updated_at is None else updated_at

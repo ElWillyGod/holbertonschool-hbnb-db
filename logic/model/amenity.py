@@ -5,43 +5,24 @@
 '''
 
 from logic.model.trackedobject import TrackedObject
-from logic.model.validationlib import isAmenityDuplicated
-from logic.model.logicexceptions import AmenityNameDuplicated
-from sqlalchemy import column, String, TIMESTAMP
-from persistence import db
+from sqlalchemy import Column, String
 
 
-class Amenity(TrackedObject, db.Model):
+class Amenity(TrackedObject):
     '''
         Amenity Class.
     '''
 
     __tablename__ = 'amenity'
-    name = db.Column(db.String(255),
-                         primary_key=True)
+    name = Column(String(255), unique=True)
 
-    id = db.Column(db.String,
-                       nullable=False,
-                       primary_key=True)
-
-    created_at = db.Column(db.TIMESTAMP,
-                               nullable=False)
-
-    update_at = db.Column(db.TIMESTAMP,
-                              nullable=False)
-
-    def __init__(self,
-                 name: str,
-                 *,
-                 id: str = None,
-                 created_at: str = None,
-                 updated_at: str = None,
-                 update: dict | None = None
-                 ) -> None:
+    def __init__(
+            self,
+            name: str,
+            *,
+            id: str = None,
+            created_at: str = None,
+            updated_at: str = None
+) -> None:
         super().__init__(id, created_at, updated_at)
-        """
-        if update is None or "name" in update:
-            if isAmenityDuplicated(name):
-                raise AmenityNameDuplicated("amenity already exists")
-                """
         self.name = name

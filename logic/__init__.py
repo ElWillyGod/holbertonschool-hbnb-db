@@ -3,10 +3,11 @@
     Business Logic Package
 '''
 
-# Imports
-from persistence import DM
-from persistence.country_manager import CountryManager
+# For db.
+from flask_sqlalchemy import SQLAlchemy
 
-# Exports
+# Exports.
 from logic.model import logicexceptions
-from logic.logicfacade import LogicFacade
+
+db = SQLAlchemy()
+Base = db.Model

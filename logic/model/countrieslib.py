@@ -3,7 +3,9 @@
     quickdoc
 '''
 
-from logic.model import countries
+from persistence.country_manager import CountryManager
+
+countries = CountryManager.get()
 
 
 def getCountry(country_code: str):

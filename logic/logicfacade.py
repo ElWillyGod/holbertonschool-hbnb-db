@@ -8,12 +8,12 @@
 from abc import ABC
 import os
 
-from logic.model.classes import getClassByName
+from logic.model import classes
+from logic.model.classes import getObjectByName
 from logic.model.countrieslib import getCountry, getCountries
 from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
 from logic.model.validationlib import idExists
 from logic import DM as Persistence
-from logic.model.linkeddeleter import raiseDeleteEvent
 
 
 class LogicFacade(ABC):
@@ -42,14 +42,16 @@ class LogicFacade(ABC):
 
     @staticmethod
     def getByType(type: str) -> dict:
-        return Persistence.get_all(type)
+        obj = classes.getObjectByName(type)
+        return Persistence.get_all(obj)
 
     @staticmethod
     def getByID(
         id: str,
         type: str
 ) -> dict:
-        call = Persistence.get(id, type)
+        obj = classes.getObjectByName(type)
+        call = Persistence.get(id, obj)
         if call is None or len(call) == 0:
             raise IDNotFoundError("id not found")
         return call
@@ -59,11 +61,11 @@ class LogicFacade(ABC):
         id: str,
         type: str
 ) -> None:
-        call = Persistence.get(id, type)
+        obj = classes.getObjectByName(type)
+        call = Persistence.get(id, obj)
         if call is None or len(call) == 0:
             raise IDNotFoundError("id not found")
-        raiseDeleteEvent(type, call)
-        Persistence.delete(id, type)
+        Persistence.delete(id, obj)
 
     @staticmethod
     def updateByID(
@@ -81,7 +83,7 @@ class LogicFacade(ABC):
         data["id"] = id
         data["created_at"] = old_data["created_at"]
         data["updated_at"] = None
-        data_updated = getClassByName(type)(**data, update=updated)
+        data_updated = getObjectByName(type)(**data, update=updated)
         Persistence.update(id, type, data_updated.toJson())
         return Persistence.get(id, type)
 
@@ -90,7 +92,7 @@ class LogicFacade(ABC):
         type: str,
         data: dict
 ) -> dict:
-        new = getClassByName(type)(**data)
+        new = getObjectByName(type)(**data)
         id = new.id
         return Persistence.save(
             id, type, new if os.environ.get('USE_DATABASE') else new.toJson())

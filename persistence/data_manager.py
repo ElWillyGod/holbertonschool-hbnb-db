@@ -9,10 +9,8 @@ import os
 import glob
 
 from persistence.data_manager_interface import IPersistenceManager
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
+from flask_sqlalchemy.model import Model
+from logic import db
 
 class DataManager(IPersistenceManager):
     """
@@ -30,7 +28,7 @@ class DataManager(IPersistenceManager):
         if not os.path.exists(storage_path):
             os.makedirs(self.storage_path)
 
-    def _file_path(self, entity_type: str, entity_id=""):
+    def _file_path(self, entity_type: Model, entity_id=""):
         """
             Generates the file path for an entity
             Attributes:
@@ -54,7 +52,7 @@ class DataManager(IPersistenceManager):
                 The entity
         """
 
-        if os.environ.get('USE_DATABASE'):# config de la bd
+        if os.environ.get('USE_DATABASE'):  # config de la bd
 
             db.session.add(entity)
             db.session.commit()
@@ -77,7 +75,7 @@ class DataManager(IPersistenceManager):
         return result
         
 
-    def get(self, entity_id: str, entity_type: str) -> dict:
+    def get(self, entity_id: str, entity_type: Model) -> dict:
         """
             Retrieves an entity from a JSON file
             Attributes:
@@ -104,7 +102,7 @@ class DataManager(IPersistenceManager):
                     entity = json.load(file)
                 return entity
 
-    def update(self, entity_id: str, entity_type: str, data: dict) -> dict:
+    def update(self, entity_id: str, entity_type, data: dict) -> dict:
         """
             Update an entity by saving it again to the JSON file
             Attributes:
@@ -126,7 +124,7 @@ class DataManager(IPersistenceManager):
 
         return data
 
-    def delete(self, entity_id: str, entity_type: str) -> None:
+    def delete(self, entity_id: str, entity_type: Model) -> None:
         """
             Delete an entity by removing its JSON file
             Attributes:
@@ -157,7 +155,7 @@ class DataManager(IPersistenceManager):
                 raise FileNotFoundError(
                     f"No such entity: {entity_type} with {entity_id}")
 
-    def get_all(self, entity_type: str) -> list[dict]:
+    def get_all(self, entity_type) -> list[dict]:
         """
             Retrieves all entities of a given type
             Attributes:
@@ -174,7 +172,7 @@ class DataManager(IPersistenceManager):
             return entity
 
         else:
-
+            entity_type
             path = os.path.join(self.storage_path, f"{entity_type}_*.json")
             files = glob.glob(path)
             entities = []
@@ -184,7 +182,7 @@ class DataManager(IPersistenceManager):
                         entities.append(data)
             return entities
 
-    def get_by_property(self, entity_type: str,
+    def get_by_property(self, entity_type: Model,
                         property_name: str, property_value) -> list[dict]:
         """
             Retrieves all entities of a given type that match a specific property

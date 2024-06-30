@@ -20,7 +20,7 @@ classes = [
            ["review", Review]
           ]
 
-def getClassByName(name):
+def getObjectByName(name):
     '''
         Gets a class by it's singular name (classes[0]) or
         plural name (classes[1])
