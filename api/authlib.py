@@ -19,7 +19,7 @@ def _isAdmin(user: dict | None) -> bool:
         Returns true if user is an admin (is_admin == True).
     '''
 
-    return user.get("is_admin", default=False)
+    return user.get("is_admin", False)
 
 
 def notGetAllAuthorized(
