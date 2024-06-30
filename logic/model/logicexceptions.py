@@ -63,3 +63,20 @@ class AmenityNameDuplicated(Exception):  # 409
     '''
 
     pass
+
+
+class ForbiddenAccess(Exception):  # 403
+    '''
+        Called when trying to do an unauthorized action.
+        (needs is_admin = True)
+    '''
+
+    pass
+
+
+class EmailNotFoundError(Exception):  # 404
+    '''
+        Called when an email is not found.
+    '''
+
+    pass

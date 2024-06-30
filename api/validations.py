@@ -1,8 +1,7 @@
 
-"""
+'''
     Endpoint validation library.
-"""
-
+'''
 
 
 def idChecksum(id: str) -> bool:
@@ -10,8 +9,7 @@ def idChecksum(id: str) -> bool:
         Checks if an id's lenght is valid.
     '''
 
-    return len(id) == 36
-
+    return len(id) == 32
 
 
 def isCountryValid(country_code: str) -> bool:
@@ -29,8 +27,11 @@ def isCountryValid(country_code: str) -> bool:
     return True
 
 
-
-def isStrValid(string: str, ignoreStr: str="", ignoreDigits=True) -> bool:
+def isStrValid(
+        string: str,
+        ignoreStr: str = "",
+        ignoreDigits=True
+) -> bool:
     '''
         Checks if the string does not have any special character aside
         from chars from ignoreStr.
@@ -40,7 +41,7 @@ def isStrValid(string: str, ignoreStr: str="", ignoreDigits=True) -> bool:
 
     if not string.isascii():
         return False
-    
+
     if not string.isprintable():
         return False
 
@@ -103,7 +104,7 @@ def isEmailValid(email: str) -> bool:
         valid example: "user@gmail.com"
         valid example: "user@ceibal.edu.uy"
     '''
-    
+
     if " " in email:
         return False
 
@@ -150,25 +151,31 @@ def isEmailValid(email: str) -> bool:
     return True
 
 
-def isNoneFields(enty: str, data: dict) -> bool:
+def isNoneFields(entity: str, data: dict) -> bool:
+    '''
+        Checks all fields of an object.
+    '''
 
     required_fields = []
 
-    if enty == 'user':
-        required_fields = ['email', 'first_name', 'last_name']
+    if entity == 'user':
+        required_fields = ['email', 'first_name', 'last_name',
+                           'password', 'is_admin']
 
-    if enty == 'city':
+    if entity == 'city':
         required_fields = ['name', 'country_code']
 
-    if enty == 'amenity':
+    if entity == 'amenity':
         required_fields = ['name']
 
-    if enty == 'place':
-        required_fields = ['name', 'description', 'city_id',  # 'address',
-                           'latitude', 'longitude', 'host_id', 'number_of_rooms',
-                           'number_of_bathrooms', 'price_per_night', 'max_guests',
-                           'amenity_ids']
-    if enty == 'review':
+    if entity == 'place':
+        required_fields = [
+            'name', 'description', 'city_id',  # 'address',
+            'latitude', 'longitude', 'host_id', 'number_of_rooms',
+            'number_of_bathrooms', 'price_per_night', 'max_guests',
+            'amenity_ids'
+            ]
+    if entity == 'review':
         required_fields = ['user_id', 'rating', 'comment']
 
     if len(data) != len(required_fields):
@@ -180,3 +187,14 @@ def isNoneFields(enty: str, data: dict) -> bool:
             return True
 
     return False
+
+
+def isPasswordValid(password: str) -> bool:
+    '''
+        Checks if the password is valid before encryption.
+    '''
+
+    if not isinstance(password, str):
+        return False
+
+    return True

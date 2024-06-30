@@ -1,0 +1,61 @@
+Retrieve details of a specific user.
+---
+tags:
+  - users
+
+responses:
+  200:
+    description: Details of the specified user
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: The ID of the review
+            example: "1f2390e77d1341a3b59d0cb56fba5f45"
+          email:
+            type: string
+            description: Email address of the user
+            example: example@gmail.com
+          first_name:
+            type: string
+            description: First name of the user
+            example: Alice
+          last_name:
+            type: string
+            description: Last name of the user
+            example: Smith
+          password:
+            type: string
+            description: Password of the user
+            example: AliceSmith1234
+          is_admin:
+            type: bool
+            description: Is the user an admin?
+            example: false
+          created_at:
+            type: string
+            description: Date and time when the review was created
+            example: "2077-03-30 03:30:30.303030"
+          updated_at:
+            type: string
+            description: Date and time when the review was last updated
+            example: "2077-03-30 03:30:30.303030"
+  401:
+    description: Not authenticated.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
+  403:
+    description: Not authorized.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges

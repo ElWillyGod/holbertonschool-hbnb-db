@@ -8,12 +8,37 @@ from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import idExists, isOwnerIDTheSame
 from logic.model.logicexceptions import IDNotFoundError, TryingToReviewOwnPlace
 
+from sqlalchemy.orm import Session
+from api import db
+from sqlalchemy import Column, Integer, ForeignKey, TIMESTAMP, create_engine, engine
 
-class Review(TrackedObject):
-    """
-        Review Class.
-    """
 
+class Review(TrackedObject, db.Model):
+
+    __tablename__ = 'review'
+
+    id = db.Column(db.Integer,
+                nullable=False,
+                primary_key=True)
+
+    placeId = db.Column(db.Integer,
+                     ForeignKey('place.id'),
+                     nullable=False,
+                     primary_key=True)
+
+    userId = db.Column(db.Integer,
+                    ForeignKey('user.id'),
+                    nullable=False,
+                    primary_key=True)
+
+    reating = db.Column(db.Integer,
+                     nullable=False)
+
+    create_at = db.Column(db.TIMESTAMP,
+                       nullable=False)
+
+    update_at = db.Column(db.TIMESTAMP,
+                       nullable=False)
     def __init__(self,
                  place_id: str,
                  user_id: str,
@@ -26,12 +51,14 @@ class Review(TrackedObject):
                  update: dict | None = None
                  ) -> None:
         super().__init__(id, created_at, updated_at)
+        """
         if not idExists(place_id, "places"):
             raise IDNotFoundError("place_id doesn't pair with a place")
         if not idExists(user_id, "users"):
             raise IDNotFoundError("user_id doesn't pair with a user")
         if isOwnerIDTheSame(place_id, user_id):
             raise TryingToReviewOwnPlace("you cannot review your own place")
+            """
         self.rating = rating
         self.place_id = place_id
         self.user_id = user_id

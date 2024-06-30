@@ -1,0 +1,52 @@
+Delete a specific place by its ID
+---
+tags:
+  - places
+
+parameters:
+  - in: path
+    name: place_id
+    type: string
+    required: true
+    description: ID of the place to be deleted
+
+
+responses:
+  204:
+    description: Place deleted successfully
+    schema:
+      type: string
+      example: ""
+      description: Empty string
+  400:
+    description: Invalid place ID format
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
+  401:
+    description: Not authenticated
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
+  403:
+    description: Not authorized
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges
+  404:
+    description: Place not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found

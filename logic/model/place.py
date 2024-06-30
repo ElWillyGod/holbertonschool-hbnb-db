@@ -7,11 +7,56 @@ from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import idExists
 from logic.model.logicexceptions import IDNotFoundError
 
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, TIMESTAMP
+from api import db
 
-class Place(TrackedObject):
-    """
-        Place Class.
-    """
+
+class Place(TrackedObject, db.Model):
+
+    __tablename__ = 'place'
+
+    id = db.Column(db.Integer,
+                nullable=False,
+                primary_key=True)
+
+    userId = db.Column(db.Integer,
+                    ForeignKey('user.id'),
+                    nullable=False,
+                    primary_key=True)
+
+    name = db.Column(db.String(255),
+                  nullable=False)
+
+    description = db.Column(db.String(255),
+                         nullable=False)
+
+    numberOfRooms = db.Column(db.Integer,
+                           nullable=False)
+
+    numberOfBathrooms = db.Column(db.Integer,
+                               nullable=False)
+
+    maxGues = db.Column(db.Integer,
+                     nullable=False)
+
+    pricePreNigth = db.Column(db.Float,
+                           nullable=False)
+
+    latitude = db.Column(db.Float,
+                      nullable=False)
+
+    longitude = db.Column(db.Float,
+                       nullable=False)
+
+    citiId = db.Column(db.Integer,
+                    ForeignKey('city.id'),
+                    nullable=False)
+
+    create_at = db.Column(db.TIMESTAMP,
+                       nullable=False)
+
+    update_at = db.Column(db.TIMESTAMP,
+                       nullable=False)
 
     def __init__(self,
                  host_id: str,
@@ -32,6 +77,7 @@ class Place(TrackedObject):
                  update: dict | None = None
                  ) -> None:
         super().__init__(id, created_at, updated_at)
+        """
         if not idExists(host_id, "users"):
             raise IDNotFoundError("host_id does not exist")
         if not idExists(city_id, "cities"):
@@ -39,6 +85,7 @@ class Place(TrackedObject):
         for id in amenity_ids:
             if not idExists(id, "amenities"):
                 raise IDNotFoundError(f"'{id}' in amenity_ids does not exist")
+                """
         self.host_id = host_id
         self.name = name
         self.description = description

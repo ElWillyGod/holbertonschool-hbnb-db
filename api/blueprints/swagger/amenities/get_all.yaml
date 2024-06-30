@@ -1,0 +1,25 @@
+Retrieve a list of all amenities
+---
+tags:
+  - amenities
+
+responses:
+  200:
+    description: A list of amenities
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            example: "1f2390e77d1341a3b59d0cb56fba5f45"
+          name:
+            type: string
+            example: Pool
+          created_at:
+            type: string
+            example: "2077-03-30 03:30:30.303030"
+          updated_at:
+            type: string
+            example: "2077-03-30 03:30:30.303030"

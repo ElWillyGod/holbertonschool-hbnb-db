@@ -8,9 +8,7 @@ from typing import Any
 import requests
 import json
 from pathlib import Path
-from glob import glob
 import time
-
 
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -29,10 +27,8 @@ class HTTPTestClass:
         If debug == True it shows the result of all passed assertions.
     '''
 
-    URL: str = "http://127.0.0.1:5000/"
-    savefolderpath: str = "persistence/storage"
+    local_URL: str = "http://127.0.0.1:5000/"
     _root_path = Path(__file__).parent.parent.resolve()
-    savefolderpath = f"{_root_path}/{savefolderpath}/*.json"
 
     assertionsPassed: int = 0
     assertionsFailed: int = 0
@@ -43,6 +39,7 @@ class HTTPTestClass:
     json: dict = {}
     headers: dict = {'Content-type': 'application/json',
                      'Accept': 'application/json'}
+    token: str | None = None
     prefix: str = f">>> "
     suffix: str = f"{RESET}"
     debug: bool = False
@@ -59,9 +56,10 @@ class HTTPTestClass:
         cls.assertionsPassed += 1
 
     @classmethod
-    def _ASSERTION_FAILURE(cls,
-                           errormsg: str | None = None
-                           ) -> None:
+    def _ASSERTION_FAILURE(
+        cls,
+        errormsg: str | None = None
+) -> None:
 
         if errormsg is None:
             errormsg = "Assertion Failed"
@@ -69,11 +67,12 @@ class HTTPTestClass:
         raise AssertionError(errormsg)
 
     @classmethod
-    def _ASSERT(cls,
-                value: Any,
-                expected_value: Any,
-                errormsg: str | None = None
-                ) -> None:
+    def _ASSERT(
+        cls,
+        value: Any,
+        expected_value: Any,
+        errormsg: str | None = None
+) -> None:
         msg = f"\tExpected: {expected_value}\n\tGiven: {value}"
         errormsg = msg if errormsg is None else errormsg
         if value == expected_value:
@@ -82,20 +81,22 @@ class HTTPTestClass:
             cls._ASSERTION_FAILURE(errormsg)
 
     @classmethod
-    def ASSERT_CODE(cls,
-                    code_expected: int,
-                    errormsg: str | None = None
-                    ) -> None:
+    def ASSERT_CODE(
+        cls,
+        code_expected: int,
+        errormsg: str | None = None
+) -> None:
 
         code = cls.lastResponse.status_code
         cls._ASSERT(code, code_expected, errormsg)
 
     @classmethod
-    def ASSERT_VALUE(cls,
-            key: str,
-            value_expected: Any,
-            errormsg: str | None = None
-            ) -> None:
+    def ASSERT_VALUE(
+        cls,
+        key: str,
+        value_expected: Any,
+        errormsg: str | None = None
+) -> None:
 
         data = cls.lastResponse.json()
         if isinstance(data, list):
@@ -121,6 +122,18 @@ class HTTPTestClass:
         cls._ASSERT(value, value_expected, errormsg)
 
     @classmethod
+    def CHANGE_URL(cls, url: str) -> None:
+        cls.local_URL = url
+
+    @classmethod
+    def CHANGE_URL_TO_FLASK(cls) -> None:
+        cls.local_URL = "http://127.0.0.1:5000/"
+
+    @classmethod
+    def CHANGE_URL_TO_GUNICORN(cls) -> None:
+        cls.local_URL = "http://127.0.0.1:8000/"
+
+    @classmethod
     def FROM(cls, filename: str) -> None:
         current_dir = Path(__file__).parent.resolve()
         content: dict
@@ -129,8 +142,21 @@ class HTTPTestClass:
         cls.json = content
 
     @classmethod
+    def GET_JSON(cls):
+        return cls.json
+
+    @classmethod
+    def GET_HEADERS(cls):
+        return cls.headers
+
+    @classmethod
+    def GET_TOKEN(cls):
+        return cls.token
+
+    @classmethod
     def CLEAR(cls) -> None:
         cls.json = {}
+        cls.lastResponse = None
 
     @classmethod
     def CHANGE_VALUE(cls, key: str, value: Any):
@@ -148,19 +174,46 @@ class HTTPTestClass:
         cls.json.pop(key)
 
     @classmethod
-    def GET_RESPONSE(cls) -> dict:
+    def GET_RESPONSE_CODE(cls) -> int:
+        return cls.lastResponse.status_code
+
+    @classmethod
+    def GET_RESPONSE_HEADERS(cls) -> dict:
+        return cls.lastResponse.headers
+
+    @classmethod
+    def GET_RESPONSE_JSON(cls) -> dict:
         return cls.lastResponse.json()
+
+    @classmethod
+    def GET_RESPONSE_TEXT(cls) -> dict:
+        return cls.lastResponse.text
+
+    @classmethod
+    def GET_RESPONSE(cls):
+        code = cls.GET_RESPONSE_CODE
+        headers = cls.GET_RESPONSE_HEADERS
+        try:
+            text = cls.GET_RESPONSE_TEXT
+        except Exception:
+            text = ""
+        try:
+            json = cls.GET_RESPONSE_JSON
+        except Exception:
+            json = ""
+        return {"code": code, "headers": headers, "json": json, "text": text}
 
     @classmethod
     def GET_RESPONSE_VALUE(cls, key: str):
         return cls.lastResponse.json()[key]
 
     @classmethod
-    def GET_RESPONSE_WITH(cls,
-                       key: str,
-                       value: str,
-                       key_target: str
-                       ) -> Any:
+    def GET_RESPONSE_WITH(
+        cls,
+        key: str,
+        value: str,
+        key_target: str
+) -> Any:
         '''
             Gets value from key_target from object with
             key and value of last response.
@@ -186,56 +239,71 @@ class HTTPTestClass:
             raise KeyError(f"object not found: {key}")
 
     @classmethod
-    def GET(cls, endpoint: str) -> dict:
-        response = requests.get(f"{HTTPTestClass.URL}{endpoint}")
+    def AUTH(cls, email: str, password: str) -> None:
+        cls.json = {"email": email, "password": password}
+        cls.POST("/login")
+        cls.ASSERT_CODE(200)
+        token = cls.lastResponse.json["access_token"]
+        cls.token = token
+        cls.headers.update({"Authorization": f"Bearer {token}"})
+        return token
+
+    @classmethod
+    def AUTH_FROM(cls, filename: str) -> str:
+        user: dict
+        with open(filename, "r") as f:
+            user = json.load(f)
+        email = user["email"]
+        password = user["password"]
+        cls.json = {"email": email, "password": password}
+        cls.POST("/login")
+        cls.ASSERT_CODE(200)
+        token = cls.lastResponse.json()["access_token"]
+        cls.token = token
+        cls.headers.update({"Authorization": f"Bearer {token}"})
+        return token
+
+    @classmethod
+    def GET(cls, endpoint: str) -> int:
+        response = requests.get(
+            f"{cls.local_URL}{endpoint}", headers=cls.headers)
         cls.lastResponse = response
         cls.num_http += 1
-        return response
+        return response.status_code
 
     @classmethod
-    def PRINT_RESPONSE(cls):
-        headers = cls.lastResponse.headers
-        text = cls.lastResponse.text
-        try:
-            json = cls.lastResponse.json()
-        except Exception:
-            json = ""
-        print(f"{cls.prefix}{headers=}\n{json=}\n{text=}{cls.suffix}")
-
-    @classmethod
-    def PRINT_JSON(cls):
-        print(f"{cls.prefix}{cls.json}{cls.suffix}")
-
-    @classmethod
-    def POST(cls, endpoint: str) -> dict:
-        response = requests.post(f"{HTTPTestClass.URL}{endpoint}",
-                                 json=cls.json,
-                                 headers=cls.headers)
+    def POST(cls, endpoint: str) -> int:
+        response = requests.post(
+            f"{cls.local_URL}{endpoint}",
+            json=cls.json,
+            headers=cls.headers
+        )
         cls.lastResponse = response
         cls.num_http += 1
-        return response
+        return response.status_code
 
     @classmethod
-    def PUT(cls, endpoint: str) -> dict:
-        response = requests.put(f"{HTTPTestClass.URL}{endpoint}",
-                                 json=cls.json,
-                                 headers=cls.headers)
+    def PUT(cls, endpoint: str) -> int:
+        response = requests.put(
+            f"{cls.local_URL}{endpoint}",
+            json=cls.json,
+            headers=cls.headers
+        )
         cls.lastResponse = response
         cls.num_http += 1
-        return response
+        return response.status_code
 
     @classmethod
-    def DELETE(cls, endpoint: str) -> dict:
-        response = requests.delete(f"{HTTPTestClass.URL}{endpoint}")
+    def DELETE(cls, endpoint: str) -> int:
+        response = requests.delete(
+            f"{cls.local_URL}{endpoint}", headers=cls.headers)
         cls.lastResponse = response
         cls.num_http += 1
-        return response
+        return response.status_code
 
     @classmethod
     def Teardown(cls) -> None:
-        files = glob(cls.savefolderpath)
-        for file in files:
-            Path.unlink(Path(file))
+        pass
 
     @classmethod
     def run(cls) -> None:

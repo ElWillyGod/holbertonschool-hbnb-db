@@ -7,8 +7,7 @@
 
 from abc import ABC
 from datetime import datetime
-import uuid
-import json
+from uuid import uuid4
 import inspect
 
 
@@ -28,7 +27,7 @@ class TrackedObject(ABC):
         now = str(datetime.now())
         self.created_at = now if created_at is None else created_at
         self.updated_at = now if updated_at is None else updated_at
-        self.id = str(uuid.uuid4()) if id is None else id
+        self.id = uuid4().hex if id is None else id
 
     def getAllInstanceAttributes(self):
         attributes = inspect.getmembers(self,

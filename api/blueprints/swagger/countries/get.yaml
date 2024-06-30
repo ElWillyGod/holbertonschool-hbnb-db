@@ -1,0 +1,41 @@
+Retrieve details of a specific country by its code
+---
+tags:
+  - countries
+
+parameters:
+  - in: path
+    name: country_code
+    type: string
+    required: true
+    description: 2 char ISO code of country
+
+
+responses:
+  200:
+    description: Country found
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Uruguay
+        country_code:
+          type: string
+          example: UY
+  400:
+    description: Invalid country code
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid country_code
+  404:
+    description: Country not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: country not found

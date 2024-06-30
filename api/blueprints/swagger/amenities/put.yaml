@@ -1,0 +1,83 @@
+Update an amenity by ID
+---
+tags:
+  - amenities
+
+parameters:
+  - in: path
+    name: amenity_id
+    type: string
+    required: true
+    description: The ID of the amenity to update
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the amenity
+          example: Wi-Fi Microwave
+
+
+responses:
+  204:
+    description: Amenity updated successfully, returns details
+    schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1f2390e77d1341a3b59d0cb56fba5f45"
+        name:
+          type: string
+          example: Wi-Fi Microwave
+        created_at:
+          type: string
+          example: "2077-03-30 03:30:30.303030"
+        updated_at:
+          type: string
+          example: "2077-06-06 06:06:06.060606"
+  400:
+    description: Bad request, invalid data or ID format
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
+  401:
+    description: Not authenticated.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
+  403:
+    description: Not authorized.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges
+  404:
+    description: Amenity not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found
+  409:
+    description: Amenity name already exists
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: amenity already exists

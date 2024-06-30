@@ -1,0 +1,55 @@
+Retrieve detailed information about a specific review.
+---
+tags:
+  - reviews
+
+parameters:
+  - in: path
+    name: review_id
+    type: string
+    required: true
+    description: ID of the review to retrieve
+
+
+responses:
+  200:
+    description: Detailed information about the review
+    schema:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the review
+          example: "1f2390e77d1341a3b59d0cb56fba5f45"
+        rating:
+          type: integer
+          description: Rating for the place (1 to 5)
+          example: 1
+        comment:
+          type: string
+          description: Optional comment about the place
+          example: Sucks.
+        created_at:
+          type: string
+          description: Date and time when the review was created
+          example: "2077-03-30 03:30:30.303030"
+        updated_at:
+          type: string
+          description: Date and time when the review was last updated
+          example: "2077-03-30 03:30:30.303030"
+  400:
+    description: Invalid review ID
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
+  404:
+    description: Review ID not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found

@@ -1,0 +1,69 @@
+Create a new amenity
+---
+tags:
+  - amenities
+
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the amenity
+          example: Pool
+
+
+responses:
+  201:
+    description: Amenity created successfully, returning details.
+    schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1f2390e77d1341a3b59d0cb56fba5f45"
+        name:
+          type: string
+          example: Pool
+        created_at:
+          type: string
+          example: "2077-03-30 03:30:30.303030"
+        updated_at:
+          type: string
+          example: "2077-03-30 03:30:30.303030"
+  400:
+    description: Bad request, invalid data
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
+  401:
+    description: Not authenticated.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
+  403:
+    description: Not authorized.
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges
+  409:
+    description: Amenity name already exists
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: amenity already exists

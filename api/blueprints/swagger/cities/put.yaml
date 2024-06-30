@@ -1,0 +1,91 @@
+Update a city by ID
+---
+tags:
+  - cities
+
+parameters:
+  - in: path
+    name: city_id
+    type: string
+    required: true
+    description: The ID of the city to update
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - name
+        - country_code
+      properties:
+        name:
+          type: string
+          description: The name of the city
+          example: Montevideo
+        country_code:
+          type: string
+          description: 2 char ISO code of country
+          example: UY
+
+
+responses:
+  204:
+    description: City updated successfully
+    schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1f2390e77d1341a3b59d0cb56fba5f45"
+        name:
+          type: string
+          example: Montevideo
+        country_code:
+          type: string
+          example: UY
+        created_at:
+          type: string
+          example: "2077-03-30 03:30:30.303030"
+        updated_at:
+          type: string
+          example: "2077-06-06 06:06:06.060606"
+  400:
+    description: Bad request, invalid data or ID format
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid id
+  401:
+    description: Not authenticated
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthenticated
+  403:
+    description: Not authorized
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: requires admin privileges
+  404:
+    description: City not found
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: id not found
+  409:
+    description: City name already exists
+    schema:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Montevideo already exists in UY

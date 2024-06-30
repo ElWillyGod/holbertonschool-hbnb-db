@@ -9,7 +9,7 @@ from abc import ABC
 
 from logic.model.classes import getPlural, getClassByName
 from logic.model.countrieslib import getCountry, getCountries
-from logic.model.logicexceptions import IDNotFoundError
+from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
 from logic.model.validationlib import idExists
 from logic import DM as Persistence
 from logic.model.linkeddeleter import raiseDeleteEvent
@@ -45,7 +45,10 @@ class LogicFacade(ABC):
         return Persistence.get_all(typePlural)
 
     @staticmethod
-    def getByID(id: str, type: str) -> dict:
+    def getByID(
+        id: str,
+        type: str
+) -> dict:
         typePlural = getPlural(type)
         call = Persistence.get(id, typePlural)
         if call is None or len(call) == 0:
@@ -53,7 +56,10 @@ class LogicFacade(ABC):
         return call
 
     @staticmethod
-    def deleteByID(id: str, type: str) -> None:
+    def deleteByID(
+        id: str,
+        type: str
+) -> None:
         typePlural = getPlural(type)
         call = Persistence.get(id, typePlural)
         if call is None or len(call) == 0:
@@ -62,7 +68,11 @@ class LogicFacade(ABC):
         Persistence.delete(id, typePlural)
 
     @staticmethod
-    def updateByID(id: str, type: str, data: dict) -> dict:
+    def updateByID(
+        id: str,
+        type: str,
+        data: dict
+) -> dict:
         typePlural: str = getPlural(type)
         old_data = Persistence.get(id, typePlural)
         if old_data is None or len(old_data) == 0:
@@ -79,7 +89,10 @@ class LogicFacade(ABC):
         return Persistence.get(id, typePlural)
 
     @staticmethod
-    def createObjectByJson(type: str, data: dict) -> dict:
+    def createObjectByJson(
+        type: str,
+        data: dict
+) -> dict:
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id
@@ -107,3 +120,14 @@ class LogicFacade(ABC):
         return Persistence.get_by_property(
             "places", "id", id
         )
+
+    @staticmethod
+    def getPswdAndAdminByEmail(
+        email: str
+) -> tuple[str, bool]:
+        user = Persistence.get_by_property("users", "email", email)
+        if not user:
+            raise EmailNotFoundError("email not found")
+        # user is transformed from list to dict
+        user = user[0]
+        return user["password"], user["id"], user["is_admin"]

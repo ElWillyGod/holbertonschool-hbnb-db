@@ -1,5 +1,7 @@
 {
     "email": "matiasdavezac@gmail.com",
     "first_name": "Matias",
-    "last_name": "Davezac"
+    "last_name": "Davezac",
+    "password": "zanahoria",
+    "is_admin": false
 }
