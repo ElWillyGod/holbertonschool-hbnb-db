@@ -1,1 +1,0 @@
-import persistence.model.model_amenity

@@ -7,13 +7,7 @@
 import json
 import os
 import glob
-
-from sqlalchemy.orm import session
 from persistence.data_manager_interface import IPersistenceManager
-from persistence.model.model_amenity import createAmenity
-################################################# tener cuidado con esto
-from app import app
-from api import db
 
 
 class DataManager(IPersistenceManager):
@@ -44,7 +38,7 @@ class DataManager(IPersistenceManager):
         else:
             return os.path.join(self.storage_path, f"{entity_type}.json")
         
-    def save(self, id: str, type: str, entity) -> dict:
+    def save(self, id: str, type: str, entity: dict) -> dict:
         """
             Save an entity to a JSON file
             Attributes:
@@ -52,28 +46,19 @@ class DataManager(IPersistenceManager):
             Returns:
                 The entity
         """
-        if app.config['USE_DATABASE']:# config de la bd
 
-            db.session.add(entity)
-            db.session.commit()
+        entity_type = type
+        entity_id = id
+        file_path = self._file_path(entity_type, entity_id)
 
-            db.session.close()
-
-        else:
-
-            entity_id = id
-            entity_type = type
-            file_path = self._file_path(entity_type, entity_id)
-
-            with open(file_path, 'w') as file:
-                json.dump(entity, file)
-
+        with open(file_path, 'w') as file:
+            json.dump(entity, file)
+        
         result = {
             'entity': entity,
-            'entity_type': type
+            'entity_type': entity_type
         }
         return result
-        
 
     def get(self, entity_id: str, entity_type: str) -> dict:
         """
@@ -83,23 +68,14 @@ class DataManager(IPersistenceManager):
                 entity_type: the type of the entity
             Return: the retrieved entity or None if not found
         """
-        if app.config['USE_DATABASE']:
 
-            data = db.session.query(entity_type).filter(entity_type.id == entity_id)
-
-            db.session.close()
-
-            return data
-
+        file_path = self._file_path(entity_type, entity_id)
+        if not os.path.exists(file_path):
+            return None
         else:
-
-            file_path = self._file_path(entity_type, entity_id)
-            if not os.path.exists(file_path):
-                return None
-            else:
-                with open(file_path, 'r') as file:
-                    entity = json.load(file)
-                return entity
+            with open(file_path, 'r') as file:
+                entity = json.load(file)
+            return entity
 
     def update(self, entity_id: str, entity_type: str, data: dict) -> dict:
         """
@@ -134,25 +110,13 @@ class DataManager(IPersistenceManager):
             Returns:
                 Nothing
         """
-        if app.config['USE_DATABASE']:
-
-            data = db.session.query(entity_type).filter(entity_type.id == entity_id)
-
-            db.session.delete(data)
-            db.session.commit()
-            db.session.close()
-
+        file_path = self._file_path(entity_type, entity_id)
+        if os.path.exists(file_path):
+            os.remove(file_path)
             return
-
         else:
-
-            file_path = self._file_path(entity_type, entity_id)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                return
-            else:
-                raise FileNotFoundError(
-                    f"No such entity: {entity_type} with {entity_id}")
+            raise FileNotFoundError(
+                f"No such entity: {entity_type} with {entity_id}")
 
     def get_all(self, entity_type: str) -> list[dict]:
         """
@@ -161,25 +125,14 @@ class DataManager(IPersistenceManager):
             entity_type: the type of entities to retrieve
             Return: a list of all entities of the given type in JSON
         """
-
-        if app.config['USE_DATABASE']:# config de la bd
-
-            entity = db.session.query(entity_type)
-
-            db.session.close()
-
-            return entity
-
-        else:
-
-            path = os.path.join(self.storage_path, f"{entity_type}_*.json")
-            files = glob.glob(path)
-            entities = []
-            for file_path in files:
-                    with open(file_path, 'r') as file:
-                        data = json.load(file)
-                        entities.append(data)
-            return entities
+        path = os.path.join(self.storage_path, f"{entity_type}_*.json")
+        files = glob.glob(path)
+        entities = []
+        for file_path in files:
+                with open(file_path, 'r') as file:
+                    data = json.load(file)
+                    entities.append(data)
+        return entities
 
     def get_by_property(self, entity_type: str,
                         property_name: str, property_value) -> list[dict]:

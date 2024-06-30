@@ -6,6 +6,5 @@
 '''
 
 from persistence.data_manager import DataManager
-from persistence.model import model_amenity
 
 DM = DataManager("persistence/storage")

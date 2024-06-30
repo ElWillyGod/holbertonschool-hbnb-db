@@ -1,0 +1,14 @@
+
+
+
+De tests #12-#16 de users:
+    Si se un hace post con un json con más o diferentes variables, se pasan normalmente.
+    Esto tira un KeyError cuando se pasan al __init__ de clase.
+
+
+De Test #24 de users:
+    Email no puede tener espacios. Sin embargo lo crea igual.
+
+
+De Tests de countries y cities:
+    Error en doesCountryExist, me ocupo yo.
