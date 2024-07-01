@@ -70,7 +70,7 @@ def getUser(user_id):
 
 
 @bp.post("/")
-@jwt_required(optional=False)
+#@jwt_required(optional=False)
 @swag_from("swagger/users/post.yaml")
 def createUser():
     '''
@@ -78,8 +78,8 @@ def createUser():
     '''
 
     # Checks if it's authorized to make the request.
-    if err := authlib.notPostAuthorized("user", get_jwt()):
-        return err, 403
+    #if err := authlib.notPostAuthorized("user", get_jwt()):
+    #    return err, 403
 
     # Get data from request.
     data = request.get_json()

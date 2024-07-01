@@ -20,7 +20,7 @@ class Amenity(db.Model):
     created_at = __ins.created_at
     updated_at = __ins.updated_at
 
-    names = Column(String(255), unique=True)
+    name = Column(String(255), unique=True)
 
     def toJson(self):
         return {column.name: getattr(self, column.name)

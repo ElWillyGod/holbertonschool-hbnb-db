@@ -53,7 +53,7 @@ class LogicFacade(ABC):
 ) -> dict:
         obj = classes.getObjectByName(type)
         call = Persistence.read(obj(id=id))
-        if call is None or len(call) == 0:
+        if call is None:
             raise IDNotFoundError("id not found")
         return call.toJson()
 
@@ -72,8 +72,7 @@ class LogicFacade(ABC):
         data: dict
 ) -> dict:
         obj = classes.getObjectByName(type)
-        obj = obj(**data)
-        obj.updation()
+        obj = obj(id=id, **data)
         return Persistence.update(obj).toJson()
 
     @staticmethod
@@ -83,7 +82,6 @@ class LogicFacade(ABC):
 ) -> dict:
         obj = classes.getObjectByName(type)
         obj = obj(**data)
-        obj.creation()
         return Persistence.create(obj).toJson()
         # return Persistence.get(id, type)
 

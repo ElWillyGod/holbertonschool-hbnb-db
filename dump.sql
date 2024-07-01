@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS amenity (
     updated_at VARCHAR(256) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE (id),
-    cname VARCHAR(256) NOT NULL
+    name VARCHAR(256) NOT NULL
 );
 -- USER
 CREATE TABLE IF NOT EXISTS user (
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS city (
     updated_at VARCHAR(256) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE (id),
-    cname VARCHAR(256) NOT NULL,
+    name VARCHAR(256) NOT NULL,
     country_code VARCHAR(3) NOT NULL
 );
 -- PLACE
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS place (
     FOREIGN KEY (host_id) REFERENCES user(id),
     city_id VARCHAR(256) NOT NULL,
     FOREIGN KEY (city_id) REFERENCES place(id),
-    cname VARCHAR(256) NOT NULL,
+    name VARCHAR(256) NOT NULL,
     description VARCHAR(1024) NOT NULL,
     number_of_rooms INT NOT NULL,
     number_of_bathrooms INT NOT NULL,

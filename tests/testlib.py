@@ -192,13 +192,13 @@ class HTTPTestClass:
     @classmethod
     def GET_RESPONSE(cls):
         code = cls.GET_RESPONSE_CODE
-        headers = cls.GET_RESPONSE_HEADERS
+        headers = cls.GET_RESPONSE_HEADERS()
         try:
-            text = cls.GET_RESPONSE_TEXT
+            text = cls.GET_RESPONSE_TEXT()
         except Exception:
             text = ""
         try:
-            json = cls.GET_RESPONSE_JSON
+            json = cls.GET_RESPONSE_JSON()
         except Exception:
             json = ""
         return {"code": code, "headers": headers, "json": json, "text": text}
