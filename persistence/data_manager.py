@@ -137,8 +137,7 @@ class DataManager(IPersistenceManager):
             Return: a list of entities that match the given property in JSON
         """
         if os.environ.get('USE_DATABASE'):
-            return db.session.query(obj).filter(
-                getattr(obj, property_name) == property_value).all()
+            return obj.query.filter_by(**{property_name: property_value}).all()
         else:
             all_entities = self.get_all(obj)
             matched_entities = [entity for entity in all_entities

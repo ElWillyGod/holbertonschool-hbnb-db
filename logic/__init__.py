@@ -11,4 +11,3 @@ from flask_sqlalchemy.model import Model
 from logic.model import logicexceptions
 
 db = SQLAlchemy()
-Base: Model = db.Model
