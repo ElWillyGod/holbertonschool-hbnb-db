@@ -3,6 +3,7 @@
     Warning: Changes to classes may affect all layers.
 '''
 
+from logic.model.trackedobject import TrackedObject
 from logic.model.user import User
 from logic.model.city import City
 from logic.model.country import Country
@@ -20,7 +21,7 @@ classes = [
            ["review", Review]
           ]
 
-def getObjectByName(name):
+def getObjectByName(name) -> TrackedObject:
     '''
         Gets a class by it's name.
     '''

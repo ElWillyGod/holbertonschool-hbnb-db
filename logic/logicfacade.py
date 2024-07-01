@@ -6,6 +6,7 @@
 '''
 
 from abc import ABC
+from datetime import datetime
 
 from logic.model import classes
 from logic.model.classes import getObjectByName
@@ -51,7 +52,7 @@ class LogicFacade(ABC):
         type: str
 ) -> dict:
         obj = classes.getObjectByName(type)
-        call = Persistence.read(id, obj)
+        call = Persistence.read(obj(id=id))
         if call is None or len(call) == 0:
             raise IDNotFoundError("id not found")
         return call.toJson()
@@ -62,10 +63,7 @@ class LogicFacade(ABC):
         type: str
 ) -> None:
         obj = classes.getObjectByName(type)
-        call = Persistence.read(id, obj)
-        if call is None or len(call) == 0:
-            raise IDNotFoundError("id not found")
-        Persistence.delete(id, obj)
+        Persistence.delete(obj(id=id))
 
     @staticmethod
     def updateByID(
@@ -74,19 +72,9 @@ class LogicFacade(ABC):
         data: dict
 ) -> dict:
         obj = classes.getObjectByName(type)
-        old_data = Persistence.get(id, type)
-        if old_data is None or len(old_data) == 0:
-            raise IDNotFoundError("id not found")
-        updated = []
-        for key in data:
-            if data[key] != old_data[key]:
-                updated.append(key)
-        data["id"] = id
-        data["created_at"] = old_data["created_at"]
-        data["updated_at"] = None
-        data_updated = getObjectByName(type)(**data, update=updated)
-        Persistence.update(id, type, data_updated.toJson())
-        return Persistence.read(id, type).toJson()
+        obj = obj(**data)
+        obj.updation()
+        return Persistence.update(obj).toJson()
 
     @staticmethod
     def createObjectByJson(
@@ -94,9 +82,9 @@ class LogicFacade(ABC):
         data: dict
 ) -> dict:
         obj = classes.getObjectByName(type)
-        new = obj(**data)
-        id = new.id
-        return Persistence.create(id, type, new).toJson()
+        obj = obj(**data)
+        obj.creation()
+        return Persistence.create(obj).toJson()
         # return Persistence.get(id, type)
 
     @staticmethod
@@ -110,7 +98,7 @@ class LogicFacade(ABC):
     @staticmethod
     def getContryCities(code: str) -> dict:
         return Persistence.get_by_property(
-            "cities", "country_code", code
+            classes.City, "country_code", code
         ).toJson()
 
     @staticmethod
@@ -118,7 +106,7 @@ class LogicFacade(ABC):
         if not idExists(id, 'places'):
             raise IDNotFoundError("id not found")
         return Persistence.get_by_property(
-            "places", "id", id
+            classes.Review, "id", id
         )
 
     @staticmethod
