@@ -4,6 +4,8 @@
 
     Tests if nothing awful occurs on execution to save time.
 '''
+import sys
+from testlib import HTTPTestClass
 
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -12,9 +14,6 @@ BLUE = "\033[34m"
 CYAN = "\033[36m"
 MAGENTA = "\033[35m"
 RESET = "\033[0m"
-
-import sys
-from testlib import HTTPTestClass
 
 
 class TestSmoke(HTTPTestClass):

@@ -21,7 +21,7 @@ class TestAmenities(HTTPTestClass):
             *,
             expectAtPOST: int = 201,
             overrideNone: bool = False
-) -> dict:
+    ) -> dict:
 
         cls.FROM(f"amenities/valid_amenity_{num}.json")
 
@@ -107,8 +107,11 @@ class TestAmenities(HTTPTestClass):
 
     @classmethod
     def test_10_different_attributes_POST(cls):
-        cls.createAmenity(2, {"name": None, "example": "pechuga"},
-                       expectAtPOST=400)
+        cls.createAmenity(
+            2,
+            {"name": None, "example": "pechuga"},
+            expectAtPOST=400
+        )
 
     @classmethod
     def test_11_less_attributes_PUT(cls):
@@ -173,7 +176,7 @@ class TestAmenities(HTTPTestClass):
     @classmethod
     def test_19_invalid_name_POST(cls):
         cls.createAmenity(2, {"name": "\n"}, expectAtPOST=400)
-        cls.createAmenity(2, {"name": "Lechuga😂😂😂"}, expectAtPOST=400)
+        cls.createAmenity(2, {"name": "Lechuga🥬"}, expectAtPOST=400)
         cls.createAmenity(2, {"name": "🗿"}, expectAtPOST=400)
         cls.createAmenity(2, {"name": "777"}, expectAtPOST=400)
 

@@ -44,6 +44,7 @@ class TestShell(HTTPTestClass):
 
     pass
 
+
 def exit(*args: str) -> None:
     loop = False
 

@@ -14,13 +14,14 @@ class TestCities(HTTPTestClass):
     '''
 
     @classmethod
-    def createCity(cls,
-            num: int,
-            dic: dict | None = None,
-            *,
-            expectAtPOST: int = 201,
-            overrideNone: bool = False
-) -> dict:
+    def createCity(
+        cls,
+        num: int,
+        dic: dict | None = None,
+        *,
+        expectAtPOST: int = 201,
+        overrideNone: bool = False
+    ) -> dict:
         '''
             Creates a city.
         '''
@@ -51,6 +52,11 @@ class TestCities(HTTPTestClass):
         id = kwargs["id"]
         cls.DELETE(f"/cities/{id}")
         cls.ASSERT_CODE(204)
+
+    @classmethod
+    def test_00_auth(cls):
+        cls.AUTH_FROM("admin.json")
+        cls.ASSERT_CODE(200)
 
     @classmethod
     def test_01_general_GET(cls):
@@ -124,13 +130,22 @@ class TestCities(HTTPTestClass):
 
     @classmethod
     def test_13_different_attributes_POST(cls):
-        cls.createCity(3,{"name": None,
-                          "favorite_fruit": "banana"}, expectAtPOST=400)
-        cls.createCity(4, {"country_code": None,
-                           "favorite_fruit": "banana"}, expectAtPOST=400)
-        cls.createCity(1, {"country_code": None, "name": None,
-                           "explosive_type": "C4",
-                           "favorite_fruit": "banana"}, expectAtPOST=400)
+        cls.createCity(
+            3,
+            {"name": None, "favorite_fruit": "banana"},
+            expectAtPOST=400
+        )
+        cls.createCity(
+            4,
+            {"country_code": None, "favorite_fruit": "banana"},
+            expectAtPOST=400
+        )
+        cls.createCity(
+            1,
+            {"country_code": None, "name": None, "explosive_type": "C4",
+             "favorite_fruit": "banana"},
+            expectAtPOST=400
+        )
 
     @classmethod
     def test_14_less_attributes_PUT(cls):
@@ -227,7 +242,7 @@ class TestCities(HTTPTestClass):
         def testPOST(name):
             cls.createCity(4, {"name": name}, expectAtPOST=400)
 
-        testPOST("prr😀m")
+        testPOST("Lechuga🥬")
         testPOST("777")
         testPOST("Mi\nColon\n")
 

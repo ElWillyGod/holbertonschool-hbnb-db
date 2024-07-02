@@ -47,13 +47,14 @@ class TestPlaces(HTTPTestClass):
         return cls.GET_RESPONSE_VALUE("id")
 
     @classmethod
-    def createPlace(cls,
-            num: int,
-            dic: dict | None = None,
-            *,
-            expectAtPOST: int = 201,
-            overrideNone: bool = False
-) -> dict:
+    def createPlace(
+        cls,
+        num: int,
+        dic: dict | None = None,
+        *,
+        expectAtPOST: int = 201,
+        overrideNone: bool = False
+    ) -> dict:
         '''
             Creates a place:
                 -> Creates all the necessary objects to create a place.
@@ -123,6 +124,11 @@ class TestPlaces(HTTPTestClass):
                 cls.ASSERT_CODE(204)
 
     @classmethod
+    def test_00_auth(cls):
+        cls.AUTH_FROM("admin.json")
+        cls.ASSERT_CODE(200)
+
+    @classmethod
     def test_01_general_GET(cls):
         cls.GET("/places")
         cls.ASSERT_CODE(200)
@@ -171,11 +177,31 @@ class TestPlaces(HTTPTestClass):
 
     @classmethod
     def test_08_less_attributes_POST(cls):
-        cls.createPlace(1, {"name": None}, expectAtPOST=400)
-        cls.createPlace(2, {"description": None}, expectAtPOST=400)
-        cls.createPlace(3, {"latitude": None, "longitude": None}, expectAtPOST=400)
-        cls.createPlace(1, {"host_id": None, "city_id": None}, expectAtPOST=400)
-        cls.createPlace(2, {"amenity_ids": None}, expectAtPOST=400)
+        cls.createPlace(
+            1,
+            {"name": None},
+            expectAtPOST=400
+        )
+        cls.createPlace(
+            2,
+            {"description": None},
+            expectAtPOST=400
+        )
+        cls.createPlace(
+            3,
+            {"latitude": None, "longitude": None},
+            expectAtPOST=400
+        )
+        cls.createPlace(
+            1,
+            {"host_id": None, "city_id": None},
+            expectAtPOST=400
+        )
+        cls.createPlace(
+            2,
+            {"amenity_ids": None},
+            expectAtPOST=400
+        )
 
     @classmethod
     def test_09_more_attributes_POST(cls):
@@ -183,12 +209,32 @@ class TestPlaces(HTTPTestClass):
 
     @classmethod
     def test_10_different_attributes_POST(cls):
-        cls.createPlace(1, {"description": None, "rating": 100}, expectAtPOST=400)
-        cls.createPlace(2, {"name": None, "favorite_fruit": "banana"}, expectAtPOST=400)
-        cls.createPlace(3, {"host_id": None, "explosive_type": "C4"}, expectAtPOST=400)
-        cls.createPlace(1, {"city_id": None, "car": "Toyota"}, expectAtPOST=400)
-        cls.createPlace(2, {"host_id": None, "explosive_type": "C4",
-                            "city_id": None, "car": "Toyota"}, expectAtPOST=400)
+        cls.createPlace(
+            1,
+            {"description": None, "rating": 100},
+            expectAtPOST=400
+        )
+        cls.createPlace(
+            2,
+            {"name": None, "favorite_fruit": "banana"},
+            expectAtPOST=400
+        )
+        cls.createPlace(
+            3,
+            {"host_id": None, "explosive_type": "C4"},
+            expectAtPOST=400
+        )
+        cls.createPlace(
+            1,
+            {"city_id": None, "car": "Toyota"},
+            expectAtPOST=400
+        )
+        cls.createPlace(
+            2,
+            {"host_id": None, "explosive_type": "C4", "city_id": None,
+             "car": "Toyota"},
+            expectAtPOST=400
+        )
 
     @classmethod
     def test_11_less_attributes_PUT(cls):

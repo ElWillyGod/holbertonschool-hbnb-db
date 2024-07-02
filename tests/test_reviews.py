@@ -14,6 +14,11 @@ class TestReviews(HTTPTestClass):
     '''
 
     @classmethod
+    def test_00_auth(cls):
+        cls.AUTH_FROM("admin.json")
+        cls.ASSERT_CODE(200)
+
+    @classmethod
     def test_1(c):
         pass
 

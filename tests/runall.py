@@ -14,7 +14,12 @@ import test_cities
 import test_places
 import test_reviews
 
+
 def run(url: str = "http://127.0.0.1:5000/"):
+    '''
+        Run smoke, if successful run all tests.
+    '''
+
     test_smoke.run(url)
     test_amenities.run(url)
     test_countries.run(url)
@@ -22,6 +27,7 @@ def run(url: str = "http://127.0.0.1:5000/"):
     test_cities.run(url)
     test_places.run(url)
     test_reviews.run(url)
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:

@@ -45,9 +45,10 @@ class HTTPTestClass:
     debug: bool = False
 
     @classmethod
-    def _ASSERTION_SUCCESS(cls,
-                           msg: str | None = None
-                           ) -> None:
+    def _ASSERTION_SUCCESS(
+        cls,
+        msg: str | None = None
+    ) -> None:
 
         if msg is None:
             msg = "Assertion Passed"
@@ -59,7 +60,7 @@ class HTTPTestClass:
     def _ASSERTION_FAILURE(
         cls,
         errormsg: str | None = None
-) -> None:
+    ) -> None:
 
         if errormsg is None:
             errormsg = "Assertion Failed"
@@ -72,7 +73,7 @@ class HTTPTestClass:
         value: Any,
         expected_value: Any,
         errormsg: str | None = None
-) -> None:
+    ) -> None:
         msg = f"\tExpected: {expected_value}\n\tGiven: {value}"
         errormsg = msg if errormsg is None else errormsg
         if value == expected_value:
@@ -85,7 +86,7 @@ class HTTPTestClass:
         cls,
         code_expected: int,
         errormsg: str | None = None
-) -> None:
+    ) -> None:
         '''
             Asserts that the code of last response is equal to the
             code expected.
@@ -100,7 +101,7 @@ class HTTPTestClass:
         key: str,
         value_expected: Any,
         errormsg: str | None = None
-) -> None:
+    ) -> None:
         '''
             Asserts that the value of key of last response is equal to the
             value expected.
@@ -119,7 +120,7 @@ class HTTPTestClass:
             if found_one:
                 if errormsg is None:
                     errormsg = (f"No key with expected value found " +
-                    f"{key}: {value_expected}")
+                                f"{key}: {value_expected}")
                 raise AssertionError(errormsg)
             else:
                 raise KeyError(f"key not found for test: {key}")
@@ -246,7 +247,7 @@ class HTTPTestClass:
         key: str,
         value: str,
         key_target: str
-) -> Any:
+    ) -> Any:
         '''
             Gets value from key_target from object with
             key and value of last response.

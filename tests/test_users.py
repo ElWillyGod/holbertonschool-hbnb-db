@@ -31,13 +31,14 @@ class TestUsers(HTTPTestClass):
     '''
 
     @classmethod
-    def createUser(cls,
-            num: int,
-            dic: dict | None = None,
-            *,
-            expectAtPOST: int = 201,
-            overrideNone: bool = False
-) -> dict:
+    def createUser(
+        cls,
+        num: int,
+        dic: dict | None = None,
+        *,
+        expectAtPOST: int = 201,
+        overrideNone: bool = False
+    ) -> dict:
         cls.FROM(f"users/valid_user_{num}.json")
 
         if dic is not None:
@@ -64,6 +65,11 @@ class TestUsers(HTTPTestClass):
         id = kwargs["id"]
         cls.DELETE(f"/users/{id}")
         cls.ASSERT_CODE(204)
+
+    @classmethod
+    def test_00_auth(cls):
+        cls.AUTH_FROM("admin.json")
+        cls.ASSERT_CODE(200)
 
     @classmethod
     def test_01_general_GET(cls):
@@ -139,7 +145,6 @@ class TestUsers(HTTPTestClass):
     def test_13_different_attributes_POST(cls):
         cls.createUser(2, {"first_name": None, "example": "pechuga"},
                        expectAtPOST=400)
-
 
     @classmethod
     def test_14_less_attributes_PUT(cls):
@@ -233,13 +238,13 @@ class TestUsers(HTTPTestClass):
     @classmethod
     def test_25_invalid_first_name_POST(cls):
         cls.createUser(1, {"first_name": "ex\nmple"}, expectAtPOST=400)
-        cls.createUser(1, {"first_name": "prr😀m"}, expectAtPOST=400)
+        cls.createUser(1, {"first_name": "Lechuga🥬"}, expectAtPOST=400)
         cls.createUser(1, {"first_name": "777"}, expectAtPOST=400)
 
     @classmethod
     def test_26_invalid_last_name_POST(cls):
         cls.createUser(1, {"last_name": "ex\nmple"}, expectAtPOST=400)
-        cls.createUser(1, {"last_name": "prr😀m"}, expectAtPOST=400)
+        cls.createUser(1, {"last_name": "Lechuga🥬"}, expectAtPOST=400)
         cls.createUser(1, {"last_name": "777"}, expectAtPOST=400)
 
 
