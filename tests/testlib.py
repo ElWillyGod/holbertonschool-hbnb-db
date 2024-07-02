@@ -86,6 +86,10 @@ class HTTPTestClass:
         code_expected: int,
         errormsg: str | None = None
 ) -> None:
+        '''
+            Asserts that the code of last response is equal to the
+            code expected.
+        '''
 
         code = cls.lastResponse.status_code
         cls._ASSERT(code, code_expected, errormsg)
@@ -97,6 +101,10 @@ class HTTPTestClass:
         value_expected: Any,
         errormsg: str | None = None
 ) -> None:
+        '''
+            Asserts that the value of key of last response is equal to the
+            value expected.
+        '''
 
         data = cls.lastResponse.json()
         if isinstance(data, list):
@@ -135,6 +143,11 @@ class HTTPTestClass:
 
     @classmethod
     def FROM(cls, filename: str) -> None:
+        '''
+            Store into a dictionary all the data of a json file.
+            Subsequent POST and PUT will use this data.
+        '''
+
         current_dir = Path(__file__).parent.resolve()
         content: dict
         with open(f"{current_dir}/{filename}", "r") as file:
@@ -159,18 +172,27 @@ class HTTPTestClass:
         cls.lastResponse = None
 
     @classmethod
-    def CHANGE_VALUE(cls, key: str, value: Any):
+    def SET_VALUE(cls, key: str, value: Any):
+        '''
+            Set data of key to value from stored data.
+        '''
+
         cls.json[key] = value
 
     @classmethod
-    def SAVE_VALUE(cls, key: str) -> None:
+    def GET_VALUE(cls, key: str) -> None:
         '''
-            Gets value from key of sent json.
+            Gets value from key from stored data.
         '''
+
         return cls.json[key]
 
     @classmethod
     def REMOVE_VALUE(cls, key: str) -> None:
+        '''
+            Removes value from stored data.
+        '''
+
         cls.json.pop(key)
 
     @classmethod
@@ -190,9 +212,19 @@ class HTTPTestClass:
         return cls.lastResponse.text
 
     @classmethod
-    def GET_RESPONSE(cls):
-        code = cls.GET_RESPONSE_CODE
-        headers = cls.GET_RESPONSE_HEADERS()
+    def GET_RESPONSE(cls) -> dict:
+        '''
+            Combines all the gets from response.
+        '''
+
+        try:
+            code = cls.GET_RESPONSE_CODE()
+        except Exception:
+            code = ""
+        try:
+            headers = cls.GET_RESPONSE_HEADERS()
+        except Exception:
+            headers = ""
         try:
             text = cls.GET_RESPONSE_TEXT()
         except Exception:
@@ -201,6 +233,7 @@ class HTTPTestClass:
             json = cls.GET_RESPONSE_JSON()
         except Exception:
             json = ""
+
         return {"code": code, "headers": headers, "json": json, "text": text}
 
     @classmethod
@@ -218,6 +251,7 @@ class HTTPTestClass:
             Gets value from key_target from object with
             key and value of last response.
         '''
+
         data = cls.lastResponse.json()
         if isinstance(data, dict):
             if key not in data:
@@ -239,7 +273,11 @@ class HTTPTestClass:
             raise KeyError(f"object not found: {key}")
 
     @classmethod
-    def AUTH(cls, email: str, password: str) -> None:
+    def AUTH(cls, email: str, password: str) -> str:
+        '''
+            Authenticate from an email and a password.
+        '''
+
         cls.json = {"email": email, "password": password}
         cls.POST("/login")
         cls.ASSERT_CODE(200)
@@ -250,6 +288,10 @@ class HTTPTestClass:
 
     @classmethod
     def AUTH_FROM(cls, filename: str) -> str:
+        '''
+            Authenticate from a user in a json file.
+        '''
+
         user: dict
         with open(filename, "r") as f:
             user = json.load(f)
@@ -265,6 +307,10 @@ class HTTPTestClass:
 
     @classmethod
     def GET(cls, endpoint: str) -> int:
+        '''
+            HTTP GET request.
+        '''
+
         response = requests.get(
             f"{cls.local_URL}{endpoint}", headers=cls.headers)
         cls.lastResponse = response
@@ -273,6 +319,10 @@ class HTTPTestClass:
 
     @classmethod
     def POST(cls, endpoint: str) -> int:
+        '''
+            HTTP POST request.
+        '''
+
         response = requests.post(
             f"{cls.local_URL}{endpoint}",
             json=cls.json,
@@ -284,6 +334,10 @@ class HTTPTestClass:
 
     @classmethod
     def PUT(cls, endpoint: str) -> int:
+        '''
+            HTTP PUT request.
+        '''
+
         response = requests.put(
             f"{cls.local_URL}{endpoint}",
             json=cls.json,
@@ -295,6 +349,10 @@ class HTTPTestClass:
 
     @classmethod
     def DELETE(cls, endpoint: str) -> int:
+        '''
+            HTTP DELETE request.
+        '''
+
         response = requests.delete(
             f"{cls.local_URL}{endpoint}", headers=cls.headers)
         cls.lastResponse = response
@@ -303,14 +361,19 @@ class HTTPTestClass:
 
     @classmethod
     def Teardown(cls) -> None:
+        '''
+            Called after the ending of each test. Made to be overriden.
+        '''
+
         pass
 
     @classmethod
-    def run(cls) -> None:
+    def run(cls) -> tuple[int, int]:
         '''
             Gets all methods, and then filters them to get only methods that
             have the word "test" in them and are not from Object.
         '''
+
         methods = inspect.getmembers(cls, lambda a: inspect.isroutine(a))
         tests = {
                  attr: func for attr, func in methods if
@@ -358,3 +421,4 @@ class HTTPTestClass:
               f"{cls.assertionsPassed}/{assertions_total} Assertions, " +
               f"{cls.num_http} HTTP Requests." +
               f"{cls.suffix}\n")
+        return cls.testsFailed, cls.testsPassed

@@ -4,6 +4,7 @@
     Defines tests for 'Countries' endpoints.
 '''
 
+import sys
 from testlib import HTTPTestClass
 
 
@@ -33,9 +34,13 @@ class TestCountries(HTTPTestClass):
         cls.ASSERT_VALUE("name", "Brazil")
 
 
-def run():
+def run(url: str = "http://127.0.0.1:5000/"):
+    TestCountries.CHANGE_URL(url)
     TestCountries.run()
 
 
 if __name__ == "__main__":
-    run()
+    if len(sys.argv) == 1:
+        run()
+    else:
+        run(sys.argv[1])

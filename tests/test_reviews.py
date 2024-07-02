@@ -4,6 +4,7 @@
     Defines tests for 'reviews' endpoints.
 '''
 
+import sys
 from testlib import HTTPTestClass
 
 
@@ -17,9 +18,13 @@ class TestReviews(HTTPTestClass):
         pass
 
 
-def run():
+def run(url: str = "http://127.0.0.1:5000/"):
+    TestReviews.CHANGE_URL(url)
     TestReviews.run()
 
 
 if __name__ == "__main__":
-    run()
+    if len(sys.argv) == 1:
+        run()
+    else:
+        run(sys.argv[1])

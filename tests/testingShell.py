@@ -87,8 +87,7 @@ def runner(line: str) -> None:
         "GET_HEADERS": TestShell.GET_HEADERS,
         "GET_TOKEN": TestShell.GET_TOKEN,
         "CLEAR": TestShell.CLEAR,
-        "CHANGE_VALUE": TestShell.CHANGE_VALUE,
-        "ADD_VALUE": TestShell.CHANGE_VALUE,  # Synonim
+        "SET_VALUE": TestShell.SET_VALUE,
         "REMOVE_VALUE": TestShell.REMOVE_VALUE,
         "GET_RESPONSE": TestShell.GET_RESPONSE,
         "GET_RESPONSE_CODE": TestShell.GET_RESPONSE_CODE,
@@ -114,9 +113,13 @@ def runner(line: str) -> None:
         if command in commands:
             ret = commands[command](*args[1:])
             if ret:
-                print(ret)
+                if isinstance(ret, dict):
+                    for key in ret:
+                        print(f"  - {CYAN}{key}{RESET}: {ret[key]}")
+                else:
+                    print(ret)
         else:
-            raise Exception(f"{command} not found")
+            raise Exception(f"  {RED}!{RESET} {command} {RED}not found{RESET}")
 
 
 def main() -> None:
@@ -132,7 +135,7 @@ def main() -> None:
             print()
             Loop.stop()
         except Exception as e:
-            print(f">>> {RED}{e}{RESET}")
+            print(f"  {RED}!{RESET} {e}{RESET}")
 
 
 if __name__ == "__main__":

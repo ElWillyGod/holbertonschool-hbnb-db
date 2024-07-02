@@ -4,6 +4,7 @@
     Defines tests for 'places' endpoints.
 '''
 
+import sys
 from testlib import HTTPTestClass
 
 
@@ -47,12 +48,12 @@ class TestPlaces(HTTPTestClass):
 
     @classmethod
     def createPlace(cls,
-                    num: int,
-                    dic: dict | None = None,
-                    *,
-                    expectAtPOST: int = 201,
-                    overrideNone: bool = False
-                    ) -> dict:
+            num: int,
+            dic: dict | None = None,
+            *,
+            expectAtPOST: int = 201,
+            overrideNone: bool = False
+) -> dict:
         '''
             Creates a place:
                 -> Creates all the necessary objects to create a place.
@@ -73,9 +74,9 @@ class TestPlaces(HTTPTestClass):
         cls.FROM(f"places/valid_place_{num}.json")
 
         # Assign ids to place json
-        cls.CHANGE_VALUE("host_id", host_id)
-        cls.CHANGE_VALUE("city_id", city_id)
-        cls.CHANGE_VALUE("amenity_ids", [amenity_id])
+        cls.SET_VALUE("host_id", host_id)
+        cls.SET_VALUE("city_id", city_id)
+        cls.SET_VALUE("amenity_ids", [amenity_id])
 
         safe_copy = cls.json.copy()
         safe_copy["amenity_ids"] = amenity_ids.copy()
@@ -86,7 +87,7 @@ class TestPlaces(HTTPTestClass):
                 if dic[key] is None or overrideNone:
                     cls.REMOVE_VALUE(key)
                 else:
-                    cls.CHANGE_VALUE(key, dic[key])
+                    cls.SET_VALUE(key, dic[key])
 
         # If expected to fail at POST don't continue
         if expectAtPOST != 201:
@@ -142,7 +143,7 @@ class TestPlaces(HTTPTestClass):
         place = cls.createPlace(1)
         id = place["id"]
         description = "UPDATED"
-        cls.CHANGE_VALUE("description", description)
+        cls.SET_VALUE("description", description)
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(201)
 
@@ -196,30 +197,30 @@ class TestPlaces(HTTPTestClass):
         cls.REMOVE_VALUE("name")
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("name", place["name"])
+        cls.SET_VALUE("name", place["name"])
 
         cls.REMOVE_VALUE("host_id")
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("host_id", place["host_id"])
+        cls.SET_VALUE("host_id", place["host_id"])
 
         cls.REMOVE_VALUE("city_id")
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("city_id", place["city_id"])
+        cls.SET_VALUE("city_id", place["city_id"])
 
         cls.REMOVE_VALUE("host_id")
         cls.REMOVE_VALUE("city_id")
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("host_id", place["host_id"])
-        cls.CHANGE_VALUE("city_id", place["city_id"])
+        cls.SET_VALUE("host_id", place["host_id"])
+        cls.SET_VALUE("city_id", place["city_id"])
 
     @classmethod
     def test_12_more_attributes_PUT(cls):
         place = cls.createPlace(2)
         id = place["id"]
-        cls.CHANGE_VALUE("rating", 100)
+        cls.SET_VALUE("rating", 100)
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
 
@@ -228,41 +229,41 @@ class TestPlaces(HTTPTestClass):
         place = cls.createPlace(3)
         id = place["id"]
         cls.REMOVE_VALUE("description")
-        cls.CHANGE_VALUE("rating", 100)
+        cls.SET_VALUE("rating", 100)
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("description", place["description"])
+        cls.SET_VALUE("description", place["description"])
         cls.REMOVE_VALUE("rating")
 
         cls.REMOVE_VALUE("name")
-        cls.CHANGE_VALUE("favorite_fruit", "banana")
+        cls.SET_VALUE("favorite_fruit", "banana")
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("name", place["name"])
+        cls.SET_VALUE("name", place["name"])
         cls.REMOVE_VALUE("favorite_fruit")
 
         cls.REMOVE_VALUE("host_id")
-        cls.CHANGE_VALUE("explosive_type", "C4")
+        cls.SET_VALUE("explosive_type", "C4")
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("host_id", place["host_id"])
+        cls.SET_VALUE("host_id", place["host_id"])
         cls.REMOVE_VALUE("explosive_type")
 
         cls.REMOVE_VALUE("city_id")
-        cls.CHANGE_VALUE("car", "Toyota")
+        cls.SET_VALUE("car", "Toyota")
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("city_id", place["city_id"])
+        cls.SET_VALUE("city_id", place["city_id"])
         cls.REMOVE_VALUE("car")
 
         cls.REMOVE_VALUE("host_id")
         cls.REMOVE_VALUE("city_id")
-        cls.CHANGE_VALUE("explosive_type", "C4")
-        cls.CHANGE_VALUE("car", "Toyota")
+        cls.SET_VALUE("explosive_type", "C4")
+        cls.SET_VALUE("car", "Toyota")
         cls.PUT(f"/places/{id}")
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("host_id", place["host_id"])
-        cls.CHANGE_VALUE("city_id", place["city_id"])
+        cls.SET_VALUE("host_id", place["host_id"])
+        cls.SET_VALUE("city_id", place["city_id"])
         cls.REMOVE_VALUE("explosive_type")
         cls.REMOVE_VALUE("car")
 
@@ -343,9 +344,13 @@ class TestPlaces(HTTPTestClass):
         place = cls.createPlace(1, {"amenity_ids": []})
 
 
-def run():
+def run(url: str = "http://127.0.0.1:5000/"):
+    TestPlaces.CHANGE_URL(url)
     TestPlaces.run()
 
 
 if __name__ == "__main__":
-    run()
+    if len(sys.argv) == 1:
+        run()
+    else:
+        run(sys.argv[1])

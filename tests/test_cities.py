@@ -4,6 +4,7 @@
     Defines tests for 'cities' endpoints.
 '''
 
+import sys
 from testlib import HTTPTestClass
 
 
@@ -14,24 +15,24 @@ class TestCities(HTTPTestClass):
 
     @classmethod
     def createCity(cls,
-                    num: int,
-                    dic: dict | None = None,
-                    *,
-                    expectAtPOST: int = 201,
-                    overrideNone: bool = False
-                    ) -> dict:
+            num: int,
+            dic: dict | None = None,
+            *,
+            expectAtPOST: int = 201,
+            overrideNone: bool = False
+) -> dict:
         '''
             Creates a city.
         '''
         cls.FROM(f"cities/valid_city_{num}.json")
-        name = cls.SAVE_VALUE("name")
+        name = cls.GET_VALUE("name")
 
         if dic is not None:
             for key in dic:
                 if dic[key] is None or overrideNone:
                     cls.REMOVE_VALUE(key)
                 else:
-                    cls.CHANGE_VALUE(key, dic[key])
+                    cls.SET_VALUE(key, dic[key])
 
         if expectAtPOST != 201:
             cls.POST("/cities")
@@ -71,14 +72,14 @@ class TestCities(HTTPTestClass):
     def test_04_valid_PUT(cls):
         for i in range(1, 5):
             city = cls.createCity(i)
-            cls.CHANGE_VALUE("name", city["name"] + "UPDATED")
+            cls.SET_VALUE("name", city["name"] + "UPDATED")
             cls.PUT("/cities/" + city["id"])
             cls.ASSERT_CODE(201)
 
     @classmethod
     def test_05_valid_country_code_PUT(cls):
         city = cls.createCity(1)
-        cls.CHANGE_VALUE("country_code", "CA")
+        cls.SET_VALUE("country_code", "CA")
         cls.PUT("/cities/" + city["id"])
         cls.ASSERT_CODE(201)
 
@@ -91,8 +92,8 @@ class TestCities(HTTPTestClass):
     def test_07_duplicated_entry_PUT(cls):
         city1 = cls.createCity(2)
         city2 = cls.createCity(3)
-        cls.CHANGE_VALUE("name", city1["name"])
-        cls.CHANGE_VALUE("country_code", city1["country_code"])
+        cls.SET_VALUE("name", city1["name"])
+        cls.SET_VALUE("country_code", city1["country_code"])
         cls.PUT("/cities/" + city2["id"])
         cls.ASSERT_CODE(409)
 
@@ -138,7 +139,7 @@ class TestCities(HTTPTestClass):
         cls.REMOVE_VALUE("name")
         cls.PUT("/cities/" + city["id"])
         cls.ASSERT_CODE(400)
-        cls.CHANGE_VALUE("name", city["name"])
+        cls.SET_VALUE("name", city["name"])
 
         cls.REMOVE_VALUE("country_code")
         cls.PUT("/cities/" + city["id"])
@@ -147,7 +148,7 @@ class TestCities(HTTPTestClass):
     @classmethod
     def test_15_more_attributes_PUT(cls):
         city = cls.createCity(2)
-        cls.CHANGE_VALUE("favorite_fruit", "banana")
+        cls.SET_VALUE("favorite_fruit", "banana")
         cls.PUT("/cities/" + city["id"])
         cls.ASSERT_CODE(400)
 
@@ -156,23 +157,23 @@ class TestCities(HTTPTestClass):
         city = cls.createCity(3)
 
         cls.REMOVE_VALUE("name")
-        cls.CHANGE_VALUE("favorite_fruit", "banana")
+        cls.SET_VALUE("favorite_fruit", "banana")
         cls.PUT("/cities/" + city["id"])
         cls.ASSERT_CODE(400)
         cls.REMOVE_VALUE("favorite_fruit")
-        cls.CHANGE_VALUE("name", city["name"])
+        cls.SET_VALUE("name", city["name"])
 
         cls.REMOVE_VALUE("country_code")
-        cls.CHANGE_VALUE("explosive_type", "C4")
+        cls.SET_VALUE("explosive_type", "C4")
         cls.PUT("/cities/" + city["id"])
         cls.ASSERT_CODE(400)
         cls.REMOVE_VALUE("explosive_type")
-        cls.CHANGE_VALUE("country_code", city["country_code"])
+        cls.SET_VALUE("country_code", city["country_code"])
 
         cls.REMOVE_VALUE("name")
         cls.REMOVE_VALUE("country_code")
-        cls.CHANGE_VALUE("favorite_fruit", "banana")
-        cls.CHANGE_VALUE("explosive_type", "C4")
+        cls.SET_VALUE("favorite_fruit", "banana")
+        cls.SET_VALUE("explosive_type", "C4")
         cls.PUT("/cities/" + city["id"])
         cls.ASSERT_CODE(400)
 
@@ -244,9 +245,13 @@ class TestCities(HTTPTestClass):
         pass
 
 
-def run():
+def run(url: str = "http://127.0.0.1:5000/"):
+    TestCities.CHANGE_URL(url)
     TestCities.run()
 
 
 if __name__ == "__main__":
-    run()
+    if len(sys.argv) == 1:
+        run()
+    else:
+        run(sys.argv[1])

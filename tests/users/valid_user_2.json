@@ -1,5 +1,7 @@
 {
     "email": "monachina@hotmail.com",
     "first_name": "Alison",
-    "last_name": "Alvez"
+    "last_name": "Alvez",
+    "password": "cortina-Pelicano-2",
+    "is_admin": false
 }
