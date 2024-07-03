@@ -21,6 +21,8 @@ from api.blueprints import *
 
 import api.home_redirection as home_redirection
 
+import api.error_handler as error_handler
+
 from flasgger import Swagger
 
 from logic import db
@@ -46,7 +48,7 @@ def appFactory() -> Flask:
     '''
 
     # Creates app and adds configs.
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='templates')
     app.config.from_pyfile("settings.py")
     app.url_map.strict_slashes = False
 
@@ -72,6 +74,9 @@ def appFactory() -> Flask:
 
     # Redirects homepage ("/") to apidocs
     app.register_blueprint(home_redirection.bp)
+
+    # Registers error handling
+    app.register_blueprint(error_handler.error_handler)
 
     # Assigns template to Swagger.
     # If runned with gunicorn, it overwrites the host attr to gunicorn's

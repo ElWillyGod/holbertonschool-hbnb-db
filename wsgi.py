@@ -18,8 +18,5 @@
 '''
 
 from api import appFactory
-from dotenv import load_dotenv
-
-load_dotenv('.env')
 
 app = appFactory()
