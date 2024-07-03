@@ -12,6 +12,7 @@ import flask_bcrypt
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 from flasgger import swag_from
+from api.error_handler import handleCats
 
 # Instanciates all required objects.
 jwt = JWTManager()
@@ -33,27 +34,27 @@ def hashPassword(password):
 # Authentication error handlers.
 @jwt.unauthorized_loader
 def handle_unauthorized_error(err):
-    return {"error": "Unauthenticated"}, 401
+    return handleCats(f"unauthenticated: {err}", 401)
 
 
 @jwt.invalid_token_loader
 def handle_invalid_token_error(err):
-    return {"error": "Invalid token"}, 401
+    return handleCats(f"invalid token: {err}", 401)
 
 
 @jwt.expired_token_loader
-def handle_expired_token_error(err):
-    return {"error": "Expired token"}, 401
+def handle_expired_token_error(header, payload):
+    return handleCats("expired token", 401)
 
 
 @jwt.revoked_token_loader
-def handle_revoked_token_error(err):
-    return {"error": "Revoked token"}, 401
+def handle_revoked_token_error(header, payload):
+    return handleCats("revoked token", 401)
 
 
 @jwt.needs_fresh_token_loader
-def handle_needs_fresh_token_error(err):
-    return {"error": "Needs fresh token"}, 401
+def handle_needs_fresh_token_error(header, payload):
+    return handleCats("needs fresh token", 401)
 
 
 @login_bp.post('/login')
@@ -66,8 +67,8 @@ def login():
         user identity.
     '''
 
-    WRONG_FIELDS = {"error": "needs email and password"}
-    WRONG_DATA = {"error": "wrong email or password"}
+    WRONG_FIELDS = {"error": "needs email and password"}  # 400
+    WRONG_DATA = {"error": "wrong email or password"}  # 401
 
     # Get user request info.
     email = request.json.get("email", None)
@@ -81,7 +82,7 @@ def login():
     try:
         hashed_password, user_id, is_admin = (
             LogicFacade.getPswdAndAdminByEmail(email)
-            )
+        )
     except logicexceptions.EmailNotFoundError as err:
         return WRONG_DATA, 401
 
@@ -98,4 +99,4 @@ def login():
 
         return {"access_token": access_token}, 200
     else:
-        return WRONG_DATA, 400
+        return WRONG_DATA, 401

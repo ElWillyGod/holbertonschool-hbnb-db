@@ -14,6 +14,7 @@
         @PUT /places/{place_id}: Update an existing place's information.
 
         @DELETE /places/{place_id}: Delete a specific place.
+    TODO: 409 does not get raise on POST and PUT
 '''
 
 from flask import request, Blueprint
@@ -23,6 +24,7 @@ from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
 import api.authlib as authlib
+from werkzeug.exceptions import BadRequest, Forbidden, Conflict, NotFound
 
 bp = Blueprint("places", __name__, url_prefix="/places")
 
@@ -37,7 +39,7 @@ def getAllPlaces():
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("place", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Calls BL to get all places.
     places = LogicFacade.getByType('place')
@@ -55,17 +57,17 @@ def getPlace(place_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("place", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Check if id is valid.
     if not val.idChecksum(place_id):
-        return {'err': "Invalid ID"}, 400
+        raise BadRequest("invalid id")
 
     # Calls BL to get place.
     try:
         place = LogicFacade.getByID(place_id, 'place')
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
     return place, 200
 
@@ -80,49 +82,49 @@ def createPlace():
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPostAuthorized("place", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
 
     # Check if data is valid.
     if val.isNoneFields('place', data):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid data")
 
     if not val.idChecksum(data['host_id']):
-        return {'error': "Invalid host ID"}, 400
+        raise BadRequest("invalid host id")
 
     if not val.idChecksum(data['city_id']):
-        return {'error': "Invalid city ID"}, 400
+        raise BadRequest("invalid city id")
 
     if not (val.isLatitudeValid(data['latitude']) and
             val.isLongitudeValid(data['longitude'])):
-        return {'error': "Invalid location"}, 400
+        raise BadRequest("invalid location")
 
     if not val.isNameValid(data['name']):
-        return {'error': "Invalid name"}, 400
+        raise BadRequest("invalid name")
 
     if not (isinstance(data['number_of_rooms'], int) and
             isinstance(data['number_of_bathrooms'], int) and
             isinstance(data['max_guests'], int) and
             isinstance(data['price_per_night'], (int, float))):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid data")
 
     if not (data['number_of_rooms'] > 0 and
             data['number_of_bathrooms'] >= 0 and
             data['max_guests'] > 0 and
             data['price_per_night'] > 0):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid data")
 
     for amenity_id in data['amenity_ids']:
         if not val.idChecksum(amenity_id):
-            return {'error': f'Invalid amenity ID: {amenity_id}'}, 400
+            raise BadRequest(f'invalid amenity id: {amenity_id}')
 
     # Calls BL to create place.
     try:
         place = LogicFacade.createObjectByJson('place', data)
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
     return place, 201
 
@@ -137,48 +139,48 @@ def updatePlace(place_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPutAuthorized("place", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
 
     # Check if data is valid.
     if not val.idChecksum(place_id):
-        return {'error': "Invalid ID"}, 400
+        raise BadRequest("invalid id")
 
     if val.isNoneFields('place', data):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid data")
 
     if not (val.isLatitudeValid(data['latitude']) and
             val.isLongitudeValid(data['longitude'])):
-        return {'error': "Invalid location"}, 400
+        raise BadRequest("invalid location")
 
     if not (isinstance(data['number_of_rooms'], int) and
             isinstance(data['number_of_bathrooms'], int) and
             isinstance(data['max_guests'], int) and
             isinstance(data['price_per_night'], (int, float))):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid data")
 
     if not (data['number_of_rooms'] > 0 and
             data['number_of_bathrooms'] >= 0 and
             data['max_guests'] > 0 and
             data['price_per_night'] > 0):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid data")
 
     if not val.idChecksum(data['city_id']):
-        return {'error': "Invalid city ID"}, 400
+        raise BadRequest("invalid city id")
 
     for amenity_id in data['amenity_ids']:
         if not val.idChecksum(amenity_id):
-            return {'error': 'Invalid amenity ID'}, 400
+            raise BadRequest('invalid amenity id')
 
     # Calls BL to update place.
     try:
         place = LogicFacade.updateByID(place_id, 'place', data)
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
-    return place, 201
+    return place, 204
 
 
 @bp.delete('/<place_id>')
@@ -191,16 +193,16 @@ def deletePlace(place_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notDeleteAuthorized("place", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Check if id is valid.
     if not val.idChecksum(place_id):
-        return {'error': "Invalid place ID"}, 400
+        raise BadRequest("invalid place id")
 
     # Calls BL to delete place.
     try:
         LogicFacade.deleteByID(place_id, 'place')
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
     return "", 204

@@ -16,6 +16,7 @@ from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
 import api.authlib as authlib
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 bp = Blueprint("countries", __name__, url_prefix="/countries")
 
@@ -30,7 +31,7 @@ def getAllCountries():
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("country", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Calls BL to get all countries.
     countries = LogicFacade.getAllCountries()
@@ -48,16 +49,16 @@ def getCounty(country_code):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("country", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Check if country code is valid.
     if not val.isCountryValid(country_code):
-        return {'error': '404 Not Found'}, 404
+        raise BadRequest('code is not valid')
 
     # Calls BL to get country.
     try:
         countries = LogicFacade.getCountry(country_code)
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.CountryNotFoundError) as err:
+        raise NotFound(str(err))
 
     return countries, 200

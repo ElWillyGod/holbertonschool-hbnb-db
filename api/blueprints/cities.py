@@ -24,6 +24,7 @@ from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
 import api.authlib as authlib
+from werkzeug.exceptions import BadRequest, Forbidden, Conflict, NotFound
 
 bp = Blueprint("cities", __name__, url_prefix="/cities")
 
@@ -38,7 +39,7 @@ def getAllCities():
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("city", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Calls BL to get all cities.
     cities = LogicFacade.getByType("city")
@@ -56,17 +57,19 @@ def getCitiesForCountry(country_code):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("country/city", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Check if country code is valid.
     if not val.isCountryValid(country_code):
-        return {'error': "Invalid country code"}, 400
+        raise BadRequest("Invalid country code")
 
     # Call BL to get cities of country.
     try:
         cities = LogicFacade.getContryCities(country_code)
+    except (logicexceptions.CountryNotFoundError) as err:
+        raise NotFound(str(err))
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
     return cities, 200
 
@@ -81,17 +84,17 @@ def getCity(city_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("city", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Check if id is valid.
     if not val.idChecksum(city_id):
-        return {'error': "Invalid ID format"}, 400
+        raise BadRequest("Invalid ID format")
 
     # Calls BL to get city.
     try:
         city = LogicFacade.getByID(city_id, "city")
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
     return city, 200
 
@@ -106,29 +109,29 @@ def createCity():
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPostAuthorized("city", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
 
     # Check if data is valid.
     if val.isNoneFields('city', data):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("Invalid data")
 
     name = data['name']
     code = data['country_code']
 
     if not (val.isNameValid(name) and
             val.isCountryValid(code)):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("Invalid data")
 
     # Calls BL to create city.
     try:
         city = LogicFacade.createObjectByJson("city", data)
     except (logicexceptions.CountryNotFoundError) as err:
-        return {'error': str(err)}, 400
+        raise BadRequest(str(err))
     except (logicexceptions.CityNameDuplicated) as err:
-        return {'error': str(err)}, 409
+        raise Conflict(str(err))
 
     return city, 201
 
@@ -143,35 +146,35 @@ def updateCity(city_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPutAuthorized("city", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
 
     # Check if data is valid.
     if not val.idChecksum(city_id):
-        return {'error': "Invalid ID format"}, 400
+        raise BadRequest("Invalid ID format")
 
     if val.isNoneFields('city', data):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("Invalid data")
 
     name = data['name']
     code = data['country_code']
 
     if not val.isNameValid(name) or not val.isCountryValid(code):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("Invalid data")
 
     # Calls BL to update city.
     try:
         city = LogicFacade.updateByID(city_id, "city", data)
     except (logicexceptions.CountryNotFoundError) as err:
-        return {'error': str(err)}, 400
+        raise BadRequest(str(err))
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
     except (logicexceptions.CityNameDuplicated) as err:
-        return {'error': str(err)}, 409
+        raise Conflict(str(err))
 
-    return city, 201
+    return city, 204
 
 
 @bp.delete('/<city_id>')
@@ -184,16 +187,16 @@ def deleteCity(city_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notDeleteAuthorized("city", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Check if id is valid.
     if not val.idChecksum(city_id):
-        return {'error': 'Invalid ID'}, 400
+        raise BadRequest('Invalid ID')
 
     # Calls BL to delete city.
     try:
         LogicFacade.deleteByID(city_id, "city")
-    except (logicexceptions.IDNotFoundError) as message:
-        return {'error': str(message)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        raise NotFound(str(err))
 
     return "", 204

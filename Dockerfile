@@ -1,3 +1,5 @@
+# docker build . -t hbnb-hb && docker run hbnb-hb 
+
 FROM python:3.11-alpine
 
 WORKDIR /app

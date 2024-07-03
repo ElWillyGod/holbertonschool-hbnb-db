@@ -22,6 +22,7 @@ from logic.logicfacade import LogicFacade
 from api.security import hashPassword
 import api.validations as val
 import api.authlib as authlib
+from werkzeug.exceptions import BadRequest, Forbidden, Conflict, NotFound
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 
@@ -36,7 +37,7 @@ def getAllUsers():
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("user", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Calls BL to get all users.
     users = LogicFacade.getByType("user")
@@ -54,17 +55,17 @@ def getUser(user_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("user", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Checks if id is valid.
     if not val.idChecksum(user_id):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid id")
 
     # Calls BL to get user.
     try:
         users = LogicFacade.getByID(user_id, 'user')
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
     return users, 200
 
@@ -79,14 +80,14 @@ def createUser():
 
     # Checks if it's authorized to make the request.
     #if err := authlib.notPostAuthorized("user", get_jwt()):
-    #    return err, 403
+    #    raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
 
     # Check if data is valid.
     if val.isNoneFields('user', data):
-        return {'error': "Invalid data or missing fields"}, 400
+        raise BadRequest("invalid fields")
 
     email = data.get('email', "email")
     first_name = data.get('first_name', "firstname")
@@ -97,16 +98,16 @@ def createUser():
     if (not val.isStrValid(email) or
             not val.isNameValid(first_name) or
             not val.isNameValid(last_name)):
-        return {'error': "Invalid data or missing fields"}, 400
+        raise BadRequest("invalid data")
 
     if not val.isEmailValid(email):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid email")
 
     if not val.isPasswordValid(password):
-        return {'error': "invalid password"}, 400
+        raise BadRequest("invalid password")
 
     if not isinstance(is_admin, bool):
-        return {'error': "invalid is_admin"}, 400
+        raise BadRequest("invalid is_admin")
 
     # Hashes password.
     data["password"] = hashPassword(data["password"])
@@ -115,7 +116,7 @@ def createUser():
     try:
         user = LogicFacade.createObjectByJson("user", data)
     except (logicexceptions.EmailDuplicated) as err:
-        return {'error': str(err)}, 409
+        raise Conflict(str(err))
 
     return user, 201
 
@@ -130,18 +131,18 @@ def updateUser(user_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPutAuthorized("user", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Checks if id is valid.
     if not val.idChecksum(user_id):
-        return {'error': 'Invalid id'}, 400
+        raise BadRequest('invalid id')
 
     # Get data from request.
     data = request.get_json()
 
     # Checks if data is valid.
     if val.isNoneFields('user', data):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid fields")
 
     email = data.get('email')
     first_name = data.get('first_name')
@@ -152,16 +153,16 @@ def updateUser(user_id):
     if (not val.isStrValid(email) or
             not val.isNameValid(first_name) or
             not val.isNameValid(last_name)):
-        return {'error': "invalid data"}, 400
+        raise BadRequest("invalid data")
 
     if not val.isEmailValid(email):
-        return {'error': "invalid email"}, 400
+        raise BadRequest("invalid email")
 
     if not val.isPasswordValid(password):
-        return {'error': "invalid password"}, 400
+        raise BadRequest("invalid password")
 
     if not isinstance(is_admin, bool):
-        return {'error': "invalid is_admin"}, 400
+        raise BadRequest("invalid is_admin")
 
     # Hashes password.
     data["password"] = hashPassword(data["password"])
@@ -169,12 +170,12 @@ def updateUser(user_id):
     # Calls BL to update user.
     try:
         user = LogicFacade.updateByID(user_id, "user", data, user=get_jwt())
-    except (logicexceptions.EmailDuplicated) as err:
-        return {'error': str(err)}, 409
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
+    except (logicexceptions.EmailDuplicated) as err:
+        raise Conflict(str(err))
 
-    return user, 201
+    return user, 204
 
 
 @bp.delete('/<user_id>')
@@ -187,16 +188,16 @@ def deleteUser(user_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notDeleteAuthorized("user", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Checks if id is valid.
     if not val.idChecksum(user_id):
-        return {'error': 'Invalid user ID'}, 400
+        raise BadRequest('Invalid user ID')
 
     # Calls BL to delete user.
     try:
         LogicFacade.deleteByID(user_id, "user", user=get_jwt())
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
     return "", 204

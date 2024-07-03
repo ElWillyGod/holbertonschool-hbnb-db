@@ -22,6 +22,7 @@ from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validations as val
 import api.authlib as authlib
+from werkzeug.exceptions import BadRequest, Forbidden, Conflict, NotFound
 
 bp = Blueprint("amenities", __name__, url_prefix="/amenities")
 
@@ -36,7 +37,7 @@ def getAllAmenities():
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAllAuthorized("amenity", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Calls BL to get all amenities
     amenities = LogicFacade.getByType('amenity')
@@ -54,17 +55,17 @@ def getAmenity(amenity_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notGetAuthorized("amenity", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Checks if id is valid.
     if not val.idChecksum(amenity_id):
-        return {'error': "Invalid ID"}, 400
+        raise BadRequest("invalid id")
 
     # Calls BL to get amenity
     try:
         amenities = LogicFacade.getByID(amenity_id, 'amenity')
-    except (logicexceptions.IDNotFoundError) as error:
-        return {'error': str(error)}, 404
+    except (logicexceptions.IDNotFoundError) as err:
+        raise NotFound(str(err))
 
     return amenities, 200
 
@@ -79,7 +80,7 @@ def createAmenity():
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPostAuthorized("amenity", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
@@ -87,13 +88,13 @@ def createAmenity():
     # Check if data is valid.
     if (val.isNoneFields('amenity', data) or
             not val.isNameValid(data['name'])):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid data")
 
     # Try creating amenity in BL layer.
     try:
         amenity = LogicFacade.createObjectByJson('amenity', data)
-    except (logicexceptions.AmenityNameDuplicated) as error:
-        return {'error': str(error)}, 409
+    except (logicexceptions.AmenityNameDuplicated) as err:
+        raise Conflict(str(err))
 
     return amenity, 201
 
@@ -108,27 +109,27 @@ def updateAmenity(amenity_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notPutAuthorized("amenity", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
 
     # Check if data is valid.
     if val.isNoneFields('amenity', data) or not val.isNameValid(data['name']):
-        return {'error': "Invalid data"}, 400
+        raise BadRequest("invalid data")
 
     if not val.idChecksum(amenity_id):
-        return {'error': 'Invalid ID format'}, 400
+        raise BadRequest('invalid id format')
 
     # Try updating amenity in BL layer.
     try:
         amenity = LogicFacade.updateByID(amenity_id, 'amenity', data)
     except (logicexceptions.AmenityNameDuplicated) as err:
-        return {'error': str(err)}, 409
+        raise Conflict(str(err))
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
-    return amenity, 201
+    return amenity, 204
 
 
 @bp.delete('/<amenity_id>')
@@ -141,16 +142,16 @@ def deleteAmenity(amenity_id):
 
     # Checks if it's authorized to make the request.
     if err := authlib.notDeleteAuthorized("amenity", get_jwt()):
-        return err, 403
+        raise Forbidden(err)
 
     # Try creating amenity in BL layer.
     if not val.idChecksum(amenity_id):
-        return {'error': "Invalid ID format"}, 400
+        raise BadRequest("invalid id format")
 
     # Try creating amenity in BL layer.
     try:
         LogicFacade.deleteByID(amenity_id, 'amenity')
     except (logicexceptions.IDNotFoundError) as err:
-        return {'error': str(err)}, 404
+        raise NotFound(str(err))
 
     return "", 204
