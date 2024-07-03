@@ -11,23 +11,7 @@ from testlib import HTTPTestClass
 class TestUsers(HTTPTestClass):
     '''
     Tests:
-        #1:  General GET
-        #2:  valid POSTs then GET   -linked
-        #3:  General GET
-        #4:  valid name PUTs        -linked
-        #5:  valid DELETEs          -linked
-        #6:  valid email PUT
-        #7:  existing email PUT
-        #8:  empty GET
-        #9:  empty PUT
-        #10: empty DELETE
-        #11: less attributes POST
-        #12: more attributes POST
-        #13: different attributes POST
-        #14: less attributes PUT
-        #15: more attributes PUT
-        #16: different attributes PUT
-        #17: duplicate entry POST
+        #0:  AUTH_FROM admin.json
     '''
 
     @classmethod
@@ -65,6 +49,11 @@ class TestUsers(HTTPTestClass):
         id = kwargs["id"]
         cls.DELETE(f"/users/{id}")
         cls.ASSERT_CODE(204)
+
+    @classmethod
+    def Teardown(cls):
+        if cls.last_failed and (id_of_last_post := cls.last_post_id):
+            cls.DELETE(id_of_last_post)
 
     @classmethod
     def test_00_auth(cls):

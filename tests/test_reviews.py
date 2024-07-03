@@ -10,8 +10,14 @@ from testlib import HTTPTestClass
 
 class TestReviews(HTTPTestClass):
     '''
-        #1: Post-Get review
+        #0:  AUTH_FROM admin.json
+        #1:  Post-Get review
     '''
+
+    @classmethod
+    def Teardown(cls):
+        if cls.last_failed and (id_of_last_post := cls.last_post_id):
+            cls.DELETE(id_of_last_post)
 
     @classmethod
     def test_00_auth(cls):

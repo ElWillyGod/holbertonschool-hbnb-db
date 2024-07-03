@@ -1,14 +1,16 @@
  ---
-  All commands must be in uppercase and be the first word. Each subsequent word
-is passed to the command in a list, similar to a shell. You can separate
-commands with a ';'.
+  All commands must be the first word. Each subsequent word is passed to the
+command in a list, similar to a shell. You can separate commands with a ';'.
+Uppercase is recommended for commands but not necessary anymore.
+These are not the only commands also, the shell gets all class methods from the
+HTTPTestClass.
 
 Builtin:
-  - help/HELP
+  - HELP
     = passes this file to stdout
-  - exit/EXIT:
+  - EXIT/QUIT:
     = exits shell's loop
-  - clear
+  - CLEAR
     = clears screen, don't confuse with CLEAR
 
 Configuration:
@@ -32,6 +34,8 @@ Value Manipulation:
     = remove value from loaded json
   - GET_RESPONSE
     = prints all information about last response
+  - SAVE_RESPONSE
+    = saves all information about last response to filename. default is log.txt
   - GET_RESPONSE_CODE
     = prints response code
   - GET_RESPONSE_JSON

@@ -4,11 +4,14 @@
 '''
 
 import inspect
+from io import TextIOWrapper
 from typing import Any
 import requests
 import json
 from pathlib import Path
 import time
+
+import requests.structures
 
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -27,15 +30,17 @@ class HTTPTestClass:
         If debug == True it shows the result of all passed assertions.
     '''
 
-    local_URL: str = "http://127.0.0.1:5000/"
+    local_url: str = "http://127.0.0.1:5000/"
     _root_path = Path(__file__).parent.parent.resolve()
 
-    assertionsPassed: int = 0
-    assertionsFailed: int = 0
-    testsPassed: int = 0
-    testsFailed: int = 0
+    assertions_passed: int = 0
+    assertions_failed: int = 0
+    tests_passed: int = 0
+    tests_failed: int = 0
     num_http: int = 0
-    lastResponse: requests.Response | None = None
+    last_response: requests.Response | None = None
+    last_post_id: str | None = None
+    last_failed: bool = False
     json: dict = {}
     headers: dict = {'Content-type': 'application/json',
                      'Accept': 'application/json'}
@@ -54,7 +59,7 @@ class HTTPTestClass:
             msg = "Assertion Passed"
         if cls.debug:
             print(f"{cls.prefix}{GREEN}{msg}{cls.suffix}")
-        cls.assertionsPassed += 1
+        cls.assertions_passed += 1
 
     @classmethod
     def _ASSERTION_FAILURE(
@@ -64,7 +69,7 @@ class HTTPTestClass:
 
         if errormsg is None:
             errormsg = "Assertion Failed"
-        cls.assertionsFailed += 1
+        cls.assertions_failed += 1
         raise AssertionError(errormsg)
 
     @classmethod
@@ -92,7 +97,7 @@ class HTTPTestClass:
             code expected.
         '''
 
-        code = cls.lastResponse.status_code
+        code = cls.last_response.status_code
         cls._ASSERT(code, code_expected, errormsg)
 
     @classmethod
@@ -107,7 +112,7 @@ class HTTPTestClass:
             value expected.
         '''
 
-        data = cls.lastResponse.json()
+        data = cls.last_response.json()
         if isinstance(data, list):
             found_one = False
             for dic in data:
@@ -132,15 +137,15 @@ class HTTPTestClass:
 
     @classmethod
     def CHANGE_URL(cls, url: str) -> None:
-        cls.local_URL = url
+        cls.local_url = url
 
     @classmethod
     def CHANGE_URL_TO_FLASK(cls) -> None:
-        cls.local_URL = "http://127.0.0.1:5000/"
+        cls.local_url = "http://127.0.0.1:5000/"
 
     @classmethod
     def CHANGE_URL_TO_GUNICORN(cls) -> None:
-        cls.local_URL = "http://127.0.0.1:8000/"
+        cls.local_url = "http://127.0.0.1:8000/"
 
     @classmethod
     def FROM(cls, filename: str) -> None:
@@ -170,7 +175,7 @@ class HTTPTestClass:
     @classmethod
     def CLEAR(cls) -> None:
         cls.json = {}
-        cls.lastResponse = None
+        cls.last_response = None
 
     @classmethod
     def SET_VALUE(cls, key: str, value: Any):
@@ -198,19 +203,19 @@ class HTTPTestClass:
 
     @classmethod
     def GET_RESPONSE_CODE(cls) -> int:
-        return cls.lastResponse.status_code
+        return cls.last_response.status_code
 
     @classmethod
     def GET_RESPONSE_HEADERS(cls) -> dict:
-        return cls.lastResponse.headers
+        return dict(cls.last_response.headers)
 
     @classmethod
     def GET_RESPONSE_JSON(cls) -> dict:
-        return cls.lastResponse.json()
+        return cls.last_response.json()
 
     @classmethod
     def GET_RESPONSE_TEXT(cls) -> dict:
-        return cls.lastResponse.text
+        return cls.last_response.text
 
     @classmethod
     def GET_RESPONSE(cls) -> dict:
@@ -238,8 +243,75 @@ class HTTPTestClass:
         return {"code": code, "headers": headers, "json": json, "text": text}
 
     @classmethod
+    def SAVE_RESPONSE(cls, filename: str = "log.txt"):
+        '''
+            Save response to file.
+        '''
+
+        def writeHell(
+                obj: object,
+                file: TextIOWrapper,
+                level: int = 0
+        ) -> None:
+            '''
+                Writes in a beautiful way.
+            '''
+
+            def goodWrite(string: str):
+                str_len = len(string)
+                l = 0
+                if str_len < 80:
+                    file.write(string)
+                    return
+                for i in range(str_len // 80):
+                    file.write(string[i * 80: (i + 1) * 80])
+                    file.write("\n")
+                    l = i
+                file.write(string[(l + 1) * 80:])
+
+            if isinstance(obj, dict):
+                len_of_obj = len(obj) - 1
+                f.write("{")
+                for i, key in enumerate(obj):
+                    file.write(f"{key}: ")
+                    if (isinstance(obj[key], dict) or
+                            isinstance(obj[key], list)):
+                        writeHell(obj[key], file, level + 1)
+                    else:
+                        goodWrite(f"{repr(key)}: {repr(obj[key])}")
+                    if len_of_obj != i:
+                        f.write(", ")
+                    if i % 3 == 2:
+                        f.write("\n")
+                f.write("}")
+            elif isinstance(obj, list):
+                len_of_obj = len(obj) - 1
+                f.write("[")
+                for i, element in enumerate(obj):
+                    writeHell(element, file, level + 1)
+                    if len_of_obj != i:
+                        f.write(", \n")
+                f.write("]")
+            else:
+                f.write("  " * level)
+                goodWrite(f"- {str(obj)}")
+
+        with open(filename, "a+") as f:
+            response = cls.GET_RESPONSE()
+            f.write("\n---\n")
+            f.write("\ncode:\n")
+            writeHell(response["code"], f)
+            f.write("\nheaders:\n")
+            writeHell(response["headers"], f)
+            f.write("\njson:\n")
+            writeHell(response["json"], f)
+            f.write("\ntext:\n")
+            writeHell(response["text"], f)
+            f.write("\n---\n")
+
+    @classmethod
     def GET_RESPONSE_VALUE(cls, key: str):
-        return cls.lastResponse.json()[key]
+        return cls.last_response.json()[key]
 
     @classmethod
     def GET_RESPONSE_WITH(
@@ -253,7 +325,7 @@ class HTTPTestClass:
             key and value of last response.
         '''
 
-        data = cls.lastResponse.json()
+        data = cls.last_response.json()
         if isinstance(data, dict):
             if key not in data:
                 raise KeyError(f"object does not present {key}")
@@ -282,9 +354,10 @@ class HTTPTestClass:
         cls.json = {"email": email, "password": password}
         cls.POST("/login")
         cls.ASSERT_CODE(200)
-        token = cls.lastResponse.json["access_token"]
+        token = cls.last_response.json["access_token"]
         cls.token = token
         cls.headers.update({"Authorization": f"Bearer {token}"})
+        cls.last_failed = False
         return token
 
     @classmethod
@@ -301,9 +374,10 @@ class HTTPTestClass:
         cls.json = {"email": email, "password": password}
         cls.POST("/login")
         cls.ASSERT_CODE(200)
-        token = cls.lastResponse.json()["access_token"]
+        token = cls.last_response.json()["access_token"]
         cls.token = token
         cls.headers.update({"Authorization": f"Bearer {token}"})
+        cls.last_failed = False
         return token
 
     @classmethod
@@ -313,9 +387,10 @@ class HTTPTestClass:
         '''
 
         response = requests.get(
-            f"{cls.local_URL}{endpoint}", headers=cls.headers)
-        cls.lastResponse = response
+            f"{cls.local_url}{endpoint}", headers=cls.headers)
+        cls.last_response = response
         cls.num_http += 1
+        cls.last_failed = False
         return response.status_code
 
     @classmethod
@@ -325,12 +400,17 @@ class HTTPTestClass:
         '''
 
         response = requests.post(
-            f"{cls.local_URL}{endpoint}",
+            f"{cls.local_url}{endpoint}",
             json=cls.json,
             headers=cls.headers
         )
-        cls.lastResponse = response
+        cls.last_response = response
+        try:
+            cls.last_post_id = response.json().get("id")
+        except Exception:
+            pass
         cls.num_http += 1
+        cls.last_failed = False
         return response.status_code
 
     @classmethod
@@ -340,12 +420,13 @@ class HTTPTestClass:
         '''
 
         response = requests.put(
-            f"{cls.local_URL}{endpoint}",
+            f"{cls.local_url}{endpoint}",
             json=cls.json,
             headers=cls.headers
         )
-        cls.lastResponse = response
+        cls.last_response = response
         cls.num_http += 1
+        cls.last_failed = False
         return response.status_code
 
     @classmethod
@@ -355,9 +436,10 @@ class HTTPTestClass:
         '''
 
         response = requests.delete(
-            f"{cls.local_URL}{endpoint}", headers=cls.headers)
-        cls.lastResponse = response
+            f"{cls.local_url}{endpoint}", headers=cls.headers)
+        cls.last_response = response
         cls.num_http += 1
+        cls.last_failed = False
         return response.status_code
 
     @classmethod
@@ -388,38 +470,40 @@ class HTTPTestClass:
             print(f"{cls.prefix}{YELLOW}Running {name}...{cls.suffix}")
             try:
                 tests[name]()
-                cls.testsPassed += 1
+                cls.tests_passed += 1
             except AssertionError as e:
                 print(f"{cls.prefix}{RED}Check failed on {name}:{RESET}\n" +
                       f"{e}{cls.suffix}\n")
-                print(f"\t[{cls.lastResponse.request.method}]")
-                print(f"\t-{cls.lastResponse.request.url}")
-                print(f"\t-{cls.lastResponse.reason}")
+                print(f"\t[{cls.last_response.request.method}]")
+                print(f"\t-{cls.last_response.request.url}")
+                print(f"\t-{cls.last_response.reason}")
                 print(f"\n\t{RED}RESPONSE:{RESET}")
-                print(f"{cls.lastResponse.text}")
+                print(f"{cls.last_response.text}")
                 print(f"\n\t{RED}JSON:{RESET}")
                 print(f"{cls.json}\n")
-                cls.testsFailed += 1
+                cls.last_failed = True
+                cls.tests_failed += 1
             except KeyError as e:
                 print(f"{cls.prefix}{RED}{name} did not find key to check:" +
                       f"{RESET}\n\t{e}{cls.suffix}")
-                cls.testsFailed += 1
+                cls.last_failed = True
+                cls.tests_failed += 1
             finally:
                 cls.Teardown()
 
-        if cls.testsFailed == 0:
+        if cls.tests_failed == 0:
             print(f"{cls.prefix}{GREEN}All tests from " +
                   f"{cls.__name__} passed: ", end="")
-        elif cls.testsPassed == 0:
+        elif cls.tests_passed == 0:
             print(f"{cls.prefix}{RED}All tests from " +
                   f"{cls.__name__} failed: ", end="")
         else:
             print(f"{cls.prefix}{YELLOW}Some tests from " +
                   f"{cls.__name__} failed: ", end="")
-        tests_total = cls.testsPassed + cls.testsFailed
-        assertions_total = cls.assertionsFailed + cls.assertionsPassed
-        print(f"{RESET}{cls.testsPassed}/{tests_total} Tests, " +
-              f"{cls.assertionsPassed}/{assertions_total} Assertions, " +
+        tests_total = cls.tests_passed + cls.tests_failed
+        assertions_total = cls.assertions_failed + cls.assertions_passed
+        print(f"{RESET}{cls.tests_passed}/{tests_total} Tests, " +
+              f"{cls.assertions_passed}/{assertions_total} Assertions, " +
               f"{cls.num_http} HTTP Requests." +
               f"{cls.suffix}\n")
-        return cls.testsFailed, cls.testsPassed
+        return cls.tests_failed, cls.tests_passed

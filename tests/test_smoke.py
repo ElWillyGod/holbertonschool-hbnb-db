@@ -23,7 +23,7 @@ class TestSmoke(HTTPTestClass):
 
     @classmethod
     def Teardown(cls) -> None:
-        if cls.testsFailed >= 1:
+        if cls.tests_failed >= 1:
             raise AssertionError()
 
     @classmethod

@@ -10,7 +10,8 @@ from testlib import HTTPTestClass
 
 class TestCities(HTTPTestClass):
     '''
-        #1: Post-Get city
+        #0:  AUTH_FROM admin.json
+        #1:  Post-Get city
     '''
 
     @classmethod
@@ -52,6 +53,11 @@ class TestCities(HTTPTestClass):
         id = kwargs["id"]
         cls.DELETE(f"/cities/{id}")
         cls.ASSERT_CODE(204)
+
+    @classmethod
+    def Teardown(cls):
+        if cls.last_failed and (id_of_last_post := cls.last_post_id):
+            cls.DELETE(id_of_last_post)
 
     @classmethod
     def test_00_auth(cls):

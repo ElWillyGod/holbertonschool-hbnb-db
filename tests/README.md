@@ -1,15 +1,20 @@
 # Integration tests
 ---
 
+## Important
+  The automatic tests are defined for this application. They might not work on
+other applications under similar requirements.
+
 ## How to use
-  Run runall.py to run all automatic tests. The default url is
-http://127.0.0.1:5000/, but you can change it if you provide it as an argument.
-Example: ./runall.py http://127.0.0.1:8000/
+  Run "runall.py" to run all automatic tests. The default url is
+"http://127.0.0.1:5000/", but you can change it if you provide it as an
+argument. Example: "./runall.py http://127.0.0.1:8000/"
   You can also do the same but individually with each test, or make manual
-tests using the testingShell.py.
-  The testing shell provides a way to use the testlib.py with a command line
-interface. You can use it by running it directly (i.e. ./testingShell.py).
-You see all commands using "help" and exit using "exit/quit".
+tests using the "testingShell.py".
+  The testing shell provides a way to use the "testlib.py" with a command line
+interface. You can use it by running it directly (i.e. "./testingShell.py").
+You can see all the commands using 'help' and exit using 'exit/quit'. You can
+also see all the commands inside "shell_help.txt"
 
 ## Why
   Automatic tests can be used to see if any changes to fix something breaks

@@ -10,7 +10,8 @@ from testlib import HTTPTestClass
 
 class TestPlaces(HTTPTestClass):
     '''
-        #1: Post-Get place
+        #0:  AUTH_FROM admin.json
+        #1:  Post-Get place
     '''
 
     @classmethod
@@ -122,6 +123,11 @@ class TestPlaces(HTTPTestClass):
             for amenity_id in amenity_ids:
                 cls.DELETE(f"/amenities/{amenity_id}")
                 cls.ASSERT_CODE(204)
+
+    @classmethod
+    def Teardown(cls):
+        if cls.last_failed and (id_of_last_post := cls.last_post_id):
+            cls.DELETE(id_of_last_post)
 
     @classmethod
     def test_00_auth(cls):

@@ -10,7 +10,27 @@ from testlib import HTTPTestClass
 
 class TestAmenities(HTTPTestClass):
     '''
-        #1: Post-Get amenity
+    Tests:
+        #0:  AUTH_FROM admin.json
+        #1:  GET /amenities
+        #2:  POST /amenities & GET /amenities/<id> & DELETE /amenities/<id>
+        #3:  GET /amenities
+        #4:  PUT /amenities/<id>
+        #5:  GET /amenities/ & GET "/amenities/  "
+        #6:  DELETE /amenities/ & DELETE "/amenities/  "
+        #7:  PUT /amenities/ & GET "/amenities/  "
+        #8:  less attr POST
+        #9:  more attr POST
+        #10: diff attr POST
+        #11: less attr PUT
+        #12: more attr PUT
+        #13: diff attr PUT
+        #14: duplicate entity post
+        #15: GET deleted entity
+        #16: PUT deleted entity
+        #17: DELETE deleted entity
+        #18: empty entity name POST
+        #19: invalid entity POST
     '''
 
     @classmethod
@@ -51,6 +71,11 @@ class TestAmenities(HTTPTestClass):
         cls.ASSERT_CODE(204)
 
     @classmethod
+    def Teardown(cls):
+        if cls.last_failed and (id_of_last_post := cls.last_post_id):
+            cls.DELETE(id_of_last_post)
+
+    @classmethod
     def test_00_auth(cls):
         cls.AUTH_FROM("admin.json")
         cls.ASSERT_CODE(200)
@@ -61,7 +86,7 @@ class TestAmenities(HTTPTestClass):
         cls.ASSERT_CODE(200)
 
     @classmethod
-    def test_02_valid_POST_GET(cls):
+    def test_02_valid_POST_GET_DELETE(cls):
         for i in range(1, 4):
             user = cls.createAmenity(i)
             cls.deleteAmenity(**user)
@@ -83,18 +108,24 @@ class TestAmenities(HTTPTestClass):
     @classmethod
     def test_05_empty_id_GET(cls):
         cls.GET("/amenities/")
-        cls.ASSERT_CODE(404)
+        cls.ASSERT_CODE(200)
+        cls.GET("/amenities/ ")
+        cls.ASSERT_CODE(400)
 
     @classmethod
     def test_06_empty_id_DELETE(cls):
         cls.DELETE("/amenities/")
-        cls.ASSERT_CODE(404)
+        cls.ASSERT_CODE(405)
+        cls.DELETE("/amenities/ ")
+        cls.ASSERT_CODE(400)
 
     @classmethod
     def test_07_empty_id_PUT(cls):
         user = cls.createAmenity(1)
-        cls.PUT("/amenities/")
-        cls.ASSERT_CODE(404)
+        cls.DELETE("/amenities/")
+        cls.ASSERT_CODE(405)
+        cls.DELETE("/amenities/ ")
+        cls.ASSERT_CODE(400)
         cls.deleteAmenity(**user)
 
     @classmethod
