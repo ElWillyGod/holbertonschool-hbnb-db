@@ -5,8 +5,8 @@ Table users {
   id varchar [primary key, not null, unique]
   password varchar [not null]
   email varchar [not null, unique]
-  firstName varchar
-  lastName varchar
+  first_name varchar
+  last_name varchar
   role varchar
   created_at datetime [not null]
   update_at datetime [not null]
@@ -14,9 +14,9 @@ Table users {
 
 Table review {
   id varchar [primary key, not null]
-  placeId varchar [not null, Ref: > place.id]
-  userId varchar [not null, Ref: > users.id]
-  reating int [not null]
+  place_id varchar [not null, Ref: > place.id]
+  user_id varchar [not null, Ref: > users.id]
+  rating int [not null]
   comment varchar
   created_at datetime [not null]
   update_at datetime [not null]
@@ -32,23 +32,23 @@ Table amenity {
 Table city {
   id varchar [primary key, not null]
   name varchar [unique]
-  countryCode varchar [primary key]
+  country_code varchar [primary key]
   created_at datetime [not null]
   update_at datetime [not null]
 }
 
 Table place {
   id varchar [primary key, not null]
-  userId varchar [not null, Ref: > users.id]
+  user_id varchar [not null, Ref: > users.id]
   name varchar [not null]
   description varchar [not null]
-  numberOfRooms int [not null]
-  numberOfBathrooms int [not null]
-  maxGues int [not null]
-  pricePreNigth float [not null]
+  number_of_rooms int [not null]
+  number_of_bathrooms int [not null]
+  max_guest int [not null]
+  price_per_night float [not null]
   latitude float [not null]
   longitude float [not null]
-  cityId varchar [not null, Ref: > city.id]
+  city_id varchar [not null, Ref: > city.id]
   created_at datetime [not null]
   update_at datetime [not null]
 }
