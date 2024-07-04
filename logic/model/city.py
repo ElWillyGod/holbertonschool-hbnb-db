@@ -32,8 +32,7 @@ class City(TrackedObject, db.Model):
                  *,
                  id: str = None,
                  created_at: str = None,
-                 updated_at: str = None,
-                 update: dict | None = None
+                 updated_at: str = None
                  ) -> None:
         super().__init__(id, created_at, updated_at)
         """

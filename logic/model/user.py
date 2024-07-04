@@ -25,6 +25,10 @@ class User(TObj, db.Model):
 
     is_admin = db.Column(db.Boolean, nullable=False)
 
+    def __init__(self, id: str = None,
+                 created_at: str = None,
+                 updated_at: str = None):
+        super().__init__(id, created_at, updated_at)
 
 """
 class User(db.Model):
