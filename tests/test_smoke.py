@@ -6,6 +6,7 @@
 '''
 import sys
 from testlib import HTTPTestClass
+import asyncio
 
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -27,25 +28,37 @@ class TestSmoke(HTTPTestClass):
             raise AssertionError()
 
     @classmethod
-    def test_smoke(cls):
+    def test_smoke_api(cls):
         try:
-            cls.GET("/countries")
+            cls.GET("/apidocs")
             cls.ASSERT_CODE(200)
         except Exception as err:
-            raise AssertionError(f"{RED}Smoke test failed:\n{RESET}  - {err}")
+            raise AssertionError(
+                f"{RED}API Smoke test failed:\n{RESET}  - {err}")
+
+    @classmethod
+    def test_smoke_db(cls):
+        try:
+            cls.GET("/amenities")
+            cls.ASSERT_CODE(200)
+        except Exception as err:
+            raise AssertionError(
+                f"{RED}DB Smoke test failed:\n{RESET}  - {err}")
 
 
-def run(url: str = "http://127.0.0.1:5000/"):
+async def run(url: str = "http://127.0.0.1:5000/", *, ooe=False):
     '''
-        Runs all methods of class that start with name with given url.
+        Runs all methods of class that start with name test with given url.
     '''
 
-    TestSmoke.CHANGE_URL(url)
-    return TestSmoke.run()
+    return TestSmoke.run(url=url, only_output_errors=ooe)
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        run()
+        asyncio.run(run())
     else:
-        run(sys.argv[1])
+        url = sys.argv[1]
+        if url == "gunicorn":
+            url = "http://127.0.0.1:8000/"
+        asyncio.run(run(url))

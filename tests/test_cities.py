@@ -6,6 +6,7 @@
 
 import sys
 from testlib import HTTPTestClass
+import asyncio
 
 
 class TestCities(HTTPTestClass):
@@ -266,13 +267,19 @@ class TestCities(HTTPTestClass):
         pass
 
 
-def run(url: str = "http://127.0.0.1:5000/"):
-    TestCities.CHANGE_URL(url)
-    TestCities.run()
+async def run(url: str = "http://127.0.0.1:5000/", *, ooe=False):
+    '''
+        Runs all methods of class that start with name test with given url.
+    '''
+
+    return TestCities.run(url=url, only_output_errors=ooe)
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        run()
+        asyncio.run(run())
     else:
-        run(sys.argv[1])
+        url = sys.argv[1]
+        if url == "gunicorn":
+            url = "http://127.0.0.1:8000/"
+        asyncio.run(run(url))

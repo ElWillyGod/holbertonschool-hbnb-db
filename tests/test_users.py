@@ -6,6 +6,7 @@
 
 import sys
 from testlib import HTTPTestClass
+import asyncio
 
 
 class TestUsers(HTTPTestClass):
@@ -23,6 +24,7 @@ class TestUsers(HTTPTestClass):
         expectAtPOST: int = 201,
         overrideNone: bool = False
     ) -> dict:
+
         cls.FROM(f"users/valid_user_{num}.json")
 
         if dic is not None:
@@ -237,13 +239,19 @@ class TestUsers(HTTPTestClass):
         cls.createUser(1, {"last_name": "777"}, expectAtPOST=400)
 
 
-def run(url: str = "http://127.0.0.1:5000/"):
-    TestUsers.CHANGE_URL(url)
-    TestUsers.run()
+async def run(url: str = "http://127.0.0.1:5000/", *, ooe=False):
+    '''
+        Runs all methods of class that start with name test with given url.
+    '''
+
+    return TestUsers.run(url=url, only_output_errors=ooe)
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        run()
+        asyncio.run(run())
     else:
-        run(sys.argv[1])
+        url = sys.argv[1]
+        if url == "gunicorn":
+            url = "http://127.0.0.1:8000/"
+        asyncio.run(run(url))

@@ -443,19 +443,30 @@ class HTTPTestClass:
         return response.status_code
 
     @classmethod
+    def Setup(cls) -> None:
+        '''
+            Called before each test. Can be ovewritten.
+        '''
+
+        cls.last_post_id = None
+
+    @classmethod
     def Teardown(cls) -> None:
         '''
-            Called after the ending of each test. Made to be overriden.
+            Called after the ending of each test. Made to be overwritten.
         '''
 
         pass
 
     @classmethod
-    def run(cls) -> tuple[int, int]:
+    def run(cls, *, url=None, only_output_errors=False) -> tuple[int, int]:
         '''
             Gets all methods, and then filters them to get only methods that
             have the word "test" in them and are not from Object.
         '''
+
+        if url is not None:
+            cls.CHANGE_URL = url
 
         methods = inspect.getmembers(cls, lambda a: inspect.isroutine(a))
         tests = {
@@ -464,11 +475,18 @@ class HTTPTestClass:
                  attr.find("test") != -1
                 }
 
-        print(f"{cls.prefix}{MAGENTA}Running {cls.__name__}...{cls.suffix}")
+        if not only_output_errors:
+            print(f"{cls.prefix}{MAGENTA}",
+                  f"Running {cls.__name__}...",
+                  f"{cls.suffix}")
         for name in tests:
             time.sleep(0.1)
-            print(f"{cls.prefix}{YELLOW}Running {name}...{cls.suffix}")
+            if not only_output_errors:
+                print(f"{cls.prefix}{YELLOW}" +
+                      f"Running {name}..." +
+                      f"{cls.suffix}")
             try:
+                cls.Setup()
                 tests[name]()
                 cls.tests_passed += 1
             except AssertionError as e:
@@ -506,4 +524,4 @@ class HTTPTestClass:
               f"{cls.assertions_passed}/{assertions_total} Assertions, " +
               f"{cls.num_http} HTTP Requests." +
               f"{cls.suffix}\n")
-        return cls.tests_failed, cls.tests_passed
+        return cls.tests_failed, cls.tests_passed, cls.num_http
