@@ -10,7 +10,23 @@ from uuid import uuid4
 from logic import db
 from sqlalchemy import Boolean, Column, String
 
+class User(db.Model):
+    """tabla del user"""
 
+    __tablename__ = 'user'
+
+    password = db.Column(db.String(255),
+                      nullable=False,
+                      primary_key=True)
+
+    firstName = db.Column(db.String(255))
+
+    lastName = db.Column(db.String(255))
+
+    role = db.Column(db.String(255))
+
+
+"""
 class User(db.Model):
     '''
         User Table.
@@ -31,3 +47,4 @@ class User(db.Model):
     def toJson(self):
         return {column.name: getattr(self, column.name)
                 for column in self.__table__.columns}
+"""

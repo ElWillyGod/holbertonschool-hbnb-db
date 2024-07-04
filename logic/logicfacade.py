@@ -82,6 +82,7 @@ class LogicFacade(ABC):
 ) -> dict:
         obj = classes.getObjectByName(type)
         obj = obj(**data)
+        print('{}'.format(obj.id))
         return Persistence.create(obj).toJson()
         # return Persistence.get(id, type)
 

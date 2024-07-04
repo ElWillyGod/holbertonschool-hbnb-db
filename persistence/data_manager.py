@@ -9,6 +9,7 @@ import os
 import glob
 from typing import Any
 
+
 from persistence.data_manager_interface import IPersistenceManager
 from logic import db
 
@@ -45,13 +46,13 @@ class DataManager(IPersistenceManager):
             Creates an obj.
         """
 
-        if os.environ.get('USE_DATABASE'):
+        if os.environ.get('USE_DATABASE'): 
             db.session
             db.session.add(obj)
             db.session.commit()
             return db.session.query(obj.__class__).filter_by(id=obj.id).first()
         else:
-            file_path = self._file_path(obj, obj.id)
+            file_path = self._file_path(obj)
             with open(file_path, 'w') as file:
                 json.dump(obj.toJson(), file)
 
@@ -63,7 +64,7 @@ class DataManager(IPersistenceManager):
         if os.environ.get('USE_DATABASE'):
             return db.session.query(obj.__class__).get(obj.id)
         else:
-            file_path = self._file_path(obj, obj.id)
+            file_path = self._file_path(obj)
             if not os.path.exists(file_path):
                 return None
             else:
@@ -79,10 +80,15 @@ class DataManager(IPersistenceManager):
         if os.environ.get('USE_DATABASE'):
             old_obj = db.session.query(obj.__class__).get(obj.id)
             # No se
+            for key, value in obj.__dict__.items():
+                if not (key.startswith('_') or key == 'created_at'):
+                    setattr(old_obj, key, value)
+
             db.session.commit()
+
             return db.session.query(obj.__class__).get(obj.id)
         else:
-            file_path = self._file_path(obj, obj.id)
+            file_path = self._file_path(obj)
             with open(file_path, 'r') as file:
                 obj = json.load(file)
                 obj.update(obj)
@@ -100,7 +106,7 @@ class DataManager(IPersistenceManager):
             db.session.delete(row)
             db.session.commit()
         else:
-            file_path = self._file_path(obj, obj.id)
+            file_path = self._file_path(obj)
             if os.path.exists(file_path):
                 os.remove(file_path)
                 return
