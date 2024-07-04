@@ -18,17 +18,26 @@ class TrackedObject:
         update_time() -> None: Updates the updated_at attribute.
         toJson() -> str: Returns a JSON representation of this object.
     '''
-    id = db.Column(db.String(255),
-                       nullable=False,
-                       primary_key=True)
+    id = db.Column(
+         db.String(255),
+         nullable=False,
+         primary_key=True
+    )
 
-    created_at = db.Column(db.String(255), default=str(db.func.current_timestamp()))
-    updated_at = db.Column(db.String(255), onupdate=str(db.func.current_timestamp()))
+    created_at = db.Column(
+         db.String(255),
+         default=str(db.func.current_timestamp())
+    )
+    updated_at = db.Column(
+         db.String(255),
+         onupdate=str(db.func.current_timestamp())
+    )
 
     def __init__(self,
                  id: str = None,
                  created_at: str = None,
-                 updated_at: str = None):
+                 updated_at: str = None
+    ):
         now = str(datetime.now())
         self.created_at = now if created_at is None else created_at
         self.updated_at = now if updated_at is None else updated_at

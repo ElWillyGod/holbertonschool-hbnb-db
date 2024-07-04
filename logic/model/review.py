@@ -14,30 +14,32 @@ class Review(TrackedObject, db.Model):
 
     __tablename__ = 'review'
 
-    placeId = db.Column(db.Integer,
+    place_id = db.Column(db.Integer,
                      ForeignKey('place.id'),
                      nullable=False,
                      primary_key=True)
 
-    userId = db.Column(db.Integer,
-                    ForeignKey('user.id'),
-                    nullable=False,
-                    primary_key=True)
+    user_id = db.Column(
+        db.Integer,
+        ForeignKey('user.id'),
+        nullable=False,
+        primary_key=True
+    )
 
-    reating = db.Column(db.Integer,
-                     nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
 
-    def __init__(self,
-                 place_id: str,
-                 user_id: str,
-                 rating: int,
-                 comment: str,
-                 *,
-                 id: str = None,
-                 created_at: str = None,
-                 updated_at: str = None,
-                 update: dict | None = None
-                 ) -> None:
+    def __init__(
+            self,
+            place_id: str,
+            user_id: str,
+            rating: int,
+            comment: str,
+            *,
+            id: str = None,
+            created_at: str = None,
+            updated_at: str = None,
+            update: dict | None = None
+    ) -> None:
         super().__init__(id, created_at, updated_at)
         """
         if not idExists(place_id, "places"):

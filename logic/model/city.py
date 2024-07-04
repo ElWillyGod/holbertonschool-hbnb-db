@@ -19,9 +19,11 @@ class City(TrackedObject, db.Model):
                     nullable=False,
                     primary_key=True)
 
-    countryCode = db.Column(db.String(255),
-                            nullable=False,
-                            primary_key=True)
+    country_code = db.Column(
+        db.String(255),
+        nullable=False,
+        primary_key=True
+    )
 
 
     def __init__(self,

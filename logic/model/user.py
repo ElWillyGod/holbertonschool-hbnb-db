@@ -10,20 +10,20 @@ from uuid import uuid4
 from logic import db
 from sqlalchemy import Boolean, Column, String
 
-class User(db.Model):
+class User(TObj, db.Model):
     """tabla del user"""
 
     __tablename__ = 'user'
 
-    password = db.Column(db.String(255),
-                      nullable=False,
-                      primary_key=True)
+    email = db.Column(db.String(255), nullable=False, primary_key=True)
 
-    firstName = db.Column(db.String(255))
+    password = db.Column(db.String(255), nullable=False)
 
-    lastName = db.Column(db.String(255))
+    first_name = db.Column(db.String(255), nullable=False)
 
-    role = db.Column(db.String(255))
+    last_name = db.Column(db.String(255), nullable=False)
+
+    is_admin = db.Column(db.Boolean, nullable=False)
 
 
 """

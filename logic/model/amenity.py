@@ -15,9 +15,11 @@ class Amenity(TrackedObject, db.Model):
     '''
 
     __tablename__ = 'amenity'
-    name = db.Column(db.String(255),
-                         unique=True,
-                         nullable=False)
+    name = db.Column(
+        db.String(255),
+        unique=True,
+        nullable=False
+    )
 
 
     """

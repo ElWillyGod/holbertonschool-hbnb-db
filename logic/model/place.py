@@ -14,57 +14,52 @@ class Place(TrackedObject, db.Model):
     __tablename__ = 'place'
 
 
-    userId = db.Column(db.Integer,
+    user_id = db.Column(db.Integer,
                     ForeignKey('user.id'),
                     nullable=False,
                     primary_key=True)
 
-    name = db.Column(db.String(255),
-                  nullable=False)
+    name = db.Column(db.String(255), nullable=False)
 
-    description = db.Column(db.String(255),
-                         nullable=False)
+    description = db.Column(db.String(255), nullable=False)
 
-    numberOfRooms = db.Column(db.Integer,
-                           nullable=False)
+    number_of_rooms = db.Column(db.Integer, nullable=False)
 
-    numberOfBathrooms = db.Column(db.Integer,
-                               nullable=False)
+    number_of_bathrooms = db.Column(db.Integer, nullable=False)
 
-    maxGues = db.Column(db.Integer,
-                     nullable=False)
+    max_guests = db.Column(db.Integer, nullable=False)
 
-    pricePreNigth = db.Column(db.Float,
-                           nullable=False)
+    price_per_night = db.Column(db.Float, nullable=False)
 
-    latitude = db.Column(db.Float,
-                      nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
 
-    longitude = db.Column(db.Float,
-                       nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
 
-    citiId = db.Column(db.Integer,
-                    ForeignKey('city.id'),
-                    nullable=False)
+    city_id = db.Column(
+        db.Integer,
+        ForeignKey('city.id'),
+        nullable=False
+    )
 
-    def __init__(self,
-                 host_id: str,
-                 name: str,
-                 description: str,
-                 number_of_rooms: int,
-                 number_of_bathrooms: int,
-                 max_guests: int,
-                 price_per_night: float,
-                 latitude: float,
-                 longitude: float,
-                 city_id: str,
-                 amenity_ids: list[str],
-                 *,
-                 id: str = None,
-                 created_at: str = None,
-                 updated_at: str = None,
-                 update: dict | None = None
-                 ) -> None:
+    def __init__(
+            self,
+            host_id: str,
+            name: str,
+            description: str,
+            number_of_rooms: int,
+            number_of_bathrooms: int,
+            max_guests: int,
+            price_per_night: float,
+            latitude: float,
+            longitude: float,
+            city_id: str,
+            amenity_ids: list[str],
+            *,
+            id: str = None,
+            created_at: str = None,
+            updated_at: str = None,
+            update: dict | None = None
+    ) -> None:
         super().__init__(id, created_at, updated_at)
         """
         if not idExists(host_id, "users"):
