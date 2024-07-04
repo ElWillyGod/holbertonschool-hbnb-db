@@ -1,0 +1,56 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table users {
+  id varchar [primary key, not null, unique]
+  password varchar [not null]
+  email varchar [not null, unique]
+  firstName varchar
+  lastName varchar
+  role varchar
+  created_at datetime [not null]
+  update_at datetime [not null]
+}
+
+Table review {
+  id varchar [primary key, not null]
+  placeId varchar [not null, Ref: > place.id]
+  userId varchar [not null, Ref: > users.id]
+  reating int [not null]
+  comment varchar
+  created_at datetime [not null]
+  update_at datetime [not null]
+}
+
+Table amenity {
+  id varchar [primary key, not null]
+  name varchar [primary key]
+  created_at datetime [not null]
+  update_at datetime [not null]
+}
+
+Table city {
+  id varchar [primary key, not null]
+  name varchar [unique]
+  countryCode varchar [primary key]
+  created_at datetime [not null]
+  update_at datetime [not null]
+}
+
+Table place {
+  id varchar [primary key, not null]
+  userId varchar [not null, Ref: > users.id]
+  name varchar [not null]
+  description varchar [not null]
+  numberOfRooms int [not null]
+  numberOfBathrooms int [not null]
+  maxGues int [not null]
+  pricePreNigth float [not null]
+  latitude float [not null]
+  longitude float [not null]
+  cityId varchar [not null, Ref: > city.id]
+  created_at datetime [not null]
+  update_at datetime [not null]
+}
+
+Ref: amenity.id <> place.id
