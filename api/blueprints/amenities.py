@@ -71,7 +71,7 @@ def getAmenity(amenity_id):
 
 
 @bp.post('/')
-@jwt_required(optional=False)
+# @jwt_required(optional=False)
 @swag_from("swagger/amenities/post.yaml")
 def createAmenity():
     """
@@ -79,8 +79,8 @@ def createAmenity():
     """
 
     # Checks if it's authorized to make the request.
-    if err := authlib.notPostAuthorized("amenity", get_jwt()):
-        raise Forbidden(err)
+    # if err := authlib.notPostAuthorized("amenity", get_jwt()):
+        # raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()

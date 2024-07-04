@@ -46,7 +46,7 @@ class DataManager(IPersistenceManager):
             Creates an obj.
         """
 
-        if os.environ.get('USE_DATABASE'): 
+        if True:# os.environ.get('USE_DATABASE'): 
             db.session
             db.session.add(obj)
             db.session.commit()
