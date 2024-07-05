@@ -7,6 +7,7 @@
 '''
 import sys
 from testlib import HTTPTestClass
+from requests.exceptions import ConnectionError
 import asyncio
 
 RED = "\033[31m"
@@ -15,7 +16,12 @@ YELLOW = "\033[33m"
 BLUE = "\033[34m"
 CYAN = "\033[36m"
 MAGENTA = "\033[35m"
+WHITE = "\033[37m"
 RESET = "\033[0m"
+
+
+class SmokeFailure(Exception):
+    '''Called when smoke test fails'''
 
 
 class TestSmoke(HTTPTestClass):
@@ -29,22 +35,36 @@ class TestSmoke(HTTPTestClass):
             raise AssertionError()
 
     @classmethod
-    def test_smoke_api(cls):
+    def test_00_smoke_api(cls):
         try:
             cls.GET("/apidocs")
-            cls.ASSERT_CODE(200)
-        except Exception as err:
-            raise AssertionError(
-                f"{RED}API Smoke test failed:\n{RESET}  - {err}")
+            if cls.last_response.status_code != 200:
+                raise AssertionError(str(cls.last_response.status_code))
+        except ConnectionError as err:
+            raise SmokeFailure(
+                f"{RED}API Smoke test failed: " + WHITE +
+                "Could not connect to server\n" +
+                MAGENTA + "  - " + err.request.url + RESET)
+        except AssertionError as err:
+            raise SmokeFailure(
+                f"{RED}API Smoke test failed: {RESET}" +
+                "Unexpected return code: " + err)
 
     @classmethod
-    def test_smoke_db(cls):
+    def test_01_smoke_db(cls):
         try:
             cls.GET("/amenities")
-            cls.ASSERT_CODE(200)
-        except Exception as err:
-            raise AssertionError(
-                f"{RED}DB Smoke test failed:\n{RESET}  - {err}")
+            if cls.last_response.status_code != 200:
+                raise AssertionError(str(cls.last_response.status_code))
+        except ConnectionError as err:
+            raise SmokeFailure(
+                f"{RED}DB Smoke test failed: " + WHITE +
+                "Could not connect to server\n" +
+                MAGENTA + "  - " + err.request.url + RESET)
+        except AssertionError as err:
+            raise SmokeFailure(
+                f"{RED}API Smoke test failed: " + WHITE +
+                "Unexpected return code: " + MAGENTA + err + RESET)
 
 
 async def run(url: str = "http://127.0.0.1:5000/", *, ooe=False):
@@ -60,6 +80,4 @@ if __name__ == "__main__":
         asyncio.run(run())
     else:
         url = sys.argv[1]
-        if url == "gunicorn":
-            url = "http://127.0.0.1:8000/"
         asyncio.run(run(url))

@@ -11,7 +11,7 @@ Builtin:
   - EXIT/QUIT:
     = exits shell's loop
   - CLEAR
-    = clears screen, don't confuse with CLEAR
+    = clears screen, don't confuse with CLEAN
 
 Configuration:
   - CHANGE_URL <url: str>:
@@ -26,15 +26,15 @@ Value Manipulation:
     = prints headers being used
   - GET_TOKEN
     = prints token being used
-  - CLEAR
+  - CLEAN
     = resets json and last response
-  - CHANGE_VALUE/ADD_VALUE <key: str> <value: Any>
+  - SET_VALUE <key: str> <value: Any>
     = change value from loaded json
   - REMOVE_VALUE <key: str>
     = remove value from loaded json
   - GET_RESPONSE
     = prints all information about last response
-  - SAVE_RESPONSE
+  - SAVE_RESPONSE <filename: filename>
     = saves all information about last response to filename. default is log.txt
   - GET_RESPONSE_CODE
     = prints response code
@@ -47,7 +47,7 @@ Value Manipulation:
   - GET_RESPONSE_VALUE <key>
     = prints response's <key> key.
   - GET_RESPONSE_WITH <key: str> <value: Any> <target_key: str>
-    = (old) get <target_key> from object with <key>: <value> from response.
+    = (old) get <target_key> from object with <key>: <value> from last response
 
 Assertions:
   - ASSERT_CODE <code: int>

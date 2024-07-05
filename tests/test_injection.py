@@ -32,6 +32,4 @@ if __name__ == "__main__":
         asyncio.run(run())
     else:
         url = sys.argv[1]
-        if url == "gunicorn":
-            url = "http://127.0.0.1:8000/"
         asyncio.run(run(url))

@@ -5,6 +5,7 @@
 '''
 
 import sys
+from uuid import uuid4
 from testlib import HTTPTestClass
 import asyncio
 
@@ -266,6 +267,36 @@ class TestCities(HTTPTestClass):
     def test_24_null_args_POST(cls):
         pass
 
+    # 21
+    @classmethod
+    def test_21_unauthorization(cls):
+        cls.FROM("user.json")
+        cls.POST("/users")
+        cls.ASSERT_CODE(200)
+        user = cls.GET_RESPONSE_JSON()
+
+        cls.CLEAN()
+        cls.AUTH_FROM("user.json")
+        cls.POST("/cities")
+        cls.ASSERT_CODE(403)
+        cls.PUT("/cities/" + uuid4().hex)
+        cls.ASSERT_CODE(403)
+        cls.DELETE("/cities/" + uuid4().hex)
+        cls.ASSERT_CODE(403)
+
+        cls.DELETE("/users/" + user.get("id"))
+
+    # 22
+    @classmethod
+    def test_22_unaunthentication(cls):
+        cls.CLEAN()
+        cls.POST("/cities")
+        cls.ASSERT_CODE(401)
+        cls.PUT("/cities/" + uuid4().hex)
+        cls.ASSERT_CODE(401)
+        cls.DELETE("/cities/" + uuid4().hex)
+        cls.ASSERT_CODE(401)
+
 
 async def run(url: str = "http://127.0.0.1:5000/", *, ooe=False):
     '''
@@ -280,6 +311,4 @@ if __name__ == "__main__":
         asyncio.run(run())
     else:
         url = sys.argv[1]
-        if url == "gunicorn":
-            url = "http://127.0.0.1:8000/"
         asyncio.run(run(url))

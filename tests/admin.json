@@ -1,7 +1,7 @@
 {
-    "email": "admin@gmail.com",
-    "first_name": "Admin",
-    "last_name": "McGee",
-    "password": "password",
+    "email": "root@root.root",
+    "first_name": "Root",
+    "last_name": "Root",
+    "password": "root",
     "is_admin": true
 }

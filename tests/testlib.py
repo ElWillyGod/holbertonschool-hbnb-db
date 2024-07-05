@@ -137,15 +137,12 @@ class HTTPTestClass:
 
     @classmethod
     def CHANGE_URL(cls, url: str) -> None:
-        cls.local_url = url
-
-    @classmethod
-    def CHANGE_URL_TO_FLASK(cls) -> None:
-        cls.local_url = "http://127.0.0.1:5000/"
-
-    @classmethod
-    def CHANGE_URL_TO_GUNICORN(cls) -> None:
-        cls.local_url = "http://127.0.0.1:8000/"
+        if url == "flask":
+            cls.local_url = "http://127.0.0.1:5000/"
+        elif url == "gunicorn":
+            cls.local_url = "http://127.0.0.1:8000/"
+        else:
+            cls.local_url = url
 
     @classmethod
     def FROM(cls, filename: str) -> None:
@@ -173,9 +170,11 @@ class HTTPTestClass:
         return cls.token
 
     @classmethod
-    def CLEAR(cls) -> None:
+    def CLEAN(cls) -> None:
         cls.json = {}
         cls.last_response = None
+        cls.headers = {'Content-type': 'application/json',
+                       'Accept': 'application/json'}
 
     @classmethod
     def SET_VALUE(cls, key: str, value: Any):
@@ -492,13 +491,14 @@ class HTTPTestClass:
             except AssertionError as e:
                 print(f"{cls.prefix}{RED}Check failed on {name}:{RESET}\n" +
                       f"{e}{cls.suffix}\n")
-                print(f"\t[{cls.last_response.request.method}]")
-                print(f"\t-{cls.last_response.request.url}")
-                print(f"\t-{cls.last_response.reason}")
-                print(f"\n\t{RED}RESPONSE:{RESET}")
-                print(f"{cls.last_response.text}")
-                print(f"\n\t{RED}JSON:{RESET}")
-                print(f"{cls.json}\n")
+                if cls.last_response is not None:
+                    print(f"\t[{cls.last_response.request.method}]")
+                    print(f"\t-{cls.last_response.request.url}")
+                    print(f"\t-{cls.last_response.reason}")
+                    print(f"\n\t{RED}RESPONSE:{RESET}")
+                    print(f"{cls.last_response.text}")
+                    print(f"\n\t{RED}JSON:{RESET}")
+                    print(f"{cls.json}\n")
                 cls.last_failed = True
                 cls.tests_failed += 1
             except KeyError as e:
