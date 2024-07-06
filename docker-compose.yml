@@ -12,7 +12,8 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./dump.sql:/docker-entrypoint-initdb.d/dump.sql
+      - ./sql_scripts/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+      - ./sql_scripts/amenities.sql:/docker-entrypoint-initdb.d/amenities.sql
   nginx:
     restart: always
     image: nginx:1-alpine

@@ -1,5 +1,12 @@
 CREATE DATABASE IF NOT EXISTS hbnb;
 USE hbnb;
+-- COUNTRY
+-- CREATE TABLE IF NOT EXISTS country (
+--     code VARCHAR(2) NOT NULL,
+--     name VARCHAR(256) NOT NULL,
+--     PRIMARY KEY (code),
+--     UNIQUE (code),
+-- );
 -- AMENITY
 CREATE TABLE IF NOT EXISTS amenity (
     id VARCHAR(256) NOT NULL,
@@ -31,7 +38,7 @@ CREATE TABLE IF NOT EXISTS city (
     PRIMARY KEY (id),
     UNIQUE (id),
     name VARCHAR(256) NOT NULL,
-    country_code VARCHAR(3) NOT NULL
+    country_code VARCHAR(2) NOT NULL
 );
 -- PLACE
 CREATE TABLE IF NOT EXISTS place (

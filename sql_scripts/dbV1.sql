@@ -1,3 +1,5 @@
+-- Currently ignored
+
 CREATE TABLE `users` (
   `id` varchar(255) UNIQUE PRIMARY KEY NOT NULL,
   `password` varchar(255) NOT NULL,
