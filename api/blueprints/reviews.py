@@ -173,7 +173,7 @@ def updateReview(review_id):
     # Calls BL to update review.
     try:
         review = LogicFacade.updateByID(
-            review_id, 'review', data, user=get_jwt())
+            review_id, 'review', data)
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
     except (logicexceptions.TryingToReviewOwnPlace) as err:
@@ -200,7 +200,7 @@ def deleteReview(review_id):
 
     # Calls BL to delete review.
     try:
-        LogicFacade.deleteByID(review_id, 'review', user=get_jwt())
+        LogicFacade.deleteByID(review_id, 'review')
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
 
