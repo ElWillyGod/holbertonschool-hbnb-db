@@ -179,7 +179,7 @@ def updateReview(review_id):
     except (logicexceptions.TryingToReviewOwnPlace) as err:
         raise BadRequest(str(err))
 
-    return review, 204
+    return review, 200
 
 
 @bp.delete('/reviews/<review_id>')

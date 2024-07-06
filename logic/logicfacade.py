@@ -117,4 +117,4 @@ class LogicFacade(ABC):
             raise EmailNotFoundError("email not found")
         # user is transformed from list to dict
         user = user[0]
-        return user.password, user.id, user.is_admin
+        return user.password, user.is_admin

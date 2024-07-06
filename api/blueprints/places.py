@@ -180,7 +180,7 @@ def updatePlace(place_id):
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
 
-    return place, 204
+    return place, 200
 
 
 @bp.delete('/<place_id>')

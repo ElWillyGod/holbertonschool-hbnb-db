@@ -91,27 +91,28 @@ class DataManager(IPersistenceManager):
             raise FileNotFoundError(
                     f"No such obj: {obj} with {obj.id}")
 
-    def get_all(self, obj_type) -> list[Any]:
+    def get_all(self, obj) -> list[Any]:
         """
             Retrieves all entities of a given type.
         """
 
-        path = os.path.join(self.storage_path, f"{obj_type}_*.json")
+        path = os.path.join(self.storage_path, f"{obj.__tablename__}_*.json")
         files = glob.glob(path)
         entities = []
         for file_path in files:
                 with open(file_path, 'r') as file:
                     data = json.load(file)
+                    data = obj.__class__(**data)
                     entities.append(data)
         return entities
 
-    def get_by_property(self, obj_type,
+    def get_by_property(self, obj,
             property_name: str, property_value) -> list[dict]:
         """
             Retrieves all entities of a given type that match a specific property.
         """
 
-        all_entities = self.get_all(obj_type)
+        all_entities = self.get_all(obj)
         matched_entities = [entity for entity in all_entities
                             if entity.get(property_name) == property_value]
         return matched_entities

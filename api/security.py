@@ -13,6 +13,7 @@ from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 from flasgger import swag_from
 from api.error_handler import handleCats
+from werkzeug.exceptions import BadRequest, Unauthorized
 
 # Instanciates all required objects.
 jwt = JWTManager()
@@ -67,8 +68,8 @@ def login():
         user identity.
     '''
 
-    WRONG_FIELDS = {"error": "needs email and password"}  # 400
-    WRONG_DATA = {"error": "wrong email or password"}  # 401
+    WRONG_FIELDS = "needs email and password"  # 400
+    WRONG_DATA = "wrong email or password"  # 401
 
     # Get user request info.
     email = request.json.get("email", None)
@@ -76,15 +77,15 @@ def login():
 
     # Checks if request info is ok. 400 if not.
     if email is None or password is None:
-        return WRONG_FIELDS, 400
+        raise BadRequest(WRONG_FIELDS)
 
     # Fetch user data by email. 401 if email not found.
     try:
-        hashed_password, user_id, is_admin = (
+        hashed_password, is_admin = (
             LogicFacade.getPswdAndAdminByEmail(email)
         )
     except logicexceptions.EmailNotFoundError as err:
-        return WRONG_DATA, 401
+        return Unauthorized(WRONG_DATA)
 
     # Compare passwords. 401 if different.
     if bcrypt.check_password_hash(hashed_password, password):
@@ -93,10 +94,9 @@ def login():
             identity=email,
             additional_claims={
                 "is_admin": is_admin,
-                "user_id": user_id
                 }
         )
 
         return {"access_token": access_token}, 200
     else:
-        return WRONG_DATA, 401
+        raise Unauthorized(WRONG_DATA)

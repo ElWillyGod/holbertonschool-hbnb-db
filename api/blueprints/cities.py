@@ -174,7 +174,7 @@ def updateCity(city_id):
     except (logicexceptions.CityNameDuplicated) as err:
         raise Conflict(str(err))
 
-    return city, 204
+    return city, 200
 
 
 @bp.delete('/<city_id>')

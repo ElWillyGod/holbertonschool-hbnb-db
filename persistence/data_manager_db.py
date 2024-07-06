@@ -40,8 +40,6 @@ class DataManager(IPersistenceManager):
 
         db.session.commit()
 
-        return db.session.query(obj.__class__).get(obj.id)
-
 
     def delete(self, obj) -> None:
         """
@@ -66,6 +64,5 @@ class DataManager(IPersistenceManager):
         """
             Retrieves all entities of a given type that match a specific property.
         """
-
 
         return obj_type.query.filter_by(**{property_name: property_value}).all()

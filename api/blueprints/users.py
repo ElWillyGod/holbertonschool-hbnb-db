@@ -28,7 +28,7 @@ bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @bp.get('/')
-@jwt_required(optional=False)
+#@jwt_required(optional=False)
 @swag_from("swagger/users/get_all.yaml")
 def getAllUsers():
     '''
@@ -36,8 +36,8 @@ def getAllUsers():
     '''
 
     # Checks if it's authorized to make the request.
-    if err := authlib.notGetAllAuthorized("user", get_jwt()):
-        raise Forbidden(err)
+    #if err := authlib.notGetAllAuthorized("user", get_jwt()):
+    #    raise Forbidden(err)
 
     # Calls BL to get all users.
     users = LogicFacade.getByType("user")
@@ -46,7 +46,7 @@ def getAllUsers():
 
 
 @bp.get('/<user_id>')
-@jwt_required(optional=False)
+#@jwt_required(optional=False)
 @swag_from("swagger/users/get.yaml")
 def getUser(user_id):
     '''
@@ -54,8 +54,8 @@ def getUser(user_id):
     '''
 
     # Checks if it's authorized to make the request.
-    if err := authlib.notGetAuthorized("user", get_jwt()):
-        raise Forbidden(err)
+    #if err := authlib.notGetAuthorized("user", get_jwt()):
+    #    raise Forbidden(err)
 
     # Checks if id is valid.
     if not val.idChecksum(user_id):
@@ -122,7 +122,7 @@ def createUser():
 
 
 @bp.put('/<user_id>')
-@jwt_required(optional=False)
+#@jwt_required(optional=False)
 @swag_from("swagger/users/put.yaml")
 def updateUser(user_id):
     '''
@@ -130,8 +130,8 @@ def updateUser(user_id):
     '''
 
     # Checks if it's authorized to make the request.
-    if err := authlib.notPutAuthorized("user", get_jwt()):
-        raise Forbidden(err)
+    #if err := authlib.notPutAuthorized("user", get_jwt()):
+    #    raise Forbidden(err)
 
     # Checks if id is valid.
     if not val.idChecksum(user_id):
@@ -175,11 +175,11 @@ def updateUser(user_id):
     except (logicexceptions.EmailDuplicated) as err:
         raise Conflict(str(err))
 
-    return user, 204
+    return user, 200
 
 
 @bp.delete('/<user_id>')
-@jwt_required(optional=False)
+#@jwt_required(optional=False)
 @swag_from("swagger/users/delete.yaml")
 def deleteUser(user_id):
     '''
@@ -187,8 +187,8 @@ def deleteUser(user_id):
     '''
 
     # Checks if it's authorized to make the request.
-    if err := authlib.notDeleteAuthorized("user", get_jwt()):
-        raise Forbidden(err)
+    #if err := authlib.notDeleteAuthorized("user", get_jwt()):
+    #    raise Forbidden(err)
 
     # Checks if id is valid.
     if not val.idChecksum(user_id):
