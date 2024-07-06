@@ -27,8 +27,8 @@ class City(TrackedObject, db.Model):
 
 
     def __init__(self,
-                 name: str,
-                 country_code: str,
+                 name: str = None,
+                 country_code: str = None,
                  *,
                  id: str = None,
                  created_at: str = None,

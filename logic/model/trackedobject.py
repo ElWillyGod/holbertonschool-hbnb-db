@@ -33,10 +33,11 @@ class TrackedObject:
          onupdate=str(db.func.current_timestamp())
     )
 
-    def __init__(self,
-                 id: str = None,
-                 created_at: str = None,
-                 updated_at: str = None
+    def __init__(
+            self,
+            id: str = None,
+            created_at: str = None,
+            updated_at: str = None
     ):
         now = str(datetime.now())
         self.created_at = now if created_at is None else created_at

@@ -30,15 +30,14 @@ class Review(TrackedObject, db.Model):
 
     def __init__(
             self,
-            place_id: str,
-            user_id: str,
-            rating: int,
-            comment: str,
+            place_id: str = None,
+            user_id: str = None,
+            rating: int = None,
+            comment: str = None,
             *,
             id: str = None,
             created_at: str = None,
-            updated_at: str = None,
-            update: dict | None = None
+            updated_at: str = None
     ) -> None:
         super().__init__(id, created_at, updated_at)
         """

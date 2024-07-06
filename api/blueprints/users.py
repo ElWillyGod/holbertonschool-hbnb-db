@@ -169,7 +169,7 @@ def updateUser(user_id):
 
     # Calls BL to update user.
     try:
-        user = LogicFacade.updateByID(user_id, "user", data, user=get_jwt())
+        user = LogicFacade.updateByID(user_id, "user", data)
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
     except (logicexceptions.EmailDuplicated) as err:
@@ -196,7 +196,7 @@ def deleteUser(user_id):
 
     # Calls BL to delete user.
     try:
-        LogicFacade.deleteByID(user_id, "user", user=get_jwt())
+        LogicFacade.deleteByID(user_id, "user")
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
 

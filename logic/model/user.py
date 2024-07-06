@@ -15,7 +15,7 @@ class User(TObj, db.Model):
 
     __tablename__ = 'user'
 
-    email = db.Column(db.String(255), nullable=False, primary_key=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)
 
     password = db.Column(db.String(255), nullable=False)
 
@@ -25,13 +25,17 @@ class User(TObj, db.Model):
 
     is_admin = db.Column(db.Boolean, nullable=False)
 
-    def __init__(self, email: str,
-                 password: str,
-                 first_name: str,
-                 last_name: str,
-                 is_admin: str, id: str = None,
-                 created_at: str = None,
-                 updated_at: str = None):
+    def __init__(
+            self,
+            email: str = None,
+            password: str = None,
+            first_name: str = None,
+            last_name: str = None,
+            is_admin: str = None,
+            id: str = None,
+            created_at: str = None,
+            updated_at: str = None
+        ) -> None:
         super().__init__(id, created_at, updated_at)
         self.email = email
         self.password = password
