@@ -33,7 +33,6 @@ class Amenity(TrackedObject, db.Model):
 
     def __init__(self,
                  name: str = None,
-                 *,
                  id: str = None,
                  created_at: str = None,
                  updated_at: str = None
