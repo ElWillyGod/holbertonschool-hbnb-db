@@ -5,10 +5,7 @@
 '''
 
 from logic.model.trackedobject import TrackedObject as TObj
-from datetime import datetime
-from uuid import uuid4
 from logic import db
-from sqlalchemy import Boolean, Column, String
 
 class User(TObj, db.Model):
     """tabla del user"""

@@ -3,22 +3,26 @@
     Defines the Place Class.
 '''
 
-from sqlalchemy import Column, Float, ForeignKey, Integer, String
+from logic.model.amenity import Amenity
 from logic.model.trackedobject import TrackedObject
-from logic.model.city import City
-from logic.model.user import User
 from logic import db
+from persistence import dm
+
+place_amenities = db.Table('place_amenities',
+    db.Column('place_id', db.String(255), db.ForeignKey('place.id'), primary_key=True),
+    db.Column('amenity_id', db.String(255), db.ForeignKey('amenity.id'), primary_key=True)
+)
 
 class Place(TrackedObject, db.Model):
 
     __tablename__ = 'place'
 
 
-    user_id = db.Column(db.Integer,
-                    ForeignKey('user.id'),
-                    nullable=False,
-                    primary_key=True)
-
+    host_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
+        nullable=False,
+    )
     name = db.Column(db.String(255), nullable=False)
 
     description = db.Column(db.String(255), nullable=False)
@@ -37,8 +41,14 @@ class Place(TrackedObject, db.Model):
 
     city_id = db.Column(
         db.Integer,
-        ForeignKey('city.id'),
+        db.ForeignKey('city.id'),
         nullable=False
+    )
+    amenity_ids = db.relationship(
+        'Amenity',
+        secondary=place_amenities,
+        lazy='subquery',
+        backref=db.backref('place', lazy=True)
     )
 
     def __init__(
@@ -79,7 +89,9 @@ class Place(TrackedObject, db.Model):
         self.latitude = latitude
         self.longitude = longitude
         self.city_id = city_id
-        self.amenity_ids = amenity_ids
+        self.amenity_ids = []
+        for amenity_id in amenity_ids:
+            self.amenity_ids.append(dm.read(Amenity(id=amenity_id)))
 
 """
 class Place(db.Model):

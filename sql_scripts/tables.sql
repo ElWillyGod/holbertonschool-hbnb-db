@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS place (
     host_id VARCHAR(256) NOT NULL,
     FOREIGN KEY (host_id) REFERENCES user(id),
     city_id VARCHAR(256) NOT NULL,
-    FOREIGN KEY (city_id) REFERENCES place(id),
+    FOREIGN KEY (city_id) REFERENCES city(id),
     name VARCHAR(256) NOT NULL,
     description VARCHAR(1024) NOT NULL,
     number_of_rooms INT NOT NULL,
@@ -76,11 +76,9 @@ CREATE TABLE IF NOT EXISTS review (
 
 -- UNION FOR place AND amenity
 CREATE TABLE IF NOT EXISTS place_amenities (
-    id INT NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (id),
-    UNIQUE (id),
     place_id VARCHAR(256) NOT NULL,
-    FOREIGN KEY (place_id) REFERENCES place(id),
     amenity_id VARCHAR(256) NOT NULL,
+    PRIMARY KEY (place_id, amenity_id),
+    FOREIGN KEY (place_id) REFERENCES place(id),
     FOREIGN KEY (amenity_id) REFERENCES amenity(id)
 );

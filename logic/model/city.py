@@ -15,14 +15,14 @@ class City(TrackedObject, db.Model):
     __tablename__ = 'city'
 
 
-    name = db.Column(db.String(255),
-                    nullable=False,
-                    primary_key=True)
+    name = db.Column(
+        db.String(255),
+        nullable=False
+    )
 
     country_code = db.Column(
         db.String(255),
-        nullable=False,
-        primary_key=True
+        nullable=False
     )
 
 

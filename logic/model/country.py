@@ -7,7 +7,6 @@
 '''
 
 from logic import db
-from sqlalchemy import Column, String
 
 
 class Country(db.Model):
@@ -16,8 +15,8 @@ class Country(db.Model):
     """
 
     __tablename__ = 'country'
-    code = Column(String(3), primary_key=True, unique=True)
-    name = Column(String(255), unique=True)
+    code = db.Column(db.String(3), primary_key=True, unique=True)
+    name = db.Column(db.String(255), unique=True)
 
     def toJson(self):
         return {column.name: getattr(self, column.name)

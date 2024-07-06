@@ -4,10 +4,7 @@
     Reviews are linked with a user and a review.
 '''
 
-from sqlalchemy import ForeignKey
 from logic.model.trackedobject import TrackedObject
-from logic.model.user import User
-from logic.model.place import Place
 from logic import db
 
 class Review(TrackedObject, db.Model):
@@ -15,15 +12,15 @@ class Review(TrackedObject, db.Model):
     __tablename__ = 'review'
 
     place_id = db.Column(db.Integer,
-                     ForeignKey('place.id'),
+                     db.ForeignKey('place.id'),
                      nullable=False,
-                     primary_key=True)
+                     unique=True)
 
     user_id = db.Column(
         db.Integer,
-        ForeignKey('user.id'),
+        db.ForeignKey('user.id'),
         nullable=False,
-        primary_key=True
+        unique=True
     )
 
     rating = db.Column(db.Integer, nullable=False)
