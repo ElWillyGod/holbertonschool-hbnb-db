@@ -5,7 +5,7 @@
 '''
 
 import sys
-import asyncio
+from threading import Thread
 
 import test_smoke
 import test_amenities
@@ -44,7 +44,7 @@ def resultsPrint(middle: callable) -> None:
     return inner
 
 
-async def run(url: str = "http://127.0.0.1:5000/"):
+def run(url: str = "http://127.0.0.1:5000/"):
     '''
         # runall
 
@@ -55,60 +55,78 @@ async def run(url: str = "http://127.0.0.1:5000/"):
     '''
 
     try:
-        results = await test_smoke.run(url)
+        results = test_smoke.run(url)
     except test_smoke.SmokeFailure as err:
         @resultsPrint
         def errorPrint():
             print(f"  ! {RED}{err}{RESET}")
         errorPrint()
         return
-    tests = {
+
+    info = {
         "tests_failed": results[0],
         "tests_passed": results[1],
         "http_requests": results[2]
     }
 
-    results = asyncio.gather(
-        test_amenities.run(url),
-        test_countries.run(url),
-        test_users.run(url),
-        test_cities.run(url),
-        test_places.run(url),
-        test_reviews.run(url)
-    )
+    tests = [
+        test_amenities.run,
+        test_countries.run,
+        test_users.run,
+        test_cities.run,
+        test_places.run,
+        test_reviews.run
+    ]
 
-    for tuple in results:
-        tests["tests_failed"] += tuple[0]
-        tests["tests_passed"] += tuple[1]
-        tests["http_requests"] += tuple[2]
+    threads: Thread = [None] * len(tests)
+    # Results list is passed to be modified as threads don't handle returns
+    results: list[tuple[int, int, int]] = [None] * len(tests)
 
+    # Assigns a thread for each test
+    for i in range(len(tests)):
+        threads[i] = Thread(target=tests[i], args=[url, True, results, i])
+        threads[i].start()
+
+    # Waits for tests to finish
+    for i in range(len(tests)):
+        threads[i].join()
+
+    # Gathers results of tests
+    for result in results:
+        if result is not None:
+            info["tests_failed"] += result[0]
+            info["tests_passed"] += result[1]
+            info["http_requests"] += result[2]
+
+    # Prints summary
     @resultsPrint
     def successPrint():
-        if tests['tests_failed'] == 0:
+        if info['tests_failed'] == 0:
             print(f"  > {GREEN}All ",
-                  WHITE, tests['tests_passed'], GREEN,
-                  "passed successully.")
-        elif tests["tests_passed"] == 0:
+                  WHITE, info['tests_passed'], GREEN,
+                  " tests passed successully.", RESET, sep="")
+        elif info["tests_passed"] == 0:
             print(f"  > {RED}No test from all ",
-                  WHITE, tests['tests_failed'], RED,
-                  "were successful.", RESET)
+                  WHITE, info['tests_failed'], RED,
+                  " were successful.", RESET, sep="")
         else:
-            total_tests = tests['tests_failed'] + tests['tests_passed']
-            print(f"  > {YELLOW}Some tests have failed: ")
-            print(f"    - {WHITE}{tests['tests_failed']} ",
-                  YELLOW, "tests failed", RESET)
-            print(f"    - {WHITE}{tests['tests_passed']} ",
-                  YELLOW, "tests passed", RESET)
+            total_tests = info['tests_failed'] + info['tests_passed']
+            print(f"  > {YELLOW}Some tests have failed: ",
+                  RESET, sep="")
+            print(f"    - {WHITE}{info['tests_failed']} ",
+                  YELLOW, "tests failed", RESET, sep="")
+            print(f"    - {WHITE}{info['tests_passed']} ",
+                  YELLOW, "tests passed", RESET, sep="")
             print(f"    - {WHITE}{total_tests} ",
-                  YELLOW, "tests total", RESET)
+                  YELLOW, "tests total", RESET, sep="")
         print()
-        print(f"  > {MAGENTA} Total HTTP requests: ",
-              WHITE, tests['http_requests'], RESET)
+        print(f"  > {MAGENTA}Total HTTP requests: ",
+              WHITE, info['http_requests'], RESET, sep="")
     successPrint()
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        asyncio.run(run())
+        run()
     else:
-        asyncio.run(run(sys.argv[1]))
+        run(sys.argv[1])

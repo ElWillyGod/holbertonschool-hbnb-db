@@ -1,4 +1,4 @@
-# !/usr/bin/python3
+#!/usr/bin/python3
 
 '''
     Defines tests for 'amenities' endpoints.
@@ -7,7 +7,6 @@
 import sys
 from uuid import uuid4
 from testlib import HTTPTestClass
-import asyncio
 
 
 class TestAmenities(HTTPTestClass):
@@ -102,10 +101,11 @@ class TestAmenities(HTTPTestClass):
         id: str | None = None,
         **kwargs
     ) -> None:
-        id = id if id is not None else cls.amenity.get("id")
+        if id is None:
+            if cls.amenity is not None:
+                id = cls.amenity.get("id")
         if id is not None:
             cls.DELETE(f"/amenities/{id}")
-            cls.ASSERT_CODE(204)
             cls.amenity = None
 
     @classmethod
@@ -118,7 +118,6 @@ class TestAmenities(HTTPTestClass):
     @classmethod
     def test_00_auth(cls):
         cls.AUTH_FROM("admin.json")
-        cls.ASSERT_CODE(200)
 
     # Valid requests
 
@@ -328,17 +327,28 @@ class TestAmenities(HTTPTestClass):
         cls.ASSERT_CODE(401)
 
 
-async def run(url: str = "http://127.0.0.1:5000/", *, ooe=False):
+def run(
+        url: str = "http://127.0.0.1:5000/",
+        ooe=False,
+        results: list = None,
+        i: int = None
+    ) -> tuple[int, int, int]:
     '''
         Runs all methods of class that start with name test with given url.
+
+        If given a list and an index it dumps the results there too so threads
+        can get results.
     '''
 
-    return TestAmenities.run(url=url, only_output_errors=ooe)
+    output = TestAmenities.run(url=url, only_output_errors=ooe)
+    if results is not None:
+        results[i] = output
+    return output
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        asyncio.run(run())
+        run()
     else:
         url = sys.argv[1]
-        asyncio.run(run(url))
+        run(url)

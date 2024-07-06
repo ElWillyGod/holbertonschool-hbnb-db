@@ -22,6 +22,10 @@ MAGENTA = "\033[35m"
 RESET = "\033[0m"
 
 
+class AuthFailure(Exception):
+    '''Failure to authenticate as admin'''
+
+
 class HTTPTestClass:
     '''
         Test Base Class for testing the API.
@@ -352,7 +356,10 @@ class HTTPTestClass:
 
         cls.json = {"email": email, "password": password}
         cls.POST("/login")
-        cls.ASSERT_CODE(200)
+        if cls.last_response.status_code != 200:
+            cls.assertions_failed += 1
+            cls.tests_failed += 1
+            raise AuthFailure()
         token = cls.last_response.json["access_token"]
         cls.token = token
         cls.headers.update({"Authorization": f"Bearer {token}"})
@@ -372,7 +379,10 @@ class HTTPTestClass:
         password = user["password"]
         cls.json = {"email": email, "password": password}
         cls.POST("/login")
-        cls.ASSERT_CODE(200)
+        if cls.last_response.status_code != 200:
+            cls.assertions_failed += 1
+            cls.tests_failed += 1
+            raise AuthFailure()
         token = cls.last_response.json()["access_token"]
         cls.token = token
         cls.headers.update({"Authorization": f"Bearer {token}"})
@@ -488,9 +498,9 @@ class HTTPTestClass:
                 cls.Setup()
                 tests[name]()
                 cls.tests_passed += 1
-            except AssertionError as e:
+            except AssertionError as err:
                 print(f"{cls.prefix}{RED}Check failed on {name}:{RESET}\n" +
-                      f"{e}{cls.suffix}\n")
+                      f"{err}{cls.suffix}\n")
                 if cls.last_response is not None:
                     print(f"\t[{cls.last_response.request.method}]")
                     print(f"\t-{cls.last_response.request.url}")
@@ -501,11 +511,16 @@ class HTTPTestClass:
                     print(f"{cls.json}\n")
                 cls.last_failed = True
                 cls.tests_failed += 1
-            except KeyError as e:
-                print(f"{cls.prefix}{RED}{name} did not find key to check:" +
-                      f"{RESET}\n\t{e}{cls.suffix}")
+            except KeyError as err:
+                print(f"{cls.prefix}{RED}{name}did not find key to check:" +
+                      f"{RESET}\n\t{err}{cls.suffix}")
                 cls.last_failed = True
                 cls.tests_failed += 1
+            except AuthFailure as err:
+                print(f"{cls.prefix}{RED}{cls.__name__}: " +
+                      f"Could not authenticate as admin{cls.suffix}")
+                tests = {}
+                break
             finally:
                 cls.Teardown()
 

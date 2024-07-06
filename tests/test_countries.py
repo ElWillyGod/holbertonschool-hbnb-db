@@ -6,7 +6,6 @@
 
 import sys
 from testlib import HTTPTestClass
-import asyncio
 
 
 class TestCountries(HTTPTestClass):
@@ -35,17 +34,28 @@ class TestCountries(HTTPTestClass):
         cls.ASSERT_VALUE("name", "Brazil")
 
 
-async def run(url: str = "http://127.0.0.1:5000/", *, ooe=False):
+def run(
+        url: str = "http://127.0.0.1:5000/",
+        ooe=False,
+        results: list = None,
+        i: int = None
+    ) -> tuple[int, int, int]:
     '''
         Runs all methods of class that start with name test with given url.
+
+        If given a list and an index it dumps the results there too so threads
+        can get results.
     '''
 
-    return TestCountries.run(url=url, only_output_errors=ooe)
+    output = TestCountries.run(url=url, only_output_errors=ooe)
+    if results is not None:
+        results[i] = output
+    return output
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        asyncio.run(run())
+        run()
     else:
         url = sys.argv[1]
-        asyncio.run(run(url))
+        run(url)

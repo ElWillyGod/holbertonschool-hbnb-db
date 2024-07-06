@@ -18,7 +18,7 @@
 
 
     To run from docker use:
-    docker-compose up -d
+    docker compose up -d
     This will run all containers.
 '''
 from dotenv import load_dotenv

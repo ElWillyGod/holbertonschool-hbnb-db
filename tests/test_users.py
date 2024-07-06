@@ -7,7 +7,6 @@
 import sys
 from uuid import uuid4
 from testlib import HTTPTestClass
-import asyncio
 
 
 class TestUsers(HTTPTestClass):
@@ -15,6 +14,8 @@ class TestUsers(HTTPTestClass):
     Tests:
         #0:  AUTH_FROM admin.json
     '''
+
+    user: dict | None = None
 
     @classmethod
     def createUser(
@@ -48,15 +49,21 @@ class TestUsers(HTTPTestClass):
         return output
 
     @classmethod
-    def deleteUser(cls, **kwargs):
-        id = kwargs["id"]
-        cls.DELETE(f"/users/{id}")
-        cls.ASSERT_CODE(204)
+    def deleteUser(
+        cls,
+        id: str | None = None,
+        **kwargs
+    ) -> None:
+        if id is None:
+            if cls.user is not None:
+                id = cls.user.get("id")
+        if id is not None:
+            cls.DELETE(f"/users/{id}")
+            cls.user = None
 
     @classmethod
     def Teardown(cls):
-        if cls.last_failed and (id_of_last_post := cls.last_post_id):
-            cls.DELETE(id_of_last_post)
+        cls.deleteUser()
 
     @classmethod
     def test_00_auth(cls):
@@ -270,17 +277,28 @@ class TestUsers(HTTPTestClass):
         cls.ASSERT_CODE(401)
 
 
-async def run(url: str = "http://127.0.0.1:5000/", *, ooe=False):
+def run(
+        url: str = "http://127.0.0.1:5000/",
+        ooe=False,
+        results: list = None,
+        i: int = None
+    ) -> tuple[int, int, int]:
     '''
         Runs all methods of class that start with name test with given url.
+
+        If given a list and an index it dumps the results there too so threads
+        can get results.
     '''
 
-    return TestUsers.run(url=url, only_output_errors=ooe)
+    output = TestUsers.run(url=url, only_output_errors=ooe)
+    if results is not None:
+        results[i] = output
+    return output
 
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
-        asyncio.run(run())
+        run()
     else:
         url = sys.argv[1]
-        asyncio.run(run(url))
+        run(url)
