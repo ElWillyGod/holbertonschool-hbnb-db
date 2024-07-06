@@ -6,6 +6,11 @@
 '''
 
 # Exports
-from persistence.data_manager import DataManager
+import os
 
-dm = DataManager("persistence/storage")
+if os.environ.get('USE_DATABASE', '').lower() == 'true':
+    from persistence.data_manager_db import DataManager
+    dm = DataManager()
+else:
+    from persistence.data_manager_file import DataManager
+    dm = DataManager("persistence/storage")

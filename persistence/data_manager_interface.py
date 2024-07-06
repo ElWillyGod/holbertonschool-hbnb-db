@@ -17,25 +17,25 @@ from abc import abstractmethod, ABC
 class IPersistenceManager(ABC):
 
     @abstractmethod
-    def create(self, entity):
+    def create(self, obj):
         pass
     
     @abstractmethod
-    def read(self, entity_id, entity_type):
+    def read(self, obj):
         pass
 
     @abstractmethod
-    def update(self, entity):
+    def update(self, obj):
         pass
 
     @abstractmethod
-    def delete(self, entity_id, entity_type):
+    def delete(self, obj):
         pass
 
     @abstractmethod
-    def get_all(self, entity_type):
+    def get_all(self, obj_type):
         pass
 
     @abstractmethod
-    def get_by_property(self, entity_type, property_name, property_value):
+    def get_by_property(self, obj_type, property_name, property_value):
         pass

@@ -73,7 +73,8 @@ class LogicFacade(ABC):
 ) -> dict:
         obj = classes.getObjectByName(type)
         obj = obj(id=id, **data)
-        return Persistence.update(obj).toJson()
+        Persistence.update(obj)
+        return Persistence.read(obj).toJson()
 
     @staticmethod
     def createObjectByJson(
@@ -82,9 +83,8 @@ class LogicFacade(ABC):
 ) -> dict:
         obj = classes.getObjectByName(type)
         obj = obj(**data)
-        print('{}'.format(obj.id))
-        return Persistence.create(obj).toJson()
-        # return Persistence.get(id, type)
+        Persistence.create(obj)
+        return Persistence.read(obj).toJson()
 
     @staticmethod
     def getAllCountries() -> dict:
