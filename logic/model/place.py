@@ -27,12 +27,12 @@ class Place(TrackedObject, db.Model):
     longitude = db.Column(db.Float, nullable=False)
     host_id = db.Column(
         db.String(32),
-        db.ForeignKey('user.id'),
+        db.ForeignKey('users.id'),
         nullable=False,
     )
     city_id = db.Column(
         db.String(32),
-        db.ForeignKey('city.id'),
+        db.ForeignKey('cities.id'),
         nullable=False
     )
     amenity_ids = db.relationship(

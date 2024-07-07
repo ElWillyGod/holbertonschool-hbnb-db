@@ -4,10 +4,7 @@
     This abstract class defines common elements and passes them down to most
     other classes.
 '''
-
-from datetime import datetime
 from uuid import uuid4
-from sqlalchemy import Column, String
 from logic import db
 
 class TrackedObject:
@@ -25,12 +22,12 @@ class TrackedObject:
     )
 
     created_at = db.Column(
-         db.DateTime(timezone=True),
-         default=str(db.func.current_timestamp())
+         db.TIMESTAMP(timezone=True),
+         server_default=db.func.current_timestamp()
     )
     updated_at = db.Column(
-         db.DateTime(timezone=True),
-         onupdate=str(db.func.current_timestamp())
+         db.TIMESTAMP(timezone=True),
+         onupdate=db.func.current_timestamp()
     )
 
     def __init__(

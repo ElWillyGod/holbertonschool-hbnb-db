@@ -26,9 +26,9 @@ class User(TObj, db.Model):
             last_name: str = None,
             is_admin: str = None,
             *,
-            id: str = None,
-            created_at: str = None,
-            updated_at: str = None
+            id = None,
+            created_at = None,
+            updated_at = None
         ) -> None:
         super().__init__(id, created_at, updated_at)
         self.email = email
