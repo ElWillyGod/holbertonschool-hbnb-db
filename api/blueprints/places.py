@@ -30,7 +30,7 @@ bp = Blueprint("places", __name__, url_prefix="/places")
 
 
 @bp.get('/')
-@jwt_required(optional=True)
+#@jwt_required(optional=True)
 @swag_from("swagger/places/get_all.yaml")
 def getAllPlaces():
     '''
@@ -38,8 +38,8 @@ def getAllPlaces():
     '''
 
     # Checks if it's authorized to make the request.
-    if err := authlib.notGetAllAuthorized("place", get_jwt()):
-        raise Forbidden(err)
+    #if err := authlib.notGetAllAuthorized("place", get_jwt()):
+    #    raise Forbidden(err)
 
     # Calls BL to get all places.
     places = LogicFacade.getByType('place')

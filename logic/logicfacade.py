@@ -6,10 +6,8 @@
 '''
 
 from abc import ABC
-from datetime import datetime
 
 from logic.model import classes
-from logic.model.classes import getObjectByName
 from logic.model.countrieslib import getCountry, getCountries
 from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
 from logic.model.validationlib import idExists

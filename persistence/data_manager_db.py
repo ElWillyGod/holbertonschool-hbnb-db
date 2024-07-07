@@ -25,7 +25,7 @@ class DataManager(IPersistenceManager):
             retrievs an obj
         """
 
-        return db.session.query(obj.__class__).get(obj.id)
+        return obj.query.filter_by(id=obj.id).first()
 
 
     def update(self, obj) -> Any:
@@ -46,18 +46,17 @@ class DataManager(IPersistenceManager):
             Delete obj
         """
 
-        row = db.session.query(obj.__class__).get(obj.id)
+        row = obj.query.filter_by(id=obj.id).first()
         db.session.delete(row)
         db.session.commit()
 
 
-    def get_all(self, ob_type) -> list[Any]:
+    def get_all(self, obj_type) -> list[Any]:
         """
             Retrieves all entities of a given type.
         """
 
-        return db.session.query(ob_type).all()
-
+        return obj_type.query.all()
 
     def get_by_property(self, obj_type,
                         property_name: str, property_value) -> list[dict]:

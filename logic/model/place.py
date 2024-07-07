@@ -2,13 +2,12 @@
 '''
     Defines the Place Class.
 '''
-
-from logic.model.amenity import Amenity
 from logic.model.trackedobject import TrackedObject
+from logic.model.amenity import Amenity
 from logic import db
 from persistence import dm
 
-place_amenities = db.Table('place_amenities',
+place_amenities = db.Table('place_amenities', db.metadata,
     db.Column('place_id', db.String(255), db.ForeignKey('place.id'), primary_key=True),
     db.Column('amenity_id', db.String(255), db.ForeignKey('amenity.id'), primary_key=True)
 )
@@ -47,8 +46,7 @@ class Place(TrackedObject, db.Model):
     amenity_ids = db.relationship(
         'Amenity',
         secondary=place_amenities,
-        lazy='subquery',
-        backref=db.backref('place', lazy=True)
+        lazy='subquery'
     )
 
     def __init__(
@@ -90,34 +88,13 @@ class Place(TrackedObject, db.Model):
         self.longitude = longitude
         self.city_id = city_id
         self.amenity_ids = []
-        for amenity_id in amenity_ids:
-            self.amenity_ids.append(dm.read(Amenity(id=amenity_id)))
+        if amenity_ids is not None:
+            for amenity_id in amenity_ids:
+                self.amenity_ids.append(dm.read(Amenity(id=amenity_id)))
 
-"""
-class Place(db.Model):
-    '''
-        Place table.
-    '''
-
-    __tablename__ = 'place'
-    __ins = TObj()
-    id = __ins.id
-    created_at = __ins.created_at
-    updated_at = __ins.updated_at
-
-    host_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    cname = Column(String(255), nullable=False)
-    description = Column(String(255), nullable=False)
-    number_of_rooms = Column(Integer, nullable=False)
-    number_of_bathrooms = Column(Integer,  nullable=False)
-    max_guests = Column(Integer, nullable=False)
-    price_per_night = Column(Float, nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
-    city_id = Column(Integer, ForeignKey(City.id), nullable=False)
-
-    def toJson(self):
-        return {column.name: getattr(self, column.name)
-                for column in self.__table__.columns}
-
-"""
+    # Importante
+    def getAllInstanceAttributes(self):
+            columns = {column.name: getattr(self, column.name) for column in self.__table__.columns}
+            if self.amenity_ids is not None:
+                columns["amenity_ids"] = [amenity.id for amenity in self.amenity_ids]
+            return columns
