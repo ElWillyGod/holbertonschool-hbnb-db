@@ -11,7 +11,7 @@ from logic import db
 class DataManager(IPersistenceManager):
 
 
-    def create(self, obj) -> Any:
+    def create(self, obj, is_admin: bool = False) -> Any:
         """
             create register in db
         """
@@ -28,7 +28,7 @@ class DataManager(IPersistenceManager):
         return obj.query.filter_by(id=obj.id).first()
 
 
-    def update(self, obj) -> Any:
+    def update(self, obj, is_admin: bool = False) -> Any:
         """
             Update an obj
         """
@@ -41,7 +41,7 @@ class DataManager(IPersistenceManager):
         db.session.commit()
 
 
-    def delete(self, obj) -> None:
+    def delete(self, obj, is_admin: bool = False) -> None:
         """
             Delete obj
         """

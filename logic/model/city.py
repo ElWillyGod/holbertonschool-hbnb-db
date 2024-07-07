@@ -14,7 +14,6 @@ class City(TrackedObject, db.Model):
 
     __tablename__ = 'cities'
 
-
     name = db.Column(
         db.String(128),
         nullable=False

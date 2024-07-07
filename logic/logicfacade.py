@@ -10,7 +10,7 @@ from abc import ABC
 from logic.model import classes
 from logic.model.countrieslib import getCountry, getCountries
 from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
-from logic.model.validationlib import idExists, validation_manager
+from logic.model.validationlib import idExists, validationManager
 from persistence import dm as Persistence
 
 
@@ -58,34 +58,43 @@ class LogicFacade(ABC):
     @staticmethod
     def deleteByID(
         id: str,
-        type: str
+        type: str,
+        email: str = "",
+        is_admin: bool = False
 ) -> None:
         obj = classes.getObjectByName(type)
+        obj.checkThatItCanBeModifiedBy(id, email, is_admin)
         Persistence.delete(obj(id=id))
 
     @staticmethod
     def updateByID(
         id: str,
         type: str,
-        data: dict
+        data: dict,
+        email: str = "",
+        is_admin: bool = False
 ) -> dict:
         obj = classes.getObjectByName(type)
+        obj.checkThatItCanBeModifiedBy(id, email, is_admin)
         obj = obj(id=id, **data)
         if not (idExists(obj)):
             raise IDNotFoundError("id not found")
-        validation_manager(obj)
-        Persistence.update(obj)
+        validationManager(obj)
+        Persistence.update(obj, is_admin)
         return Persistence.read(obj).toJson()
 
     @staticmethod
     def createObjectByJson(
         type: str,
-        data: dict
+        data: dict,
+        email: str = "",
+        is_admin: bool = False
 ) -> dict:
         obj = classes.getObjectByName(type)
+        obj.checkThatItCanBeCreatedBy(data, email, is_admin)
         obj = obj(**data)
-        validation_manager(obj)
-        Persistence.create(obj)
+        validationManager(obj)
+        Persistence.create(obj, is_admin)
         return Persistence.read(obj).toJson()
 
     @staticmethod

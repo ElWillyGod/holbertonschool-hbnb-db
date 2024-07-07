@@ -40,8 +40,22 @@ class TrackedObject:
         self.updated_at = updated_at
         self.id = str(uuid4().hex) if id is None else id
 
-    def getAllInstanceAttributes(self):
-            return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+    def checkThatItCanBeModifiedBy(
+            self,
+            id: str = "",
+            email: str = "",
+            is_admin: bool = False
+    ) -> None:
+        pass
+
+    def checkThatItCanBeCreatedBy(
+            self,
+            data: dict = {},
+            email: str = "",
+            is_admin: bool = False
+    ) -> None:
+        pass
 
     def toJson(self) -> str:
-        return self.getAllInstanceAttributes()
+        return {column.name: getattr(self, column.name)
+                for column in self.__table__.columns}

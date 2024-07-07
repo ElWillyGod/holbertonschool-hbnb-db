@@ -16,4 +16,4 @@ ENV PORT=8000
 
 EXPOSE $PORT
 
-CMD ["gunicorn"]
+ENTRYPOINT ["gunicorn"]

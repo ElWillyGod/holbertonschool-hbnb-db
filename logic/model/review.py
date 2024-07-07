@@ -5,6 +5,9 @@
 '''
 
 from logic.model.trackedobject import TrackedObject
+from logic.model.logicexceptions import NotOwner
+from logic.model import classes
+from persistence import dm
 from logic import db
 
 class Review(TrackedObject, db.Model):
@@ -50,3 +53,17 @@ class Review(TrackedObject, db.Model):
         self.place_id = place_id
         self.user_id = user_id
         self.comment = comment
+
+    def checkThatItCanBeModifiedBy(
+            self,
+            id: str,
+            email: str,
+            is_admin: bool = False
+    ) -> None:
+        if is_admin:
+            return
+        review: Review = dm.read(Review(id=id))
+        user: classes.User = dm.get_by_property(
+            classes.User, "email", email)[0]
+        if user.id != review.user_id:
+            raise NotOwner("not owner of review")

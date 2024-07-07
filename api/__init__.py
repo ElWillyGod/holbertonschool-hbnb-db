@@ -49,7 +49,17 @@ def appFactory() -> Flask:
 
     # Creates app and adds configs.
     app = Flask(__name__, template_folder='templates')
-    app.config.from_pyfile("settings.py")
+
+    mode = environ.get("MODE")
+    if mode == "testing":
+        app.config.from_object("api.settings.TestingConfig")
+    elif mode == "development":
+        app.config.from_object("api.settings.DevelopmentConfig")
+    else:
+        app.config.from_object("api.settings.ProductionConfig")
+
+    print("SQLALCHEMY_DATABASE_URI =", app.config.get("SQLALCHEMY_DATABASE_URI"))
+
     app.url_map.strict_slashes = False
 
     # Enables Cross-Origin Resource Sharing on all paths.

@@ -37,9 +37,10 @@ class DataManager(IPersistenceManager):
             return os.path.join(self.storage_path,
                                 f"{obj.__tablename__}_{obj.id}.json")
         else:
-            return os.path.join(self.storage_path, f"{obj.__tablename__}.json")
+            return os.path.join(
+                self.storage_path, f"{obj.__tablename__}.json")
 
-    def create(self, obj) -> Any:
+    def create(self, obj, is_admin: bool = False) -> Any:
         """
             Creates an obj.
         """
@@ -48,7 +49,7 @@ class DataManager(IPersistenceManager):
         with open(file_path, 'w') as file:
             json.dump(obj.toJson(), file)
 
-    def read(self, obj) -> None | Any:
+    def read(self, obj, is_admin: bool = False) -> None | Any:
         """
             Retrieves an obj.
         """
@@ -62,7 +63,7 @@ class DataManager(IPersistenceManager):
                 ret = obj.__class__(**data)
             return ret
 
-    def update(self, obj) -> Any:
+    def update(self, obj, is_admin: bool = False) -> Any:
         """
             Update an obj.
         """
@@ -79,7 +80,7 @@ class DataManager(IPersistenceManager):
             json.dump(data, file)
 
 
-    def delete(self, obj) -> None:
+    def delete(self, obj, is_admin: bool = False) -> None:
         """
             Delete an obj.
         """

@@ -11,6 +11,7 @@ class Amenity(TrackedObject, db.Model):
     '''Amenities table'''
 
     __tablename__ = 'amenities'
+
     name = db.Column(
         db.String(64),
         unique=True,

@@ -8,7 +8,7 @@
 # Exports
 import os
 
-if os.environ.get('USE_DATABASE', '').lower() == 'true':
+if os.environ.get('DATABASE_TYPE') == 'mysql':
     from persistence.data_manager_db import DataManager
     dm = DataManager()
 else:

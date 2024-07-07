@@ -122,7 +122,11 @@ def createPlace():
 
     # Calls BL to create place.
     try:
-        place = LogicFacade.createObjectByJson('place', data)
+        jwt = get_jwt()
+        email = jwt.get("email")
+        is_admin = jwt.get("is_admin")
+        place = LogicFacade.createObjectByJson(
+            'place', data, email, is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
 
@@ -176,7 +180,11 @@ def updatePlace(place_id):
 
     # Calls BL to update place.
     try:
-        place = LogicFacade.updateByID(place_id, 'place', data)
+        jwt = get_jwt()
+        email = jwt.get("email")
+        is_admin = jwt.get("is_admin")
+        place = LogicFacade.updateByID(
+            place_id, 'place', data, email, is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
 
@@ -201,7 +209,10 @@ def deletePlace(place_id):
 
     # Calls BL to delete place.
     try:
-        LogicFacade.deleteByID(place_id, 'place')
+        jwt = get_jwt()
+        email = jwt.get("email")
+        is_admin = jwt.get("is_admin")
+        LogicFacade.deleteByID(place_id, 'place', email, is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
 

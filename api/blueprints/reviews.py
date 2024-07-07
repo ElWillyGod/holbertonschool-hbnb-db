@@ -137,10 +137,14 @@ def createReview(place_id):
 
     # Calls BL to create review.
     try:
-        review = LogicFacade.createObjectByJson('review', data)
-    except (logicexceptions.IDNotFoundError) as err:
+        jwt = get_jwt()
+        email = jwt.get("email")
+        is_admin = jwt.get("is_admin")
+        review = LogicFacade.createObjectByJson(
+            'review', data, email, is_admin)
+    except logicexceptions.IDNotFoundError as err:
         raise NotFound(str(err))
-    except (logicexceptions.TryingToReviewOwnPlace) as err:
+    except logicexceptions.TryingToReviewOwnPlace as err:
         raise BadRequest(str(err))
 
     return review, 201
@@ -172,12 +176,17 @@ def updateReview(review_id):
 
     # Calls BL to update review.
     try:
+        jwt = get_jwt()
+        email = jwt.get("email")
+        is_admin = jwt.get("is_admin")
         review = LogicFacade.updateByID(
-            review_id, 'review', data)
-    except (logicexceptions.IDNotFoundError) as err:
+            review_id, 'review', data, email, is_admin)
+    except logicexceptions.IDNotFoundError as err:
         raise NotFound(str(err))
-    except (logicexceptions.TryingToReviewOwnPlace) as err:
+    except logicexceptions.TryingToReviewOwnPlace as err:
         raise BadRequest(str(err))
+    except logicexceptions.NotOwner as err:
+        raise Forbidden(str(err))
 
     return review, 200
 
@@ -200,8 +209,13 @@ def deleteReview(review_id):
 
     # Calls BL to delete review.
     try:
-        LogicFacade.deleteByID(review_id, 'review')
+        jwt = get_jwt()
+        email = jwt.get("email")
+        is_admin = jwt.get("is_admin")
+        LogicFacade.deleteByID(review_id, 'review', email, is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
+    except logicexceptions.NotOwner as err:
+        raise Forbidden(str(err))
 
     return "", 204

@@ -12,10 +12,13 @@ from logic.model.country import Country
 from logic.model.place import Place
 from persistence import dm
 from logic.model.countrieslib import getCountries
-from logic.model.logicexceptions import AmenityNameDuplicated, EmailDuplicated, CityNameDuplicated, CountryNotFoundError, IDNotFoundError, TryingToReviewOwnPlace
+from logic.model.logicexceptions import *
 
 
-def validation_manager(obj):
+def validationManager(obj):
+    '''
+        Validates stuff
+    '''
 
     if obj.__class__ == Amenity:
         isAmenityDuplicated(obj)
@@ -37,18 +40,19 @@ def validation_manager(obj):
         if not (idExists(User(id=obj.user_id))):
             raise IDNotFoundError("user_id doesn't pair with a user")
 
-        # if isOwnerIDTheSame(Place(id=obj.place_id), User(id=obj.user_id)):
-            # raise TryingToReviewOwnPlace("you cannot review your own place")
+        if isOwnerIDTheSame(Place(id=obj.place_id), User(id=obj.user_id)):
+            raise TryingToReviewOwnPlace("you cannot review your own place")
 
     if obj.__class__ == Place:
 
         if not idExists(User(id=obj.host_id)):
             raise IDNotFoundError("host_id does not exist")
-        if not idExists(City(obj.city_id)):
+        if not idExists(City(id=obj.city_id)):
             raise IDNotFoundError("city_id does not exist")
-        # for id in amenity_ids:
-            # if not idExists(id, "amenities"):
-                # raise IDNotFoundError(f"'{id}' in amenity_ids does not exist")
+        for amenity in obj.amenity_ids:
+            if not idExists(amenity):
+                raise IDNotFoundError(
+                    f"'{amenity.id}' in amenity_ids does not exist")
 
 
 def idExists(obj) -> bool:
@@ -63,51 +67,51 @@ def idExists(obj) -> bool:
 
     return True
 
-def isUserEmailDuplicated(obj):
+def isUserEmailDuplicated(user):
     '''
         Calls persistance layer to see if a user has the same email.
     '''
 
-    call = dm.get_by_property(obj.__class__, "email", obj.email)
+    call = dm.get_by_property(user.__class__, "email", user.email)
 
     if not (call is None or len(call) == 0):
         raise EmailDuplicated("email already exists")
 
 
 
-def isAmenityDuplicated(obj):
+def isAmenityDuplicated(amenity):
     '''
         Calls persistance layer to see if a user has the same email.
     '''
 
-    call = dm.get_by_property(obj.__class__, "name", obj.name)
+    call = dm.get_by_property(amenity.__class__, "name", amenity.name)
 
     if not (call is None or len(call) == 0):
         raise AmenityNameDuplicated("amenity already exists")
 
 
-def isCityNameDuplicated(obj):
+def isCityNameDuplicated(city):
     '''
         Calls persistance layer to see if a city has the same name.
     '''
 
-    call = dm.get_by_property(obj.__class__, "country_code", obj.country_code)
+    call = dm.get_by_property(city, "country_code", city.country_code)
 
     for city in call:
-        if city["name"] == obj.name:
+        if city.name == city.name:
                 raise CityNameDuplicated(
-                    f"{obj.name} already exists in {obj.country_code}")
+                    f"{city.name} already exists in {city.country_code}")
 
 
-def isOwnerIDTheSame(objPlace, objUser) -> bool:
+def isOwnerIDTheSame(place, user) -> bool:
     '''
         Calls persistance layer to compare the owner id of a place with the
         given id.
     '''
 
-    call = dm.read(objPlace)
+    place = dm.read(place)
 
-    return call["host_id"] == objUser.id
+    return place.host_id == user.id
 
 
 def doesCountryExist(obj):

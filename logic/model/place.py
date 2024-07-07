@@ -2,6 +2,9 @@
 '''
     Defines the Place Class.
 '''
+
+from logic.model import classes
+from logic.model.logicexceptions import NotOwner
 from logic.model.trackedobject import TrackedObject
 from logic.model.amenity import Amenity
 from logic import db
@@ -84,8 +87,22 @@ class Place(TrackedObject, db.Model):
             for amenity_id in amenity_ids:
                 self.amenity_ids.append(dm.read(Amenity(id=amenity_id)))
 
+    def checkThatItCanBeModifiedBy(
+            self,
+            id: str,
+            email: str,
+            is_admin: bool = False
+    ) -> None:
+        if is_admin:
+            return
+        review: Place = dm.read(Place(id=id))
+        user: classes.User = dm.get_by_property(
+            classes.User, "email", email)[0]
+        if user.id != review.user_id:
+            raise NotOwner("not owner of place")
+
     # Importante
-    def getAllInstanceAttributes(self):
+    def toJson(self):
             columns = {column.name: getattr(self, column.name) for column in self.__table__.columns}
             if self.amenity_ids is not None:
                 columns["amenity_ids"] = [amenity.id for amenity in self.amenity_ids]
