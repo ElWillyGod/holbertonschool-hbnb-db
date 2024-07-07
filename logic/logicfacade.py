@@ -10,7 +10,7 @@ from abc import ABC
 from logic.model import classes
 from logic.model.countrieslib import getCountry, getCountries
 from logic.model.logicexceptions import IDNotFoundError, EmailNotFoundError
-from logic.model.validationlib import idExists
+from logic.model.validationlib import idExists, validation_manager
 from persistence import dm as Persistence
 
 
@@ -71,6 +71,9 @@ class LogicFacade(ABC):
 ) -> dict:
         obj = classes.getObjectByName(type)
         obj = obj(id=id, **data)
+        if not (idExists(obj)):
+            raise IDNotFoundError("id not found")
+        validation_manager(obj)
         Persistence.update(obj)
         return Persistence.read(obj).toJson()
 
@@ -81,6 +84,7 @@ class LogicFacade(ABC):
 ) -> dict:
         obj = classes.getObjectByName(type)
         obj = obj(**data)
+        validation_manager(obj)
         Persistence.create(obj)
         return Persistence.read(obj).toJson()
 
@@ -100,7 +104,7 @@ class LogicFacade(ABC):
 
     @staticmethod
     def getReviewsOfPlace(id: str) -> dict:
-        if not idExists(id, 'places'):
+        if not idExists(classes.Place(id=id)):
             raise IDNotFoundError("id not found")
         return Persistence.get_by_property(
             classes.Review, "id", id
