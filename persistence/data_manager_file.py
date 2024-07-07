@@ -102,7 +102,6 @@ class DataManager(IPersistenceManager):
         for file_path in files:
                 with open(file_path, 'r') as file:
                     data = json.load(file)
-                    print(data)
                     data = obj_type(**data)
                     entities.append(data)
         return entities
@@ -115,5 +114,5 @@ class DataManager(IPersistenceManager):
 
         all_entities = self.get_all(obj)
         matched_entities = [entity for entity in all_entities
-                            if entity.get(property_name) == property_value]
+                            if getattr(entity, property_name) == property_value]
         return matched_entities
