@@ -29,6 +29,6 @@ def handleCats(desc: str, code: int) -> Response:
     '''
 
     if RETURN_CAT == "true":
-        return make_response(render_template("error.html", code=code), code)
+        return make_response(render_template("error.html", code=code, text=desc), code)
     else:
         return make_response({"error": desc}, code)

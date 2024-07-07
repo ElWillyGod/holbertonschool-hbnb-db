@@ -8,21 +8,22 @@ from logic.model.trackedobject import TrackedObject
 from logic import db
 
 class Review(TrackedObject, db.Model):
+    '''Reviews table'''
 
-    __tablename__ = 'review'
+    __tablename__ = 'reviews'
 
-    place_id = db.Column(db.Integer,
-                     db.ForeignKey('place.id'),
-                     nullable=False,
-                     unique=True)
-
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('user.id'),
+    place_id = db.Column(
+        db.String(32),
+        db.ForeignKey('places.id'),
         nullable=False,
         unique=True
     )
-
+    user_id = db.Column(
+        db.String(32),
+        db.ForeignKey('users.id'),
+        nullable=False,
+        unique=True
+    )
     rating = db.Column(db.Integer, nullable=False)
 
     def __init__(
@@ -44,30 +45,8 @@ class Review(TrackedObject, db.Model):
             raise IDNotFoundError("user_id doesn't pair with a user")
         if isOwnerIDTheSame(place_id, user_id):
             raise TryingToReviewOwnPlace("you cannot review your own place")
-            """
+        """
         self.rating = rating
         self.place_id = place_id
         self.user_id = user_id
         self.comment = comment
-
-"""
-class Review(db.Model):
-    '''
-        Review table.
-    '''
-
-    __tablename__ = 'review'
-    __ins = TObj()
-    id = __ins.id
-    created_at = __ins.created_at
-    updated_at = __ins.updated_at
-
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
-    place_id = db.Column(db.Integer, db.ForeignKey(Place.id), nullable=False)
-    rating = db.Column(db.Integer, nullable=False)
-
-    def toJson(self):
-        return {column.name: getattr(self, column.name)
-                for column in self.__table__.columns}
-
-"""

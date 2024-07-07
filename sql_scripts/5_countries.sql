@@ -1,4 +1,6 @@
-INSERT IGNORE INTO countries (code, name)
+USE hbnb;
+
+INSERT IGNORE INTO `countries` (code, name)
 VALUES
 ('AF','Afghanistan'),
 ('AX','Åland Islands'),

@@ -8,38 +8,30 @@ from logic import db
 from persistence import dm
 
 place_amenities = db.Table('place_amenities', db.metadata,
-    db.Column('place_id', db.String(255), db.ForeignKey('place.id'), primary_key=True),
-    db.Column('amenity_id', db.String(255), db.ForeignKey('amenity.id'), primary_key=True)
+    db.Column('place_id', db.String(32), db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.String(32), db.ForeignKey('amenities.id'), primary_key=True)
 )
 
 class Place(TrackedObject, db.Model):
+    '''Places table'''
 
-    __tablename__ = 'place'
+    __tablename__ = 'places'
 
-
+    name = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.String(1024), nullable=False)
+    number_of_rooms = db.Column(db.Integer, nullable=False)
+    number_of_bathrooms = db.Column(db.Integer, nullable=False)
+    max_guests = db.Column(db.Integer, nullable=False)
+    price_per_night = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
     host_id = db.Column(
-        db.Integer,
+        db.String(32),
         db.ForeignKey('user.id'),
         nullable=False,
     )
-    name = db.Column(db.String(255), nullable=False)
-
-    description = db.Column(db.String(255), nullable=False)
-
-    number_of_rooms = db.Column(db.Integer, nullable=False)
-
-    number_of_bathrooms = db.Column(db.Integer, nullable=False)
-
-    max_guests = db.Column(db.Integer, nullable=False)
-
-    price_per_night = db.Column(db.Float, nullable=False)
-
-    latitude = db.Column(db.Float, nullable=False)
-
-    longitude = db.Column(db.Float, nullable=False)
-
     city_id = db.Column(
-        db.Integer,
+        db.String(32),
         db.ForeignKey('city.id'),
         nullable=False
     )

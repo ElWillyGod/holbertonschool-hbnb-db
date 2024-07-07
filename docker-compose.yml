@@ -2,19 +2,23 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:8.0
     container_name: mysql_db
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: hbnb
+    image: mysql:8.4
+    env_file:
+      - ./sql_scripts/.env
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./sql_scripts/tables.sql:/docker-entrypoint-initdb.d/tables.sql
-      - ./sql_scripts/amenities.sql:/docker-entrypoint-initdb.d/amenities.sql
+      - ./sql_scripts/config-file.cnf:/etc/mysql/conf.d/config-file.cnf
+      - ./sql_scripts/1_tables.sql:/docker-entrypoint-initdb.d/1_tables.sql
+      - ./sql_scripts/2_connection.sql:/docker-entrypoint-initdb.d/2_connection.sql
+      - ./sql_scripts/3_admins.sql:/docker-entrypoint-initdb.d/3_admins.sql
+      - ./sql_scripts/4_amenities.sql:/docker-entrypoint-initdb.d/4_amenities.sql
+      - ./sql_scripts/5_countries.sql:/docker-entrypoint-initdb.d/5_countries.sql
+
   nginx:
+    container_name: nginx_proxy
     restart: always
     image: nginx:1-alpine
     ports:
@@ -25,14 +29,12 @@ services:
       - web
 
   web:
-    build: .
     container_name: web_app
+    build: .
     ports:
       - "8000:8000"
-    environment:
-      - SECRET_KEY=dh72h3f98dj18z2377a2d9h82f91fdd9d8kwq9990sidqjwdjoj2fhsl241
-      - DATABASE_TYPE=mysql
-      - DATABASE_URL=mysql+mysqlconnector://root:root@0.0.0.0/hbnb
+    env_file:
+      - .env
     depends_on:
       - db
 
