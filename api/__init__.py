@@ -58,8 +58,6 @@ def appFactory() -> Flask:
     else:
         app.config.from_object("api.settings.ProductionConfig")
 
-    print("SQLALCHEMY_DATABASE_URI =", app.config.get("SQLALCHEMY_DATABASE_URI"))
-
     app.url_map.strict_slashes = False
 
     # Enables Cross-Origin Resource Sharing on all paths.

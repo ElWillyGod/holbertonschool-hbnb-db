@@ -55,7 +55,7 @@ class TestPlaces(HTTPTestClass):
             Creates city to create place.
         '''
 
-        cls.FROM(f"cities/valid_city_{num}.json")
+        cls.FROM(f"cities/city_{num}.json")
         cls.POST("/cities")
         cls.ASSERT_CODE(201)
         city_id = cls.GET_RESPONSE_VALUE("id")
@@ -68,7 +68,7 @@ class TestPlaces(HTTPTestClass):
             Creates user to host place.
         '''
 
-        cls.FROM(f"users/valid_user_{num}.json")
+        cls.FROM(f"users/user_{num}.json")
         cls.POST("/users")
         cls.ASSERT_CODE(201)
         user_id = cls.GET_RESPONSE_VALUE("id")
@@ -81,7 +81,7 @@ class TestPlaces(HTTPTestClass):
             Creates amenity to create place.
         '''
 
-        cls.FROM(f"amenities/valid_amenity_{num}.json")
+        cls.FROM(f"amenities/amenity_{num}.json")
         cls.POST("/amenities")
         cls.ASSERT_CODE(201)
         return cls.GET_RESPONSE_VALUE("id")
@@ -136,7 +136,7 @@ class TestPlaces(HTTPTestClass):
         amenity_ids = cls.createAmenities(number_of_amenities)
 
         # Take dict from json number num
-        cls.FROM(f"places/valid_place_{num}.json")
+        cls.FROM(f"places/place_{num}.json")
 
         # Assign ids to place json
         cls.SET_VALUE("host_id", host_id)
@@ -196,22 +196,30 @@ class TestPlaces(HTTPTestClass):
             Deletes a place using either args or class attributes.
         '''
 
-        place_id = place_id if place_id is not None else cls.place.get("id")
+        if place_id is None:
+            if cls.place is not None:
+                place_id = cls.place.get("id")
         if place_id is not None:
             cls.DELETE(f"/users/{host_id}")
             cls.ASSERT_CODE(204)
             cls.place = None
-        host_id = host_id if host_id is not None else cls.host_id
+        if host_id is None:
+            if cls.host_id is not None:
+                host_id = cls.host_id
         if host_id is not None:
             cls.DELETE(f"/users/{host_id}")
             cls.ASSERT_CODE(204)
             cls.host_id = None
-        city_id = city_id if city_id is not None else cls.city_id
+        if city_id is None:
+            if cls.city_id is not None:
+                city_id = cls.city_id
         if city_id is not None:
             cls.DELETE(f"/cities/{city_id}")
             cls.ASSERT_CODE(204)
             cls.city_id = None
-        amenity_ids = amenity_ids if amenity_ids else cls.amenity_ids
+        if amenity_ids is None:
+            if cls.amenity_ids is not None:
+                amenity_ids = cls.amenity_ids
         if amenity_ids is not None:
             for amenity_id in amenity_ids:
                 cls.DELETE(f"/amenities/{amenity_id}")

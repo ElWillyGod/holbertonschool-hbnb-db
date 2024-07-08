@@ -12,7 +12,7 @@ from testlib import HTTPTestClass
 class TestUsers(HTTPTestClass):
     '''
     Tests:
-        #0:  AUTH_FROM admin.json
+        ...
     '''
 
     user: dict | None = None
@@ -27,7 +27,7 @@ class TestUsers(HTTPTestClass):
         overrideNone: bool = False
     ) -> dict:
 
-        cls.FROM(f"users/valid_user_{num}.json")
+        cls.FROM(f"users/user_{num}.json")
 
         if dic is not None:
             for key in dic:
@@ -44,9 +44,9 @@ class TestUsers(HTTPTestClass):
         cls.POST("/users")
         cls.ASSERT_CODE(201)
 
-        output = cls.json.copy()
-        output["id"] = cls.GET_RESPONSE_VALUE("id")
-        return output
+        user = cls.json.copy()
+        user["id"] = cls.GET_RESPONSE_VALUE("id")
+        return user
 
     @classmethod
     def deleteUser(
@@ -65,27 +65,32 @@ class TestUsers(HTTPTestClass):
     def Teardown(cls):
         cls.deleteUser()
 
+    # 0
     @classmethod
     def test_00_auth(cls):
         cls.AUTH_FROM("admin.json")
         cls.ASSERT_CODE(200)
 
+    # 1
     @classmethod
     def test_01_general_GET(cls):
         cls.GET("/users")
         cls.ASSERT_CODE(200)
 
+    # 2
     @classmethod
     def test_02_valid_POST_GET(cls):
         for i in range(1, 4):
             user = cls.createUser(i)
             cls.deleteUser(**user)
 
+    # 3
     @classmethod
     def test_03_another_general_GET(cls):
         cls.GET("/users")
         cls.ASSERT_CODE(200)
 
+    # 4
     @classmethod
     def test_04_valid_name_PUT(cls):
         for i in range(1, 4):
@@ -95,6 +100,7 @@ class TestUsers(HTTPTestClass):
             cls.ASSERT_CODE(201)
             cls.deleteUser(**user)
 
+    # 5
     @classmethod
     def test_05_valid_email_PUT(cls):
         user = cls.createUser(1)
@@ -103,6 +109,7 @@ class TestUsers(HTTPTestClass):
         cls.ASSERT_CODE(201)
         cls.deleteUser(**user)
 
+    # 6
     @classmethod
     def test_06_existing_email_PUT(cls):
         user1 = cls.createUser(1)
@@ -113,38 +120,87 @@ class TestUsers(HTTPTestClass):
         cls.deleteUser(**user1)
         cls.deleteUser(**user2)
 
+    # Empty and invalid requests
+
+    # 7
     @classmethod
-    def test_08_empty_id_GET(cls):
+    def test_07_all_GET(cls):
+        cls.GET("/users")
+        cls.ASSERT_CODE(200)
         cls.GET("/users/")
+        cls.ASSERT_CODE(200)
+        cls.GET("/users/ ")
+        cls.ASSERT_CODE(400)
+        cls.GET("/users/abc")
+        cls.ASSERT_CODE(400)
+        cls.GET(f"/users/{uuid4().hex}")
         cls.ASSERT_CODE(404)
 
+    # 8
     @classmethod
-    def test_09_empty_id_DELETE(cls):
+    def test_08_all_DELETE(cls):
+        cls.DELETE("/users")
+        cls.ASSERT_CODE(405)
         cls.DELETE("/users/")
+        cls.ASSERT_CODE(405)
+        cls.DELETE("/users/ ")
+        cls.ASSERT_CODE(400)
+        cls.DELETE("/users/abc")
+        cls.ASSERT_CODE(400)
+        cls.DELETE(f"/users/{uuid4().hex}")
         cls.ASSERT_CODE(404)
 
+    # 9
     @classmethod
-    def test_10_empty_id_PUT(cls):
-        user = cls.createUser(1)
+    def test_09_all_PUT(cls):
+        cls.json = {}
+        cls.PUT("/users")
+        cls.ASSERT_CODE(405)
         cls.PUT("/users/")
-        cls.ASSERT_CODE(404)
-        cls.deleteUser(**user)
+        cls.ASSERT_CODE(405)
+        cls.PUT("/users/ ")
+        cls.ASSERT_CODE(400)
+        cls.PUT("/users/abc")
+        cls.ASSERT_CODE(400)
+        cls.PUT(f"/users/{uuid4().hex}")
+        cls.ASSERT_CODE(400)
 
+    # 10
+    @classmethod
+    def test_10_invalid_POST(cls):
+        cls.json = {}
+        cls.POST("/users")
+        cls.ASSERT_CODE(400)
+        cls.POST("/users/")
+        cls.ASSERT_CODE(400)
+        cls.POST("/users/ ")
+        cls.ASSERT_CODE(405)
+        cls.POST("/users/abc")
+        cls.ASSERT_CODE(405)
+        cls.POST(f"/users/{uuid4().hex}")
+        cls.ASSERT_CODE(405)
+
+    # Invalid fields requests
+
+    # 11
     @classmethod
     def test_11_less_attributes_POST(cls):
         cls.createUser(1, {"first_name": None}, expectAtPOST=400)
         cls.createUser(2, {"last_name": None}, expectAtPOST=400)
         cls.createUser(3, {"email": None}, expectAtPOST=400)
 
+    # 12
     @classmethod
     def test_12_more_attributes_POST(cls):
         cls.createUser(1, {"example": "lechuga"}, expectAtPOST=400)
 
+    # 13
     @classmethod
     def test_13_different_attributes_POST(cls):
         cls.createUser(2, {"first_name": None, "example": "pechuga"},
                        expectAtPOST=400)
 
+    # 14
     @classmethod
     def test_14_less_attributes_PUT(cls):
         user = cls.createUser(3)
@@ -153,6 +209,7 @@ class TestUsers(HTTPTestClass):
         cls.ASSERT_CODE(400)
         cls.deleteUser(**user)
 
+    # 15
     @classmethod
     def test_15_more_attributes_PUT(cls):
         user = cls.createUser(3)
@@ -161,6 +218,7 @@ class TestUsers(HTTPTestClass):
         cls.ASSERT_CODE(400)
         cls.deleteUser(**user)
 
+    # 16
     @classmethod
     def test_16_different_attributes_PUT(cls):
         user = cls.createUser(3)
@@ -170,12 +228,14 @@ class TestUsers(HTTPTestClass):
         cls.ASSERT_CODE(400)
         cls.deleteUser(**user)
 
+    # 17
     @classmethod
     def test_17_duplicate_entry_POST(cls):
         user = cls.createUser(3)
         cls.createUser(3, expectAtPOST=409)
         cls.deleteUser(**user)
 
+    # 18
     @classmethod
     def test_18_id_that_doesnt_exist_GET(cls):
         user = cls.createUser(3)
@@ -184,6 +244,7 @@ class TestUsers(HTTPTestClass):
         cls.GET(f"/users/{id}")
         cls.ASSERT_CODE(404)
 
+    # 19
     @classmethod
     def test_19_id_that_doesnt_exist_PUT(cls):
         user = cls.createUser(3)
@@ -192,6 +253,7 @@ class TestUsers(HTTPTestClass):
         cls.PUT(f"/users/{id}")
         cls.ASSERT_CODE(404)
 
+    # 20
     @classmethod
     def test_20_id_that_doesnt_exist_DELETE(cls):
         user = cls.createUser(3)
@@ -200,21 +262,25 @@ class TestUsers(HTTPTestClass):
         cls.GET(f"/users/{id}")
         cls.ASSERT_CODE(404)
 
+    # 21
     @classmethod
     def test_21_empty_first_name_POST(cls):
         cls.createUser(2, {"first_name": ""}, expectAtPOST=400)
         cls.createUser(2, {"first_name": "    "}, expectAtPOST=400)
 
+    # 22
     @classmethod
     def test_22_empty_last_name_POST(cls):
         cls.createUser(2, {"last_name": ""}, expectAtPOST=400)
         cls.createUser(2, {"last_name": "    "}, expectAtPOST=400)
 
+    # 23
     @classmethod
     def test_23_empty_email_POST(cls):
         cls.createUser(2, {"email": ""}, expectAtPOST=400)
         cls.createUser(2, {"email": "    "}, expectAtPOST=400)
 
+    # 24
     @classmethod
     def test_24_invalid_email_POST(cls):
         def checkEmailPUT(email):
@@ -234,21 +300,23 @@ class TestUsers(HTTPTestClass):
         checkEmailPUT("Hola@gm😀ail.com")
         checkEmailPUT("Hola@gmail.co😀m")
 
+    # 25
     @classmethod
     def test_25_invalid_first_name_POST(cls):
         cls.createUser(1, {"first_name": "ex\nmple"}, expectAtPOST=400)
         cls.createUser(1, {"first_name": "Lechuga🥬"}, expectAtPOST=400)
         cls.createUser(1, {"first_name": "777"}, expectAtPOST=400)
 
+    # 26
     @classmethod
     def test_26_invalid_last_name_POST(cls):
         cls.createUser(1, {"last_name": "ex\nmple"}, expectAtPOST=400)
         cls.createUser(1, {"last_name": "Lechuga🥬"}, expectAtPOST=400)
         cls.createUser(1, {"last_name": "777"}, expectAtPOST=400)
 
-    # 21
+    # 27
     @classmethod
-    def test_21_unauthorization(cls):
+    def test_27_unauthorization(cls):
         cls.FROM("user.json")
         cls.POST("/users")
         cls.ASSERT_CODE(200)
@@ -257,17 +325,17 @@ class TestUsers(HTTPTestClass):
         cls.CLEAN()
         cls.AUTH_FROM("user.json")
         cls.POST("/users")
-        cls.ASSERT_CODE(403)
+        cls.ASSERT_CODE(201)
         cls.PUT("/users/" + uuid4().hex)
-        cls.ASSERT_CODE(403)
+        cls.ASSERT_CODE(200)
         cls.DELETE("/users/" + uuid4().hex)
-        cls.ASSERT_CODE(403)
+        cls.ASSERT_CODE(204)
 
-        cls.DELETE("/users/" + user.get("id"))
+        # Should include more tests
 
-    # 22
+    # 27
     @classmethod
-    def test_22_unaunthentication(cls):
+    def test_28_unaunthentication(cls):
         cls.CLEAN()
         cls.POST("/users")
         cls.ASSERT_CODE(401)

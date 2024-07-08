@@ -54,7 +54,7 @@ class TestAmenities(HTTPTestClass):
             overrideNone: bool = False
     ) -> dict:
 
-        cls.FROM(f"amenities/valid_amenity_{filenum}.json")
+        cls.FROM(f"amenities/amenity_{filenum}.json")
 
         if dic is not None:
             for key in dic:
@@ -89,7 +89,7 @@ class TestAmenities(HTTPTestClass):
         dic: dict = {},
         expected_code: int = 200
     ) -> None:
-        cls.FROM(f"amenities/valid_amenity_{filenum}.json")
+        cls.FROM(f"amenities/amenity_{filenum}.json")
         for key in dic:
             cls.SET_VALUE(key, dic[key])
         cls.PUT("/amenities/" + id)
@@ -130,7 +130,7 @@ class TestAmenities(HTTPTestClass):
     # 2
     @classmethod
     def test_02_valid_POST_GET_DELETE(cls):
-        for i in range(1, 4):
+        for i in range(1, 6):
             amenity = cls.createAmenity(i)
             cls.deleteAmenity(**amenity)
 
@@ -143,7 +143,7 @@ class TestAmenities(HTTPTestClass):
     # 4
     @classmethod
     def test_04_valid_name_PUT(cls):
-        for i in range(1, 4):
+        for i in range(1, 6):
             amenity = cls.createAmenity(i)
             cls.SET_VALUE("name", amenity["name"] + "UPDATED")
             cls.PUT("/amenities/" + amenity["id"])
@@ -294,7 +294,7 @@ class TestAmenities(HTTPTestClass):
         amenity_1 = cls.createAmenity(1)
         amenity_2 = cls.createAmenity(2)
 
-        cls.FROM("amenities/valid_amenity_1.json")
+        cls.FROM("amenities/amenity_1.json")
         cls.PUT("/amenities/" + amenity_2["id"])
         if cls.last_response.status_code != 409:
             cls.deleteAmenity(**amenity_1)

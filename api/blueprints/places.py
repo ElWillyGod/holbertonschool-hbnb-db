@@ -14,7 +14,6 @@
         @PUT /places/{place_id}: Update an existing place's information.
 
         @DELETE /places/{place_id}: Delete a specific place.
-    TODO: 409 does not get raise on POST and PUT
 '''
 
 from flask import request, Blueprint
@@ -30,7 +29,7 @@ bp = Blueprint("places", __name__, url_prefix="/places")
 
 
 @bp.get('/')
-#@jwt_required(optional=True)
+@jwt_required(optional=True)
 @swag_from("swagger/places/get_all.yaml")
 def getAllPlaces():
     '''
@@ -38,8 +37,8 @@ def getAllPlaces():
     '''
 
     # Checks if it's authorized to make the request.
-    #if err := authlib.notGetAllAuthorized("place", get_jwt()):
-    #    raise Forbidden(err)
+    if err := authlib.notGetAllAuthorized("place", get_jwt()):
+        raise Forbidden(err)
 
     # Calls BL to get all places.
     places = LogicFacade.getByType('place')
@@ -187,6 +186,8 @@ def updatePlace(place_id):
             place_id, 'place', data, email, is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
+    except (logicexceptions.NotOwner) as err:
+        raise Forbidden(str(err))
 
     return place, 200
 
@@ -215,5 +216,7 @@ def deletePlace(place_id):
         LogicFacade.deleteByID(place_id, 'place', email, is_admin)
     except (logicexceptions.IDNotFoundError) as err:
         raise NotFound(str(err))
+    except (logicexceptions.NotOwner) as err:
+        raise Forbidden(str(err))
 
     return "", 204

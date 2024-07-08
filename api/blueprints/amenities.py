@@ -71,7 +71,7 @@ def getAmenity(amenity_id):
 
 
 @bp.post('/')
-# @jwt_required(optional=False)
+@jwt_required(optional=False)
 @swag_from("swagger/amenities/post.yaml")
 def createAmenity():
     """
@@ -79,8 +79,8 @@ def createAmenity():
     """
 
     # Checks if it's authorized to make the request.
-    # if err := authlib.notPostAuthorized("amenity", get_jwt()):
-        # raise Forbidden(err)
+    if err := authlib.notPostAuthorized("amenity", get_jwt()):
+        raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
@@ -100,7 +100,7 @@ def createAmenity():
 
 
 @bp.put('/<amenity_id>')
-#@jwt_required(optional=False)
+@jwt_required(optional=False)
 @swag_from("swagger/amenities/put.yaml")
 def updateAmenity(amenity_id):
     """
@@ -108,8 +108,8 @@ def updateAmenity(amenity_id):
     """
 
     # Checks if it's authorized to make the request.
-    #if err := authlib.notPutAuthorized("amenity", get_jwt()):
-    #    raise Forbidden(err)
+    if err := authlib.notPutAuthorized("amenity", get_jwt()):
+        raise Forbidden(err)
 
     # Get data from request.
     data = request.get_json()
@@ -133,7 +133,7 @@ def updateAmenity(amenity_id):
 
 
 @bp.delete('/<amenity_id>')
-#@jwt_required(optional=False)
+@jwt_required(optional=False)
 @swag_from("swagger/amenities/delete.yaml")
 def deleteAmenity(amenity_id):
     """
@@ -141,8 +141,8 @@ def deleteAmenity(amenity_id):
     """
 
     # Checks if it's authorized to make the request.
-    #if err := authlib.notDeleteAuthorized("amenity", get_jwt()):
-    #    raise Forbidden(err)
+    if err := authlib.notDeleteAuthorized("amenity", get_jwt()):
+        raise Forbidden(err)
 
     # Try creating amenity in BL layer.
     if not val.idChecksum(amenity_id):

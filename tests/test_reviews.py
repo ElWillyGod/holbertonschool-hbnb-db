@@ -4,6 +4,7 @@
     Defines tests for 'reviews' endpoints.
 '''
 
+from random import randint
 import sys
 from uuid import uuid4
 from testlib import HTTPTestClass
@@ -11,35 +12,8 @@ from testlib import HTTPTestClass
 
 class TestReviews(HTTPTestClass):
     '''
-    ## Amenity tests:
-    - Auth as admin
-        - 0:  AUTH_FROM admin.json
-    - Valid requests
-        - 1:  valid GET all
-        - 2:  valid POST, GET, DELETE
-        - 3:  valid GET all 2
-        - 4:  valid PUT
-    - Empty and invalid requests
-        - 5:  all GET
-        - 6:  all invalid DELETE
-        - 7:  all invalid PUT
-        - 8:  all invalid POST
-    - Invalid fields requests
-        - 9:  less attr POST
-        - 10: more attr POST
-        - 11: diff attr POST
-        - 12: less attr PUT
-        - 13: more attr PUT
-        - 14: diff attr PUT
-    - Invalid data requests
-        - 15: invalid data POST
-        - 16: invalid data PUT
-    - BL requirements tests
-        - 17: duplicate POST
-        - 18: duplicate PUT
-    - Authentication and authorization
-        - 19: unauthentication on POST, PUT, DELETE
-        - 20: unauthorization on POST, PUT, DELETE
+    Tests:
+        ...
     '''
 
     city_id: str | None = None
@@ -52,6 +26,140 @@ class TestReviews(HTTPTestClass):
     review: dict | None = None
 
     @classmethod
+    def createCity(cls, num: int) -> str:
+        '''
+            Creates city to create place.
+        '''
+
+        cls.FROM(f"cities/city_{num}.json")
+        cls.POST("/cities")
+        cls.ASSERT_CODE(201)
+        city_id = cls.GET_RESPONSE_VALUE("id")
+        cls.city_id = city_id
+        return city_id
+
+    @classmethod
+    def createUser(cls, num: int) -> str:
+        '''
+            Creates user to host place.
+        '''
+
+        cls.FROM(f"users/user_{num}.json")
+        cls.POST("/users")
+        cls.ASSERT_CODE(201)
+        user_id = cls.GET_RESPONSE_VALUE("id")
+        cls.host_id = user_id
+        return user_id
+
+    @classmethod
+    def createAmenity(cls, num: int) -> str:
+        '''
+            Creates amenity to create place.
+        '''
+
+        cls.FROM(f"amenities/amenity_{num}.json")
+        cls.POST("/amenities")
+        cls.ASSERT_CODE(201)
+        return cls.GET_RESPONSE_VALUE("id")
+
+    def createAmenities(
+            cls,
+            number_of_amenities: int | None = None
+        ) -> list[str]:
+        '''
+            Creates multiple amenities and returns a list of their ids.
+        '''
+
+        if number_of_amenities is None:
+            number_of_amenities = randint(0, 5)
+        amenity_ids = []
+
+        available = range(1, 6)
+        for _ in range(1, number_of_amenities + 1):
+            if len(available) == 0:
+                break
+            index = randint(0, len(available) - 1)
+            num = available.pop(index)
+            amenity = cls.createAmenity(num)
+            amenity_ids.append(amenity["id"])
+
+        cls.amenity_ids = amenity_ids
+        return amenity_ids
+
+    @classmethod
+    def createPlace(
+        cls,
+        num: int,
+        number_of_amenities: int | None = None,
+        dic: dict | None = None,
+        *,
+        expectAtPOST: int = 201,
+        overrideNone: bool = False
+    ) -> dict:
+        '''
+            Creates a place:
+                -> Creates all the necessary objects to create a place.
+                -> Creates place using POST.
+                -> GETs all places.
+                -> Takes created place via name.
+                -> Asserts that attributes were assigned successfully.
+                -> Returns place w/o created_at or updated_at
+        '''
+
+        # Create external objects
+        host_id = cls.createUser(num)
+        city_id = cls.createCity(num)
+        amenity_ids = cls.createAmenities(number_of_amenities)
+
+        # Take dict from json number num
+        cls.FROM(f"places/place_{num}.json")
+
+        # Assign ids to place json
+        cls.SET_VALUE("host_id", host_id)
+        cls.SET_VALUE("city_id", city_id)
+        cls.SET_VALUE("amenity_ids", amenity_ids)
+
+        # If dic is passed then override attributes.
+        if dic is not None:
+            for key in dic:
+                if dic[key] is None or overrideNone:
+                    cls.REMOVE_VALUE(key)
+                else:
+                    cls.SET_VALUE(key, dic[key])
+
+        # If expected to fail at POST don't continue
+        if expectAtPOST != 201:
+            cls.POST("/places")
+            if cls.last_response.status_code != expectAtPOST:
+                # If 201 delete everything
+                if cls.last_response.status_code == 201:
+                    cls.deletePlace(**cls.GET_RESPONSE_JSON())
+                cls._ASSERT(cls.last_response.status_code, expectAtPOST)
+
+        # POST Place
+        cls.POST("/places")
+
+        # If not 201 delete other objects
+        if cls.last_response.status_code != 201:
+            cls.deletePlace(
+                host_id=host_id,
+                city_id=city_id,
+                amenity_ids=amenity_ids
+            )
+            cls.ASSERT_CODE(201)
+
+        # Copy response
+        place = cls.json.copy()
+        place["amenity_ids"] = amenity_ids.copy()  # Deep copy
+        place["id"] = cls.GET_RESPONSE_VALUE("id")
+        cls.place_id = place.get("id")
+        cls.amenity_ids = amenity_ids
+        cls.host_id = host_id
+        cls.city_id = city_id
+
+        return place
+
+    @classmethod
     def createReview(
             cls,
             filenum: int,
@@ -61,7 +169,10 @@ class TestReviews(HTTPTestClass):
             overrideNone: bool = False
     ) -> dict:
 
-        cls.FROM(f"reviews/valid_review_{filenum}.json")
+        place_id = cls.createPlace.get("id")
+        user_id = cls.createUser(filenum + 1)
+
+        cls.FROM(f"reviews/review_{filenum}.json")
 
         if dic is not None:
             for key in dic:
@@ -82,11 +193,60 @@ class TestReviews(HTTPTestClass):
         if cls.last_response.status_code != 201:
             cls.ASSERT_CODE(201)
 
-        amenity = cls.json.copy()
-        amenity["id"] = cls.GET_RESPONSE_VALUE("id")
-        cls.review = amenity
+        review = cls.json.copy()
+        review["id"] = cls.GET_RESPONSE_VALUE("id")
+        cls.review = review
 
-        return amenity
+        return review
+
+    @classmethod
+    def deleteReview(
+        cls,
+        id: str | None = None,
+        place_id: str | None = None,
+        host_id: str | None = None,
+        city_id: str | None = None,
+        amenity_ids: list[str] | None = None,
+        **kwargs
+    ) -> None:
+        '''
+            Deletes a place using either args or class attributes.
+        '''
+        if id is None:
+            if cls.review is not None:
+                id = cls.review.get("id")
+        if id is not None:
+            cls.DELETE(f"/reviews/{id}")
+            cls.review = None
+        if place_id is None:
+            if cls.place_id is not None:
+                place_id = cls.place_id
+        if place_id is not None:
+            cls.DELETE(f"/users/{host_id}")
+            cls.ASSERT_CODE(204)
+            cls.place = None
+        if host_id is None:
+            if cls.host_id is not None:
+                host_id = cls.host_id
+        if host_id is not None:
+            cls.DELETE(f"/users/{host_id}")
+            cls.ASSERT_CODE(204)
+            cls.host_id = None
+        if city_id is None:
+            if cls.city_id is not None:
+                city_id = cls.city_id
+        if city_id is not None:
+            cls.DELETE(f"/cities/{city_id}")
+            cls.ASSERT_CODE(204)
+            cls.city_id = None
+        if amenity_ids is None:
+            if cls.amenity_ids is not None:
+                amenity_ids = cls.amenity_ids
+        if amenity_ids is not None:
+            for amenity_id in amenity_ids:
+                cls.DELETE(f"/amenities/{amenity_id}")
+                cls.ASSERT_CODE(204)
+            cls.amenity_ids = None
 
     @classmethod
     def customPUT(
@@ -96,28 +256,15 @@ class TestReviews(HTTPTestClass):
         dic: dict = {},
         expected_code: int = 200
     ) -> None:
-        cls.FROM(f"reviews/valid_review_{filenum}.json")
+        cls.FROM(f"reviews/review_{filenum}.json")
         for key in dic:
             cls.SET_VALUE(key, dic[key])
         cls.PUT("/reviews/" + id)
         cls.ASSERT_CODE(expected_code)
 
     @classmethod
-    def deleteAmenity(
-        cls,
-        id: str | None = None,
-        **kwargs
-    ) -> None:
-        if id is None:
-            if cls.review is not None:
-                id = cls.review.get("id")
-        if id is not None:
-            cls.DELETE(f"/reviews/{id}")
-            cls.review = None
-
-    @classmethod
     def Teardown(cls):
-        cls.deleteAmenity()
+        cls.deleteReview()
 
     # Auth as admin
 
@@ -301,7 +448,7 @@ class TestReviews(HTTPTestClass):
         amenity_1 = cls.createReview(1)
         amenity_2 = cls.createReview(2)
 
-        cls.FROM("reviews/valid_review_1.json")
+        cls.FROM("reviews/review_1.json")
         cls.PUT("/reviews/" + amenity_2["id"])
         if cls.last_response.status_code != 409:
             cls.deleteAmenity(**amenity_1)

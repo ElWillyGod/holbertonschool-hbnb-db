@@ -47,7 +47,7 @@ class TestSmoke(HTTPTestClass):
         except AssertionError as err:
             raise SmokeFailure(
                 f"{RED}API Smoke test failed: {RESET}" +
-                "Unexpected return code: " + err)
+                "Unexpected return code: " + cls.last_response.status_code)
 
     @classmethod
     def test_01_smoke_db(cls):
@@ -62,8 +62,33 @@ class TestSmoke(HTTPTestClass):
                 MAGENTA + "  - " + err.request.url + RESET)
         except AssertionError as err:
             raise SmokeFailure(
-                f"{RED}API Smoke test failed: " + WHITE +
-                "Unexpected return code: " + MAGENTA + err + RESET)
+                f"{RED}DB Smoke test failed: " + WHITE +
+                "Unexpected return code: " + MAGENTA +
+                str(cls.last_response.status_code) + RESET)
+
+    @classmethod
+    def test_01_smoke_db(cls):
+        try:
+            cls.GET("/users")
+            respones = cls.GET_RESPONSE_JSON()
+            for key in respones:
+                if key == "email":
+                    if respones[key] == "root@root.root":
+                        return
+            cls.FROM("admin.json")
+            cls.POST("/users")
+            if cls.last_response.status_code != 201:
+                raise AssertionError(str(cls.last_response.status_code))
+        except ConnectionError as err:
+            raise SmokeFailure(
+                f"{RED}Create admin test failed: " + WHITE +
+                "Could not connect to server\n" +
+                MAGENTA + "  - " + err.request.url + RESET)
+        except AssertionError as err:
+            raise SmokeFailure(
+                f"{RED}Create admin test failed: " + WHITE +
+                "Unexpected return code: " + MAGENTA +
+                str(cls.last_response.status_code) + RESET)
 
 
 def run(

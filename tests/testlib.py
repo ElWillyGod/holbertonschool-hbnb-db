@@ -505,10 +505,8 @@ class HTTPTestClass:
                     print(f"\t[{cls.last_response.request.method}]")
                     print(f"\t-{cls.last_response.request.url}")
                     print(f"\t-{cls.last_response.reason}")
-                    print(f"\n\t{RED}RESPONSE:{RESET}")
-                    print(f"{cls.last_response.text}")
-                    print(f"\n\t{RED}JSON:{RESET}")
-                    print(f"{cls.json}\n")
+                    print(f"\t{RED}RESPONSE:{RESET}")
+                    print(f"{cls.GET_RESPONSE_JSON()}")
                 cls.last_failed = True
                 cls.tests_failed += 1
             except KeyError as err:

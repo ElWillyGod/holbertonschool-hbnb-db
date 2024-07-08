@@ -54,7 +54,7 @@ class TestCities(HTTPTestClass):
             overrideNone: bool = False
     ) -> dict:
 
-        cls.FROM(f"cities/valid_city_{filenum}.json")
+        cls.FROM(f"cities/city_{filenum}.json")
 
         if dic is not None:
             for key in dic:
@@ -75,11 +75,11 @@ class TestCities(HTTPTestClass):
         if cls.last_response.status_code != 201:
             cls.ASSERT_CODE(201)
 
-        amenity = cls.json.copy()
-        amenity["id"] = cls.GET_RESPONSE_VALUE("id")
-        cls.city = amenity
+        city = cls.json.copy()
+        city["id"] = cls.GET_RESPONSE_VALUE("id")
+        cls.city = city
 
-        return amenity
+        return city
 
     @classmethod
     def customPUT(
@@ -89,7 +89,7 @@ class TestCities(HTTPTestClass):
         dic: dict = {},
         expected_code: int = 200
     ) -> None:
-        cls.FROM(f"cities/valid_city_{filenum}.json")
+        cls.FROM(f"cities/city_{filenum}.json")
         for key in dic:
             cls.SET_VALUE(key, dic[key])
         cls.PUT("/cities/" + id)
@@ -130,9 +130,9 @@ class TestCities(HTTPTestClass):
     # 2
     @classmethod
     def test_02_valid_POST_GET_DELETE(cls):
-        for i in range(1, 4):
-            amenity = cls.createCity(i)
-            cls.deleteCity(**amenity)
+        for i in range(1, 5):
+            city = cls.createCity(i)
+            cls.deleteCity(**city)
 
     # 3
     @classmethod
@@ -143,7 +143,7 @@ class TestCities(HTTPTestClass):
     # 4
     @classmethod
     def test_04_valid_name_PUT(cls):
-        for i in range(1, 4):
+        for i in range(1, 5):
             amenity = cls.createCity(i)
             cls.SET_VALUE("name", amenity["name"] + "UPDATED")
             cls.PUT("/cities/" + amenity["id"])
@@ -294,28 +294,21 @@ class TestCities(HTTPTestClass):
         amenity_1 = cls.createCity(1)
         amenity_2 = cls.createCity(2)
 
-        cls.FROM("cities/valid_city_1.json")
+        cls.FROM("cities/city_1.json")
         cls.PUT("/cities/" + amenity_2["id"])
         if cls.last_response.status_code != 409:
             cls.deleteCity(**amenity_1)
             cls.deleteCity(**amenity_2)
         cls.ASSERT_CODE(409)
 
+    # 19
     @classmethod
-    def test_20_empty_name_POST(cls):
-        cls.createCity(3, {"name": ""}, expectAtPOST=400)
-        cls.createCity(4, {"name": "    "}, expectAtPOST=400)
+    def test_19_invalid_country_code_POST(cls):
+        def testPOST(code):
+            cls.createCity(3, {"country_code": code}, expectAtPOST=400)
 
-    @classmethod
-    def test_21_empty_country_code_POST(cls):
-        cls.createCity(1, {"country_code": ""}, expectAtPOST=400)
-        cls.createCity(2, {"country_code": "    "}, expectAtPOST=400)
-
-    @classmethod
-    def test_22_invalid_country_code_POST(cls):
-        def testPOST(email):
-            cls.createCity(3, {"country_code": email}, expectAtPOST=400)
-
+        testPOST("")
+        testPOST("  ")
         testPOST("URU")
         testPOST("U")
         testPOST("uy")
@@ -325,17 +318,21 @@ class TestCities(HTTPTestClass):
         testPOST("😀😀")
         testPOST("😀")
 
+    # 20
     @classmethod
-    def test_23_invalid_name_POST(cls):
+    def test_20_invalid_name_POST(cls):
         def testPOST(name):
             cls.createCity(4, {"name": name}, expectAtPOST=400)
 
+        testPOST("")
+        testPOST("  ")
         testPOST("Lechuga🥬")
         testPOST("777")
         testPOST("Mi\nColon\n")
 
+    # 21
     @classmethod
-    def test_24_null_args_POST(cls):
+    def test_21_null_args_POST(cls):
         cls.createCity(1, {"country_code": None},
                        expectAtPOST=400, overrideNone=True)
         cls.createCity(2, {"name": None},
@@ -346,9 +343,9 @@ class TestCities(HTTPTestClass):
 
     # Authentication and authorization
 
-    # 19
+    # 22
     @classmethod
-    def test_19_unauthorization(cls):
+    def test_22_unauthorization(cls):
         cls.CLEAN()
         cls.AUTH_FROM("user.json")
         cls.POST("/cities")
@@ -358,9 +355,9 @@ class TestCities(HTTPTestClass):
         cls.DELETE("/cities/" + uuid4().hex)
         cls.ASSERT_CODE(403)
 
-    # 20
+    # 23
     @classmethod
-    def test_20_unaunthentication(cls):
+    def test_23_unaunthentication(cls):
         cls.CLEAN()
         cls.POST("/cities")
         cls.ASSERT_CODE(401)
